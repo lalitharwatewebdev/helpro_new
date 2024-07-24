@@ -1,0 +1,51 @@
+{
+  "menu": [
+    {
+      "url": "admin/",
+      "name": "Dashboard",
+      "icon": "<i data-feather='home'></i>",
+      "slug": "admin.home.index"
+    },
+    {
+      "url": "admin/students",
+      "name": "Students",
+      "icon": "<span class='material-symbols-outlined'>close</span>",
+      "slug": "admin.students.index"
+    },
+    {
+      "url": "admin/subjects",
+      "name": "Subject",
+      "icon": "<i data-feather='home'></i>",
+      "slug": "admin.subjects.index"
+    },
+    {
+      "url": "admin/business-settings",
+      "name": "Business Settings",
+      "icon": "<span class='material-symbols-outlined'>settings</span>",
+      "slug": "admin.business-settings.index"
+    },
+    {
+      "navheader": "Managers Management",
+      "slug": ""
+    },
+    {
+      "name": "Public Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "",
+      "submenu": [
+        {
+          "url": "admin",
+          "name": "Active Users",
+          "icon": "eye",
+          "slug": "admin"
+        },
+        {
+          "url": "admin/users",
+          "name": "Inactive Users",
+          "icon": "circle",
+          "slug": "admin"
+        }
+      ]
+    }
+  ]
+}
