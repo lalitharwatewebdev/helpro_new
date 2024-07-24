@@ -7,6 +7,57 @@
       "slug": "admin.home.index"
     },
     {
+      "url": "admin/category",
+      "name": "Category",
+      "icon": "<span class='material-symbols-outlined'>close</span>",
+      "slug": "admin.category.index"
+    },
+    {
+      "name": "Slider Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "",
+      "submenu": [
+        {
+          "url": "admin/sliders?type=user",
+          "name": "User Slider",
+          "icon": "eye",
+          "slug": "admin.sliders.index"
+        },
+        {
+          "url": "admin/sliders?type=labour",
+          "name": "Labour Slider",
+          "icon": "circle",
+          "slug": "admin.sliders.index"
+        }
+      ]
+    },
+
+    {
+      "name": "Labour Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "",
+      "submenu": [
+        {
+          "url": "admin/labours?labour_status=pending",
+          "name": "Pending Labour",
+          "icon": "eye",
+          "slug": "admin.labours.index"
+        },
+        {
+          "url": "admin/labours?labour_status=accepted",
+          "name": "Accepted Labour",
+          "icon": "circle",
+          "slug": "admin.sliders.index"
+        },
+        {
+          "url": "admin/labours?labour_status=rejected",
+          "name": "Rejected Labour",
+          "icon": "circle",
+          "slug": "admin.sliders.index"
+        }
+      ]
+    },
+    {
       "url": "admin/students",
       "name": "Students",
       "icon": "<span class='material-symbols-outlined'>close</span>",
