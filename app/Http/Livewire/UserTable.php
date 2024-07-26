@@ -12,7 +12,7 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 use Illuminate\Http\Request;
 
 
-class LabourTable extends DataTableComponent
+class UserTable extends DataTableComponent
 {
 
     protected $model = User::class;
@@ -82,7 +82,7 @@ class LabourTable extends DataTableComponent
                     return $value;
                 }),
 
-            Column::make("Aadhaar Number", "aadhaar_number")
+            Column::make("Aadhaar ", "aadhaar_number")
                 ->format(function ($value) {
                     return $value;
                 }),
@@ -165,8 +165,7 @@ class LabourTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        $modal = User::query()->where("type", "labour")
-            ->where("labour_status", $this->labour_type);
+        $modal = User::query()->where("type", "user");
         return $modal;
     }
 

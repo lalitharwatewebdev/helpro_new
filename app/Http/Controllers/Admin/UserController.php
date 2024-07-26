@@ -11,11 +11,11 @@ class UserController extends Controller
 {
     public function index()
     {
-        return view("content.tables.labour");
+        return view("content.tables.users");
     }
     public function store(Request $request)
     {
-        
+
     }
     public function edit($id)
     {

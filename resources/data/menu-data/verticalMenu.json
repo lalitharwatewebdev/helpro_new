@@ -31,7 +31,12 @@
         }
       ]
     },
-
+    {
+      "url": "admin/users",
+      "name": "User Management",
+      "icon": "<i data-feather='home'></i>",
+      "slug": "admin.users.index"
+    },
     {
       "name": "Labour Management",
       "icon": "<i data-feather='user'></i>",
