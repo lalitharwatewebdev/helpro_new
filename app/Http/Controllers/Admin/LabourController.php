@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class LabourController extends Controller
@@ -14,7 +16,7 @@ class LabourController extends Controller
      */
     public function index()
     {
-        //
+        return view('content.tables.labour');
     }
 
     /**
@@ -24,7 +26,7 @@ class LabourController extends Controller
      */
     public function create()
     {
-        //
+        return view("content.tables.add-labour");
     }
 
     /**
@@ -35,8 +37,56 @@ class LabourController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // $request->validate([
+        //     "name" => "required",
+        //     "email" => "required|email",
+        //     "phone" => "required|max:10",
+        //     "aadhaar_number" => "required|max:12",
+        //     "aadhaar_card_front" => "required|mimes:png,jpeg,webp,jpg",
+        //     "aadhaar_card_back" => "required|mimes:png,jpeg,webp,jpg",
+        //     "pan_number" => "required",
+        //     "bank_name" => "required",
+        //     "IFSC_code" => "required",
+        //     "bank_address" => "required",
+        
+        // ]);
+
+        $data = new User();
+
+        $data->name = $request->name;
+        $data->phone = $request->phone;
+
+        if ($request->aadhar_card_front) {
+
+            $data->aadhaar_card_front = FileUploader::uploadFile($request->aadhar_front, "images/aadhar");
+        }
+
+        if ($request->aadhar_card_back) {
+
+            $data->aadhaar_card_back = FileUploader::uploadFile($request->aadhar_back, "images/aadhar");
+        }
+
+        if ($request->profile_pic) {
+
+            $data->profile_pic = FileUploader::uploadFile($request->profile_pic, "images/pic");
+        }
+
+        $data->pan_card_number = $request->pan_number;
+        $data->bank_name = $request->bank_name;
+        $data->IFSC_code = $request->IFSC_code;
+        $data->name = $request->name;
+        // $data->aadhar_card_front = $request->aadhar_card_front;
+        // $data->aadhar_card_back = $request->aadhar_card_back;
+
+        $data->branch_address = $request->bank_address;
+        $data->rate_per_day = 1;
+        $data->type = "labour";
+        $data->save();
+
+        return redirect("admin/labours?labour_status=pending");
     }
+
+
 
     /**
      * Display the specified resource.
@@ -80,6 +130,12 @@ class LabourController extends Controller
      */
     public function destroy($id)
     {
-        //
+        User::find($id)->delete();
+
+        return response([
+            'header' => 'Deleted!',
+            'message' => 'Slider deleted successfully',
+            'table' => 'slider-table',
+        ]);
     }
 }

@@ -20,19 +20,21 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array
      */
-    protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'password',
-        'phone',
-        'image',
-        'address',
-        'gender',
-        'firebase_uid',
-        'status',
-        'device_id',
-    ];
+    // protected $fillable = [
+    //     'first_name',
+    //     'last_name',
+    //     'email',
+    //     'password',
+    //     'phone',
+    //     'image',
+    //     'address',
+    //     'gender',
+    //     'firebase_uid',
+    //     'status',
+    //     'device_id',
+    // ];
+
+
 
     /**
      * The attributes that should be hidden for arrays.
@@ -70,4 +72,14 @@ class User extends Authenticatable implements MustVerifyEmail
     // {
     //     return $this->first_name . ' ' . $this->last_name;
     // }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
 }

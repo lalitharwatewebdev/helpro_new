@@ -44,7 +44,7 @@ class UserTable extends DataTableComponent
                 'exportSelected' => 'Export',
             ])
             ->setConfigurableAreas([
-                'toolbar-right-end' => 'content.rapasoft.add-button',
+                // 'toolbar-right-end' => 'content.rapasoft.add-button',
                 'toolbar-left-end' => [
                     'content.rapasoft.active-inactive',
                     [
@@ -67,41 +67,45 @@ class UserTable extends DataTableComponent
 
                 ->html(),
 
-            Column::make("Name", "name")
+            Column::make("Name","name")
+            ->format(function($value){
+                return $value;
+            }),
+
+            Column::make("Email", "email")
                 ->format(function ($value) {
                     return $value;
                 }),
 
-            Column::make("Phone", "phone")
+            Column::make("Mobile No", "phone")
                 ->format(function ($value) {
                     return $value;
                 }),
 
-            Column::make("Phone", "phone")
-                ->format(function ($value) {
+            Column::make("State", "state")
+                ->format(function ($value, $row, Column $column) {
+                    return $value;
+                })->html(),
+
+            Column::make("City", "city")
+                ->format(function ($value, $row) {
                     return $value;
                 }),
 
-            Column::make("Aadhaar ", "aadhaar_number")
-                ->format(function ($value) {
-                    return $value;
-                }),
+
             // ->collap(),
 
 
-            Column::make("aadhaar_card_back", "aadhaar_number")
-                ->format(function ($value) {
-                    return $value;
-                }),
+
 
 
             Column::make('Actions')
                 ->label(function ($row, Column $column) {
-                    $delete_route = route('admin.labours.destroy', $row->id);
+                
                     $edit_route = route('admin.labours.edit', $row->id);
                     $edit_callback = 'setValue';
                     $modal = '#edit-user-modal';
-                    return view('content.table-component.action', compact('edit_route', 'delete_route', 'edit_callback', 'modal'));
+                    return view('content.table-component.action', compact('edit_route',  'edit_callback', 'modal'));
                 }),
             Column::make('status')
                 ->format(function ($value, $data, Column $column) {
@@ -166,6 +170,7 @@ class UserTable extends DataTableComponent
     public function builder(): Builder
     {
         $modal = User::query()->where("type", "user");
+        $modal->with(["state", "city"]);
         return $modal;
     }
 

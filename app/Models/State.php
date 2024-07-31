@@ -15,11 +15,13 @@ class State extends Model
         return $query->where('status', 'active');
     }
 
-    public function scopeIndia($query){
-        return $query->where("country_id","101");
+    public function scopeIndia($query)
+    {
+        return $query->where("country_id", "101");
     }
 
-    public function user(){
-        return $this->hasMany(User::class);
+    public function user()
+    {
+        return $this->hasOne(User::class);
     }
 }

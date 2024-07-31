@@ -15,7 +15,8 @@ class City extends Model
         return $query->where('status', 'active');
     }
 
-    public function user(){
-        return $this->hasMany(User::class);
+    public function user()
+    {
+        return $this->hasOne(User::class);
     }
 }

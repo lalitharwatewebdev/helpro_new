@@ -28,12 +28,18 @@
 
 
 <x-side-modal title="Add Slider" id="add-blade-modal">
-    <x-form id="add-slider" method="POST" class="" :route="route('admin.sliders.store')">
+    <x-form id="add-slider" method="POST" class="" :route="route('admin.labours.store')">
         <div class="col-md-12 col-12 ">
-            <x-input name="title" />
-            <x-input-file name="image" />
-            <x-input name="link"/>
-            <x-input name="app_type"/>
+            <x-input name="name" />
+            <x-input name="phone" />
+            <x-input name="pan"/>
+            <x-input name="bank_name"/>
+            <x-input name="add"/>
+            <x-input name="ifsc_code"/>
+            <x-input name="rate"/>
+            <x-input-file name="profile_pic"/>
+            <x-input-file name="addhar_Card_front"/>
+            <x-input-file name="addhar_Card_back"/>
         </div>
     </x-form>
 </x-side-modal>
@@ -53,7 +59,8 @@
     $(document).ready(function() {
         $(document).on('click', '[data-show]', function() {
             const modal = $(this).data('show');
-            $(`#${modal}`).modal('show');
+            // $(`#${modal}`).modal('show');
+            window.location.href = "{{route("admin.labours.add")}}"
         });
     });
 

@@ -21,45 +21,153 @@
 @endsection
 
 @section('content')
-
+    <section class="row">
+        <div class="col-lg-6">
+            <div class="card" id="chart">
+                
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card" id="labour">
+                
+            </div>
+        </div>
+    </section>
     <section id="dashboard-card">
         <div class="row match-height">
-            <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-4 col-sm-6 col-12">
+            <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
                 <div class="card cursor-pointer">
                     <div class="card-header">
                         <div>
-                            <h2 class="font-weight-bolder mb-0">{{ $user_count ?? 0 }}</h2>
+                            <h2 class="font-weight-bolder mb-0">{{ $users ?? 0 }}</h2>
                             <h6 class="card-text">Total Users</h6>
                         </div>
                         <div class="avatar bg-light-primary p-50 m-0">
                             <div class="avatar-content">
-                                <i data-feather='truck'></i>
+                                <span class="material-symbols-outlined">
+                                    account_circle
+                                    </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div onclick="location.href='{{ route('admin.home.index') }}?table[filters][status]=active&table[filters][approval_status]='"
-                class="col-lg-4 col-sm-6 col-12">
+                class="col-lg-3 col-sm-6 col-12">
                 <div class="card cursor-pointer">
                     <div class="card-header">
                         <div>
-                            <h2 class="font-weight-bolder mb-0">{{ $product_count ?? 0 }}</h2>
-                            <h6 class="card-text">Total Products</h6>
+                            <h2 class="font-weight-bolder mb-0">{{ $labours ?? 0 }}</h2>
+                            <h6 class="card-text">Total Labours</h6>
                         </div>
                         <div class="avatar bg-light-primary p-50 m-0">
                             <div class="avatar-content">
-                                <i data-feather='cpu'></i>
+                                <span class="material-symbols-outlined">
+                                    diversity_3
+                                    </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div onclick="location.href='{{ route('admin.home.index') }}?table[filters][status]=active&table[filters][approval_status]='"
+            class="col-lg-3 col-sm-6 col-12">
+            <div class="card cursor-pointer">
+                <div class="card-header">
+                    <div>
+                        <h2 class="font-weight-bolder mb-0">{{ $user_slider ?? 0 }}</h2>
+                        <h6 class="card-text">Total User Slider</h6>
+                    </div>
+                    <div class="avatar bg-light-primary p-50 m-0">
+                        <div class="avatar-content">
+                            <span class="material-symbols-outlined">
+                                filter_frames
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+            <div class="card cursor-pointer">
+                <div class="card-header">
+                    <div>
+                        <h2 class="font-weight-bolder mb-0">{{ $labour_slider ?? 0 }}</h2>
+                        <h6 class="card-text">Total Labour Slider</h6>
+                    </div>
+                    <div class="avatar bg-light-primary p-50 m-0">
+                        <div class="avatar-content">
+                            <span class="material-symbols-outlined">
+                                filter_frames
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+            <div class="card cursor-pointer">
+                <div class="card-header">
+                    <div>
+                        <h2 class="font-weight-bolder mb-0">{{ $total_categories ?? 0 }}</h2>
+                        <h6 class="card-text">Total Categories</h6>
+                    </div>
+                    <div class="avatar bg-light-primary p-50 m-0">
+                        <div class="avatar-content">
+                            <span class="material-symbols-outlined">
+                                category
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         </div>
     </section>
 @endsection
 
 @section('page-script')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+    var options = {
+  chart: {
+    type: 'area'
+  },
+  series: [{
+    name: 'sales',
+    data: @json($user_count)
+  }],
+  xaxis: {
+    categories: @json($user_date)
+  }
+}
+
+var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+chart.render();
+</script>
+
+<script>
+    var labour = {
+  chart: {
+    type: 'area'
+  },
+  series: [{
+    name: 'sales',
+    data: @json($labour_count)
+  }],
+  xaxis: {
+    categories: @json($labour_date)
+  }
+}
+
+var chart = new ApexCharts(document.querySelector("#labour"), labour);
+
+chart.render();
+</script>
+
     {{-- english to hindi translation API integration --}}
     {{-- <script>
         $(function() {

@@ -98,6 +98,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         ->controller(LabourController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('blocked', 'index')->name('blocked');
+            Route::get("add","create")->name("add");
             Route::get('destroy', 'destroy')->name('destroy');
             Route::post('store', 'store')->name('store');
             Route::get('{id}/edit', "edit")->name('edit');

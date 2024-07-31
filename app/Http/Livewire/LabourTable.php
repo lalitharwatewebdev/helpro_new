@@ -77,22 +77,32 @@ class LabourTable extends DataTableComponent
                     return $value;
                 }),
 
-            Column::make("Phone", "phone")
+            Column::make("Mobile No", "phone")
                 ->format(function ($value) {
                     return $value;
                 }),
 
-            Column::make("Aadhaar Number", "aadhaar_number")
+            Column::make("State", "state")
                 ->format(function ($value) {
                     return $value;
                 }),
-            // ->collap(),
 
-
-            Column::make("aadhaar_card_back", "aadhaar_number")
+            Column::make("City", "city")
                 ->format(function ($value) {
                     return $value;
                 }),
+
+            Column::make('profile_pic')
+                ->format(function ($row) {
+                    if ($row) {
+                        return '<img src="' . asset($row) . '" class="view-on-click  rounded-circle">';
+                    } else {
+                        return '<img src="' . asset('images/placeholder.jpg') . '" class="view-on-click  rounded-circle">';
+                    }
+                })
+                ->html(),
+
+        
 
 
             Column::make('Actions')
@@ -120,14 +130,14 @@ class LabourTable extends DataTableComponent
             // })
             // ->html(),
 
-            Column::make('Created at', 'created_at')
-                ->format(function ($value) {
-                    return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
+            // Column::make('Created at', 'created_at')
+            //     ->format(function ($value) {
+            //         return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
 
-                })
-                ->html()
-                ->collapseOnTablet()
-                ->sortable(),
+            //     })
+            //     ->html()
+            //     ->collapseOnTablet()
+            //     ->sortable(),
             // Column::make('Updated at', 'updated_at')
             //     ->format(function ($value) {
             //        return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';

@@ -33,7 +33,11 @@
             <x-input name="title" />
             <x-input-file name="image" />
             <x-input name="link"/>
-            <x-input name="app_type"/>
+            @php
+                $type = request()->query("type");
+            @endphp
+
+            <x-input name="app_type" value="{{$type}}" type="hidden"/>
         </div>
     </x-form>
 </x-side-modal>
