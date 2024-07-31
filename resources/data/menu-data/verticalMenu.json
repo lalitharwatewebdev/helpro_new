@@ -61,6 +61,11 @@
           "slug": "admin.sliders.index"
         }
       ]
+    },{
+      "url": "admin/subscriptions",
+      "name": "Subscription Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "admin.subscriptions.index"
     }
   ]
 }

@@ -9,10 +9,12 @@ use App\Http\Controllers\Admin\LabourController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Misc\SendReportController;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -96,6 +98,20 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::name('labours.')
         ->prefix('labours')
         ->controller(LabourController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('blocked', 'index')->name('blocked');
+            Route::get("add","create")->name("add");
+            Route::get('destroy', 'destroy')->name('destroy');
+            Route::post('store', 'store')->name('store');
+            Route::get('{id}/edit', "edit")->name('edit');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::post('update', 'update')->name('update');
+            Route::put('status', 'status')->name('status');
+        });
+
+        Route::name('subscriptions.')
+        ->prefix('subscriptions')
+        ->controller(SubscriptionController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('blocked', 'index')->name('blocked');
             Route::get("add","create")->name("add");
