@@ -123,6 +123,23 @@
                 </div>
             </div>
         </div>
+        <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+            <div class="card cursor-pointer">
+                <div class="card-header">
+                    <div>
+                        <h2 class="font-weight-bolder mb-0">{{ $subscriptions ?? 0 }}</h2>
+                        <h6 class="card-text">Total Subscriptions</h6>
+                    </div>
+                    <div class="avatar bg-light-primary p-50 m-0">
+                        <div class="avatar-content">
+                            <span class="material-symbols-outlined">
+                                category
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         </div>
     </section>
 @endsection

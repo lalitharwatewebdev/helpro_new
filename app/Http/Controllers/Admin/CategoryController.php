@@ -94,7 +94,26 @@ class CategoryController extends Controller
      */
     public function update(Request $request)
     {
-        
+        // $request->validate([
+        //     "title" => "required",
+        //     "image" => "required|file|mimes:png,jpg,jpeg,webp|max:2048",
+        // ]);
+
+        $data = Category::where("id",$request->id)->first();
+
+        $data->title = $request->title;
+      
+        if($request->hasFile("image")){
+            $data->image = FileUploader::uploadFile($request->file("image"),"images/category_images");
+        }
+
+        $data->save();
+
+        return response([
+            'header' => 'Success!',
+            'message' => 'Category Updated successfully',
+            'table' => 'category-table',
+        ]);
     }
 
     /**
@@ -111,6 +130,17 @@ class CategoryController extends Controller
             'header' => 'Deleted!',
             'message' => 'Category deleted successfully',
             'table' => 'category-table',
+        ]);
+    }
+
+    public function status(Request $request){
+      
+
+        Category::findOrFail($request->id)->update(['status' => $request->status]);
+
+        return response([
+            'message' => 'Subscription Status Updated Successfully',
+            'table' => 'student-table',
         ]);
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Slider;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
+use App\Models\Subscription;
 use DB;
 
 use App\Models\User;
@@ -47,9 +48,11 @@ class DashboardController extends Controller
         $user_slider = Slider::where("app_type", "user")->count();
         $labour_slider = Slider::where("app_type", "labour")->count();
 
+        $subscription = Subscription::count();
+
         $total_category = Category::count();
 
-        $data = compact("users", "labours", "user_slider", "labour_slider", "total_category","user_count","user_date","labour_count","labour_date");
+        $data = compact("users", "labours", "user_slider", "labour_slider", "total_category","user_count","user_date","labour_count","labour_date","subscription");
         return view('content.dashboard', $data);
     }
 

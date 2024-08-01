@@ -92,6 +92,11 @@ class LabourTable extends DataTableComponent
                     return $value;
                 }),
 
+                Column::make("Rate per Day", "rate_per_day")
+                ->format(function ($value) {
+                    return round($value);
+                }),
+
             Column::make('profile_pic')
                 ->format(function ($row) {
                     if ($row) {

@@ -18,61 +18,71 @@
     <section>
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
-                <form action="{{route("admin.labours.store")}}" method="POST" >
+                <form action="{{ route('admin.labours.store') }}" method="POST">
                     @csrf
-                <x-card>
-                    <x-divider text="Basic Details"/>
-                    <div class="row">
-                        <div class="col-lg-4  col-md-6">
-                            <x-input name="full_name"/>
+                    <x-card>
+                        <x-divider text="Basic Details" />
+                        <div class="row">
+                            <div class="col-lg-4  col-md-6">
+                                <x-input name="name" label="Full Name" />
+                            </div>
+                            <div class="col-lg-4  col-md-6">
+                                <x-input name="email" />
+                            </div>
+                            <div class="col-lg-4  col-md-6">
+                                <x-input name="phone" type="number" />
+                            </div>
+                            <div class="col-lg-4  col-md-6">
+                                <x-input-file name="profile_image" />
+                            </div>
+                            <div class="col-lg-4  col-md-6">
+                                <x-input name="rate_per_day" type="number" />
+                            </div>
+
+                            <div class="col-lg-4  col-md-6">
+                                <x-input name="rate_per_day" type="number" />
+                            </div>
                         </div>
-                        <div class="col-lg-4  col-md-6">
-                            <x-input name="email"/>
+                        <x-divider text="KYC Details" />
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="aadhaar_number" type="number" />
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <x-input-file name="aadhaar_card_front" />
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <x-input-file name="aadhaar_card_back" />
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <x-input-file name="pan_number" />
+                            </div>
                         </div>
-                        <div class="col-lg-4  col-md-6">
-                            <x-input name="phone" type="number"/>
+                        <x-divider text="Bank Details" />
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="bank_name" />
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="IFSC_code" />
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="bank_address" />
+                            </div>
+                            <div class="col-12 d-flex justify-content-center">
+
+                              
+                                    <button class="btn btn-primary">Submit</button>
+                                
+                            </div>
                         </div>
-                        <div class="col-lg-4  col-md-6">
-                            <x-input-file name="profile_image" type="number"/>
-                        </div>
-                    </div>
-                    <x-divider text="KYC Details" />
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6">
-                            <x-input name="aadhaar_number" type="number"/>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <x-input-file name="aadhaar_card_front"/>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <x-input-file name="aadhaar_card_back"/>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <x-input-file name="pan_number"/>
-                        </div>
-                    </div>
-                    <x-divider text="Bank Details"/>
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6">
-                            <x-input name="bank_name"/>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <x-input name="IFSC_code"/>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <x-input name="bank_address"/>
-                        </div>
-                        <div class="d-flex justify-content-center">
-                        <button class="btn btn-primary d-inline-block">Submit</button>
-                    </div>
-                    </div>
-                    <x-divider text="Order List/Booking"/>
-                </x-card>
-            </form>
+                        
+                    </x-card>
+                </form>
             </div>
         </div>
     </section>
-  
+
 @endsection
 @section('page-script')
     <script>

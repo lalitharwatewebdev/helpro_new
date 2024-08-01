@@ -36,7 +36,7 @@
     </x-form>
 </x-side-modal>
 <x-side-modal title="Update Category" id="edit-category-modal">
-    <x-form id="edit-category" method="POST" class="" :route="route('admin.category.update')">
+    <x-form id="edit-category-modal" method="POST" class="" :route="route('admin.category.update')">
         <div class="col-md-12 col-12 ">
             <x-input name="title" />
             <x-input-file name="image" />
@@ -63,7 +63,7 @@
     function setValue(data, modal) {
         $(`${modal} #id`).val(data.id);
         $(`${modal} #title`).val(data.title);
-        $(`${modal} #image`).val(data.image);
+        // $(`${modal} #image`).val(data.image);
     
         $(modal).modal('show');
     }

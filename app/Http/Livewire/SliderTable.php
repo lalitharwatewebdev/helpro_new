@@ -85,13 +85,13 @@ class SliderTable extends DataTableComponent
                 })
                 ->html(),
 
-            Column::make('Created at', 'created_at')
-                ->format(function ($value) {
-                    return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
-                })
-                ->html()
-                ->collapseOnTablet()
-                ->sortable(),
+            // Column::make('Created at', 'created_at')
+            //     ->format(function ($value) {
+            //         return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
+            //     })
+            //     ->html()
+            //     ->collapseOnTablet()
+            //     ->sortable(),
 
             Column::make('Actions')
                 ->label(function ($row, Column $column) {

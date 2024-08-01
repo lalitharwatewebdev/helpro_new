@@ -33,23 +33,24 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             "title" => "required",
-            "image" => "required|mimes:png,jpg,jpeg,webp|max:2000"
+            "amount" => "required|numeric",
+            "days" => "required|numeric"
         ]);
 
-        $data = new Category();
+        $data = new Subscription();
 
         $data->title = $request->title;
+        $data->amount = $request->amount;
+        $data->days  = $request->days;
         
-        if($request->hasFile("image")){
-            $data->image = FileUploader::uploadFile($request->file("image"),"images/category_images");
-        }
+     
 
         $data->save();
 
         return response([
             'header' => 'Added',
             'message' => 'Added successfully',
-            'table' => 'category-table',
+            'table' => 'subscription-table',
         ]);
 
 
@@ -66,6 +67,28 @@ class SubscriptionController extends Controller
         //
     }
 
+    public function update(Request $request){
+        $request->validate([
+            "title" => "required",
+            "amount" => "required|numeric",
+            "days" => "required|numeric"
+        ]);
+
+       
+
+        $data = Subscription::where("id",$request->id)->first();
+        $data->title = $request->title;
+        $data->amount = $request->amount;
+        $data->days = $request->days;
+
+        $data->save();
+        return response([
+            "message" => "Subscription Updated",
+            'table' => 'subscription-table',
+        ]);
+
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -74,9 +97,20 @@ class SubscriptionController extends Controller
      */
     public function edit($id)
     {
-        $name = new Category();
+        $name = new Subscription();
         $data = $name::where('id', $id)->first();
         return response($data);
+    }
+
+    public function status(Request $request){
+      
+
+        Subscription::findOrFail($request->id)->update(['status' => $request->status]);
+
+        return response([
+            'message' => 'Subscription Status Updated Successfully',
+            'table' => 'student-table',
+        ]);
     }
 
     /**
@@ -86,10 +120,7 @@ class SubscriptionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
-    {
-        
-    }
+   
 
     /**
      * Remove the specified resource from storage.
@@ -99,7 +130,7 @@ class SubscriptionController extends Controller
      */
     public function destroy($id)
     {
-        Category::findOrFail($id)->delete();
+        Subscription::findOrFail($id)->delete();
 
         return response([
             'header' => 'Deleted!',

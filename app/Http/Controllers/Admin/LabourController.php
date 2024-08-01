@@ -55,32 +55,30 @@ class LabourController extends Controller
 
         $data->name = $request->name;
         $data->phone = $request->phone;
+        $data->email = $request->email;
 
-        if ($request->aadhar_card_front) {
-
-            $data->aadhaar_card_front = FileUploader::uploadFile($request->aadhar_front, "images/aadhar");
+        if ($request->hasFile("aadhar_card_front")) {
+            $data->aadhaar_card_front = FileUploader::uploadFile($request->file("aadhar_card_front"), "images/aadhar");
         }
 
-        if ($request->aadhar_card_back) {
+        if ($request->hasFile("aadhar_card_back")) {
 
-            $data->aadhaar_card_back = FileUploader::uploadFile($request->aadhar_back, "images/aadhar");
+            $data->aadhaar_card_back = FileUploader::uploadFile($request->file("aadhar_card_back"), "images/aadhar");
         }
 
-        if ($request->profile_pic) {
+        if ($request->hasFile("profile_image")) {
 
-            $data->profile_pic = FileUploader::uploadFile($request->profile_pic, "images/pic");
+            $data->profile_pic = FileUploader::uploadFile($request->file("profile_image"), "images/profile_pic");
         }
 
         $data->pan_card_number = $request->pan_number;
         $data->bank_name = $request->bank_name;
         $data->IFSC_code = $request->IFSC_code;
         $data->name = $request->name;
-        // $data->aadhar_card_front = $request->aadhar_card_front;
-        // $data->aadhar_card_back = $request->aadhar_card_back;
+     
 
-        $data->branch_address = $request->bank_address;
-        $data->rate_per_day = 1;
-        $data->type = "labour";
+        $data->rate_per_day = $request->rate_per_day;
+        $data->type = "labour"; 
         $data->save();
 
         return redirect("admin/labours?labour_status=pending");
@@ -136,6 +134,21 @@ class LabourController extends Controller
             'header' => 'Deleted!',
             'message' => 'Slider deleted successfully',
             'table' => 'slider-table',
+        ]);
+    }
+
+    public function status(Request $request)
+    {
+        // $request->validate([
+        //     'id' => 'required|numeric|exists:students,id',
+        //     'status' => 'required|in:active,blocked',
+        // ]);
+
+        User::findOrFail($request->id)->update(['status' => $request->status]);
+
+        return response([
+            'message' => 'Labour status updated successfully',
+            'table' => 'labour-table',
         ]);
     }
 }

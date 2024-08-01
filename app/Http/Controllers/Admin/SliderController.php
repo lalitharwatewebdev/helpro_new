@@ -37,6 +37,7 @@ class SliderController extends Controller
      */
     public function store(Request $request)
     {
+        $app_type = $request->query("type");
         $request->validate([
             "title" => "required",
             "image" => "required|max:2000|mimes:png,jpg,jpeg,webp"
@@ -70,6 +71,21 @@ class SliderController extends Controller
         //
     }
 
+    public function status(Request $request)
+    {
+        // $request->validate([
+        //     'id' => 'required|numeric|exists:students,id',
+        //     'status' => 'required|in:active,blocked',
+        // ]);
+
+        Slider::findOrFail($request->id)->update(['status' => $request->status]);
+
+        return response([
+            'message' => 'Slider status updated successfully',
+            'table' => 'student-table',
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -78,7 +94,8 @@ class SliderController extends Controller
      */
     public function edit($id)
     {
-        //
+        $data = Slider::findOrFail($id);
+        return response($data);
     }
 
     /**
@@ -88,9 +105,24 @@ class SliderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $data = Slider::where("id",$request->id)->first();
+
+        $data->title = $request->title;
+        $data->link = $request->link;
+
+        if($request->hasFile("image ")){
+            $data->image = FileUploader::uploadFile($request->file("image"),"images/slider");
+        }
+
+        $data->save();
+
+        return response([
+            'header' => 'Success!',
+            'message' => 'Slider Updated successfully',
+            'table' => 'slider-table',
+        ]);
     }
 
     /**

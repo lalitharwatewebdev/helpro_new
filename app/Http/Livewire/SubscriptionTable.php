@@ -104,14 +104,14 @@ class SubscriptionTable extends DataTableComponent
                 // })
                 // ->html(),
 
-                Column::make('Created at', 'created_at')
-                ->format(function ($value) {
-                    return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
+                // Column::make('Created at', 'created_at')
+                // ->format(function ($value) {
+                //     return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
 
-                })
-                ->html()
-                ->collapseOnTablet()
-                ->sortable(),
+                // })
+                // ->html()
+                // ->collapseOnTablet()
+                // ->sortable(),
             // Column::make('Updated at', 'updated_at')
             //     ->format(function ($value) {
             //        return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';

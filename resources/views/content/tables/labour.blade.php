@@ -27,7 +27,7 @@
 </section>
 
 
-<x-side-modal title="Add Slider" id="add-blade-modal">
+<x-side-modal title="Add Labour" id="add-blade-modal">
     <x-form id="add-slider" method="POST" class="" :route="route('admin.labours.store')">
         <div class="col-md-12 col-12 ">
             <x-input name="name" />

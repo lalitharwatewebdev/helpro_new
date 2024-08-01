@@ -42,10 +42,11 @@
     </x-form>
 </x-side-modal>
 <x-side-modal title="Update Slider" id="edit-slider-modal">
-    <x-form id="edit-Slider" method="POST" class="" :route="route('admin.sliders.update')">
+    <x-form id="edit-slider-modal" method="POST" class="" :route="route('admin.sliders.update')">
         <div class="col-md-12 col-12 ">
             <x-input name="title" />
             <x-input-file name="image" />
+            <x-input name="link"/>
             <x-input name="id" type="hidden"/>
         </div>
 
@@ -69,7 +70,7 @@
     function setValue(data, modal) {
         $(`${modal} #id`).val(data.id);
         $(`${modal} #title`).val(data.title);
-        $(`${modal} #image`).val(data.image);
+        $(`${modal} #link`).val(data.link);
     
         $(modal).modal('show');
     }
