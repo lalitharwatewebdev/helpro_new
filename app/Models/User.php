@@ -15,25 +15,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use \Znck\Eloquent\Traits\BelongsToThrough;
 
     protected $guarded = [];
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    // protected $fillable = [
-    //     'first_name',
-    //     'last_name',
-    //     'email',
-    //     'password',
-    //     'phone',
-    //     'image',
-    //     'address',
-    //     'gender',
-    //     'firebase_uid',
-    //     'status',
-    //     'device_id',
-    // ];
-
+    
 
 
     /**

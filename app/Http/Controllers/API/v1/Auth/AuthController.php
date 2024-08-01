@@ -48,6 +48,63 @@ class AuthController extends Controller
         return response($response, 201);
     }
 
+    public function OtpLogin(Request $request){
+
+        $request->validate([
+            // "phone" => "required|numeric",
+            "device_id" => "required"
+        ]);
+
+        $type = "old";
+
+          $auth = app('firebase.auth');
+        try {
+            $verifiedIdToken = $auth->verifyIdToken($request->token);
+        } catch (FailedToVerifyToken $e) {
+            return response()->json([
+                'message' => 'The token is invalid: ' . $e->getMessage(),
+            ], 401);
+        }
+        $uid = $verifiedIdToken->claims()->get('sub');
+        $firebase_user = $auth->getUser($uid);
+        $phone = substr($firebase_user->phoneNumber, 3);
+        $user = User::where('phone', $request->phone)->first();
+        if(!empty($user)){
+            if($user->name == null){
+                $type = "new";
+            }
+            $token = $user->createToken("user")->plainTextToken;
+            $user->update([
+                "device_id" => $request->device_id
+            ]);
+
+            return response([
+                "data" => $user,
+                "token" => $token,
+                "type" => $type,
+                "status" => true
+            ],200);
+        }
+        else{
+            $data = User::create([
+                "phone" => $request->phone,
+                "device_id" => $request->device_id,
+                "type" => $request->type
+            ]);
+            $token = $data->createToken("user")->plainTextToken;
+
+            return response([
+                "data" => $data,
+                "token" => $token,
+                "type" => "new",
+                "status" => true
+            ],200);
+        }
+
+        
+
+    }
+
     public function loginOne(Request $request)
     {
         // return $request->all();
@@ -67,6 +124,14 @@ class AuthController extends Controller
             'token' => $user->createToken('user')->plainTextToken,
         ];
         return response($response, 200);
+    }
+
+    public function logOut(){
+        auth("sanctum")->user()->id->tokens()->delete();
+        return response([
+            "message" => "Logout Successfully",
+            "status" => true
+        ],200);
     }
 
     // public function login(Request $request)

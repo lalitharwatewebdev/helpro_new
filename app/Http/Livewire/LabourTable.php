@@ -72,11 +72,7 @@ class LabourTable extends DataTableComponent
                     return $value;
                 }),
 
-            Column::make("Phone", "phone")
-                ->format(function ($value) {
-                    return $value;
-                }),
-
+         
             Column::make("Mobile No", "phone")
                 ->format(function ($value) {
                     return $value;

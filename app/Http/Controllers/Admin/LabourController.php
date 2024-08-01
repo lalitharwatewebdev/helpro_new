@@ -53,7 +53,7 @@ class LabourController extends Controller
 
         $data = new User();
 
-        // dd($request->all());
+        
 
         if ($request->hasFile("aadhaar_card_front")) {
             $data->aadhaar_card_front = FileUploader::uploadFile($request->file("aadhaar_card_front"), "images/aadhar");
@@ -80,7 +80,6 @@ class LabourController extends Controller
         $data->rate_per_day = $request->rate_per_day;
         $data->type = "labour"; 
 
-         // dd($request->all());
         $data->save();
 
         return redirect("admin/labours?labour_status=pending");
@@ -107,7 +106,8 @@ class LabourController extends Controller
      */
     public function edit($id)
     {
-        //
+        $data = User::findOrFail($id);
+        return response($data);
     }
 
     /**
@@ -134,7 +134,7 @@ class LabourController extends Controller
 
         return response([
             'header' => 'Deleted!',
-            'message' => 'Slider deleted successfully',
+            'message' => 'Labour deleted successfully',
             'table' => 'slider-table',
         ]);
     }

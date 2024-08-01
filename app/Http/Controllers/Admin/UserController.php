@@ -19,13 +19,25 @@ class UserController extends Controller
     }
     public function edit($id)
     {
-        $data = User::findOrFail($id);
-        // dd($data);
+        $name = new User();
+        $data = $name::where('id', $id)->first();
         return response($data);
     }
 
     public function update(Request $request)
     {
+        $data = User::where("id",$request->id)->first();
+
+        $data->name = $request->name;
+        $data->email = $request->email;
+        $data->phone = $request->mobile_no;
+
+        $data->save();
+
+        return response([
+            'message' => 'user updated successfully',
+            'table' => 'users-table',
+        ]);
     }
 
     public function status(Request $request)
