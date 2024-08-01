@@ -38,8 +38,8 @@
             <x-input name="ifsc_code"/>
             <x-input name="rate"/>
             <x-input-file name="profile_pic"/>
-            <x-input-file name="addhar_Card_front"/>
-            <x-input-file name="addhar_Card_back"/>
+            <x-input-file name="addhar_card_front"/>
+            <x-input-file name="addhar_card_back"/>
         </div>
     </x-form>
 </x-side-modal>

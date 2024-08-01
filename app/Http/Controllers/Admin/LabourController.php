@@ -53,32 +53,34 @@ class LabourController extends Controller
 
         $data = new User();
 
-        $data->name = $request->name;
-        $data->phone = $request->phone;
-        $data->email = $request->email;
+        // dd($request->all());
 
-        if ($request->hasFile("aadhar_card_front")) {
-            $data->aadhaar_card_front = FileUploader::uploadFile($request->file("aadhar_card_front"), "images/aadhar");
+        if ($request->hasFile("aadhaar_card_front")) {
+            $data->aadhaar_card_front = FileUploader::uploadFile($request->file("aadhaar_card_front"), "images/aadhar");
         }
 
-        if ($request->hasFile("aadhar_card_back")) {
-
-            $data->aadhaar_card_back = FileUploader::uploadFile($request->file("aadhar_card_back"), "images/aadhar");
+        if ($request->hasFile("aadhaar_card_back")) {
+            $data->aadhaar_card_back = FileUploader::uploadFile($request->file("aadhaar_card_back"), "images/aadhar");
         }
 
         if ($request->hasFile("profile_image")) {
-
             $data->profile_pic = FileUploader::uploadFile($request->file("profile_image"), "images/profile_pic");
         }
 
+        $data->phone = $request->phone;
+        $data->email = $request->email;
         $data->pan_card_number = $request->pan_number;
         $data->bank_name = $request->bank_name;
         $data->IFSC_code = $request->IFSC_code;
         $data->name = $request->name;
+        $data->aadhaar_number = $request->aadhaar_number;
+        $data->branch_address = $request->bank_address;
      
 
         $data->rate_per_day = $request->rate_per_day;
         $data->type = "labour"; 
+
+         // dd($request->all());
         $data->save();
 
         return redirect("admin/labours?labour_status=pending");

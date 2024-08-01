@@ -112,7 +112,7 @@ class SliderController extends Controller
         $data->title = $request->title;
         $data->link = $request->link;
 
-        if($request->hasFile("image ")){
+        if($request->hasFile("image")){
             $data->image = FileUploader::uploadFile($request->file("image"),"images/slider");
         }
 

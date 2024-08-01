@@ -39,9 +39,7 @@
                                 <x-input name="rate_per_day" type="number" />
                             </div>
 
-                            <div class="col-lg-4  col-md-6">
-                                <x-input name="rate_per_day" type="number" />
-                            </div>
+
                         </div>
                         <x-divider text="KYC Details" />
                         <div class="row">
@@ -55,7 +53,7 @@
                                 <x-input-file name="aadhaar_card_back" />
                             </div>
                             <div class="col-lg-4 col-md-6">
-                                <x-input-file name="pan_number" />
+                                <x-input name="pan_number" />
                             </div>
                         </div>
                         <x-divider text="Bank Details" />
@@ -71,12 +69,12 @@
                             </div>
                             <div class="col-12 d-flex justify-content-center">
 
-                              
-                                    <button class="btn btn-primary">Submit</button>
-                                
+
+                                <button class="btn btn-primary">Submit</button>
+
                             </div>
                         </div>
-                        
+
                     </x-card>
                 </form>
             </div>
