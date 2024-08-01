@@ -57,11 +57,15 @@
                 <label for="contact_us">Contact Us</label>
                 <x-editor name="contact_us" />
             </div>
-            <div class="col-md-6 mt-3">
+            <div class="col-md-4 mt-3">
                 <x-input value="{{ $data['privacy_policy'] ?? '' }}" name="privacy_policy" />
             </div>
-            <div class="col-md-6 mt-3">
+            <div class="col-md-4 mt-3">
                 <x-input value="{{ $data['terms_and_conditions'] ?? '' }}" name="terms_and_conditions" />
+            </div>
+
+            <div class="col-md-4 mt-3">
+                <x-input value="{{ $data['download_link'] ?? '' }}" name="download_link" label="App Download Link" />
             </div>
 
             <div class="col-md-12 mt-3">
