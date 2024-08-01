@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\Auth\AuthController;
 use App\Http\Controllers\API\v1\BannerController;
+use App\Http\Controllers\API\v1\BusinessSettingsController;
 use App\Http\Controllers\API\v1\CategoryController;
 use App\Http\Controllers\API\v1\UserController;
 
@@ -38,6 +39,12 @@ Route::prefix('v1')->group(function () {
         Route::controller(CategoryController::class)->prefix("category")->group(function(){
             Route::get("/","get");
         });
+
+        Route::controller(BusinessSettingsController::class)->prefix("business-settings")->group(function(){
+            Route::get("/","get");
+        });
+
+        // Route::controller(BusinessSettingsController::class)->prefix("")
     });
 
     // Route::controller(AuthController::class)->prefix('user')->group(function () {

@@ -55,13 +55,13 @@ class User extends Authenticatable implements MustVerifyEmail
     //     return $this->first_name . ' ' . $this->last_name;
     // }
 
-    public function state()
+    public function states()
     {
-        return $this->belongsTo(State::class);
+        return $this->belongsTo(State::class,"state");
     }
 
-    public function city()
+    public function cities()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(City::class,"city");
     }
 }

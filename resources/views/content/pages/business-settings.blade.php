@@ -17,10 +17,19 @@
     <x-card>
         <x-form id="add-ground" method="POST" :reset="0" class="" :route="route('admin.business-settings.store')">
             <div class="col-md-3">
-                <x-input value="{{ $data['key1'] ?? '' }}" name="key1" />
+                <x-input value="{{ $data['Android_Version'] ?? '' }}" name="Android Version" />
             </div>
-            <div class="col-md-3">
+            {{-- <div class="col-md-3">
                 <x-input value="{{ $data['key2'] ?? '' }}" name="key2" />
+            </div> --}}
+            <div class="col-md-3 my-auto">
+                <div class="custom-control custom-control-success custom-switch">
+                    <input value="0" type="hidden" name="maintenance_mode">
+                    <input value="1" name="maintenance_mode" type="checkbox"
+                        @if ($data['maintenance_mode'] ?? '' == 1) checked @endif class="custom-control-input"
+                        id="switch-force-update-android">
+                    <label class="custom-control-label" for="switch-force-update-android">Maintenance Mode</label>
+                </div>
             </div>
             <div class="col-md-3 my-auto">
                 <div class="custom-control custom-control-success custom-switch">
@@ -48,13 +57,15 @@
                 <label for="contact_us">Contact Us</label>
                 <x-editor name="contact_us" />
             </div>
-            <div class="col-md-12 mt-3">
-                <label for="privacy_policy">Privacy Policy</label>
-                <x-editor name="privacy_policy" />
+            <div class="col-md-6 mt-3">
+                <x-input value="{{ $data['privacy_policy'] ?? '' }}" name="privacy_policy" />
             </div>
+            <div class="col-md-6 mt-3">
+                <x-input value="{{ $data['terms_and_conditions'] ?? '' }}" name="terms_and_conditions" />
+            </div>
+
             <div class="col-md-12 mt-3">
-                <label for="terms_and_condition">Terms and Conditions</label>
-                <x-editor name="terms_and_condition" />
+                <x-input value="{{ $data['share_content'] ?? '' }}" name="share_content" type="textarea" />
             </div>
         </x-form>
     </x-card>
@@ -70,10 +81,11 @@
                 @if ($data['contact_us'] ?? '' != '')
                     `{!! $data['contact_us'] ?? '' !!}`
                 @endif
-            fullEditor_privacy_policy.root.innerHTML =
-                `{!! $data['privacy_policy'] ?? '' !!}`
+           
             fullEditor_terms_and_condition.root.innerHTML =
-                `{!! $data['terms_and_condition'] ?? '' !!}`
+                @if ($data['terms_and_condition'] ?? '' != '')
+                    `{!! $data['terms_and_condition'] ?? '' !!}`
+                @endif
         })
     </script>
 @endsection

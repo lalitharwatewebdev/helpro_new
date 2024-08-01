@@ -24,8 +24,14 @@ class UserController extends Controller
         // ]);
 
         $data = User::where("id",auth()->user()->id)->first();
+
+        if(empty($data)){
+            return response([
+                "message" => "user not found",
+                "status" => false
+            ],400);
+        }
         $data->name = $request->username;
-        $data->phone = $request->phone;
         $data->email = $request->email;
         $data->gender = $request->gender;
         $data->state = $request->state;
@@ -46,7 +52,7 @@ class UserController extends Controller
 
     public function profile(){
         $user_id = auth()->user()->id;
-        $data = User::where("id",$user_id)->first(); 
+        $data = User::with("states","cities")->where("id",$user_id)->first(); 
         return response([
             "data" => $data,
             "status" => true
@@ -62,8 +68,8 @@ class UserController extends Controller
 
     }
 
-    public function getCity(){
-        $city = City::where("country_id", "101")->get();
+    public function getCity(Request $request){
+        $city = City::where("country_id", "101")->where("state_id",$request->query("state_id"))->get();
         return response([
             "data" => $city,
             "status" => true

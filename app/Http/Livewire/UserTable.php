@@ -84,12 +84,12 @@ class UserTable extends DataTableComponent
 
             Column::make("State", "state")
                 ->format(function ($value, $row, Column $column) {
-                    return $value;
+                    return $row->states->name ?? "";
                 })->html(),
 
             Column::make("City", "city")
                 ->format(function ($value, $row) {
-                    return $value;
+                    return $row->cities->name ?? "";
                 }),
 
 
@@ -114,24 +114,24 @@ class UserTable extends DataTableComponent
                 }),
 
 
-            // Column::make('image')
-            // ->format(function ($row) {
-            //     if ($row) {
-            //         return '<img src="' . asset($row) . '" class="view-on-click  rounded-circle">';
-            //     } else {
-            //         return '<img src="' . asset('images/placeholder.jpg') . '" class="view-on-click  rounded-circle">';
-            //     }
-            // })
-            // ->html(),
+            Column::make('profile_pic')
+            ->format(function ($row) {
+                if ($row) {
+                    return '<img src="' . asset($row) . '" class="view-on-click  rounded-circle">';
+                } else {
+                    return '<img src="' . asset('images/placeholder.jpg') . '" class="view-on-click  rounded-circle">';
+                }
+            })
+            ->html(),
 
-            Column::make('Created at', 'created_at')
-                ->format(function ($value) {
-                    return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
+            // Column::make('Created at', 'created_at')
+            //     ->format(function ($value) {
+            //         return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
 
-                })
-                ->html()
-                ->collapseOnTablet()
-                ->sortable(),
+            //     })
+            //     ->html()
+            //     ->collapseOnTablet()
+            //     ->sortable(),
             // Column::make('Updated at', 'updated_at')
             //     ->format(function ($value) {
             //        return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
@@ -170,7 +170,7 @@ class UserTable extends DataTableComponent
     public function builder(): Builder
     {
         $modal = User::query()->where("type", "user");
-        $modal->with(["state", "city"]);
+        $modal->with("states", "cities");
         return $modal;
     }
 

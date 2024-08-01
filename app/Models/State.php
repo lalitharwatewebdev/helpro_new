@@ -20,8 +20,5 @@ class State extends Model
         return $query->where("country_id", "101");
     }
 
-    public function user()
-    {
-        return $this->hasOne(User::class);
-    }
+  
 }

@@ -66,6 +66,12 @@
       "name": "Subscription Management",
       "icon": "<i data-feather='user'></i>",
       "slug": "admin.subscriptions.index"
+    },
+    {
+      "url": "admin/business-settings",
+      "name": "Business Settings",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "admin.business-settings.index"
     }
   ]
 }
