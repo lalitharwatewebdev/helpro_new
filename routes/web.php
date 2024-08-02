@@ -107,6 +107,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::post('update', 'update')->name('update');
             Route::put('status', 'status')->name('status');
+            Route::get("get-city","getCity")->name("city");
         });
 
         Route::name('subscriptions.')

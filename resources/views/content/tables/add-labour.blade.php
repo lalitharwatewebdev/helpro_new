@@ -33,8 +33,27 @@
                                 <x-input name="phone" type="number" />
                             </div>
                             <div class="col-lg-4  col-md-6">
-                                <x-input-file name="profile_image" />
+                                <x-input-file name="profile_pic" />
                             </div>
+                            <div class="col-lg-4 col-md-6">
+                                <label for="">Select State</label>
+                                <select class="select2  form-control state-select " name="state">
+                                    <option value="" selected disabled>Select State</option>
+                                    @foreach ($states as $state)
+                                        <option class="option-state-selected" value="{{ $state->id }}">
+                                            {{ $state->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label for="">Select State</label>
+                                <select class="select2  form-control city-select" name="city">
+                                    <option value="" selected disabled>Select City</option>
+
+                                </select>
+                            </div>
+
                             <div class="col-lg-4  col-md-6">
                                 <x-input name="rate_per_day" type="number" />
                             </div>
@@ -46,12 +65,12 @@
                             <div class="col-lg-4 col-md-6">
                                 <x-input name="aadhaar_number" type="number" />
                             </div>
-                            <div class="col-lg-4 col-md-6">
+                            {{-- <div class="col-lg-4 col-md-6">
                                 <x-input-file name="aadhaar_card_front" />
                             </div>
                             <div class="col-lg-4 col-md-6">
                                 <x-input-file name="aadhaar_card_back" />
-                            </div>
+                            </div> --}}
                             <div class="col-lg-4 col-md-6">
                                 <x-input name="pan_number" />
                             </div>
@@ -105,5 +124,33 @@
             // $(modal + ' [name=gender][value=' + data.gender + ']').prop('checked', true).trigger('change');
             // $(modal).modal('show');
         }
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $(".state-select").on("change", function() {
+                let state_id = $(".state-select").val()
+
+                $.ajax({
+                    type: "GET",
+                    data: {
+                        state_id: state_id
+                    },
+                    url: '{{ route('admin.labours.city') }}',
+                    success: function(response) {
+
+                        $(".city-select").empty()
+
+                        $(".city-select").append(`<option value="" selected disabled>Select City</option>`)
+
+                        response.forEach((data) => {
+                            $(".city-select").append(`
+            <option value="${data.id}">${data.name}</option>
+        `);
+                        });
+                    }
+                })
+            })
+        })
     </script>
 @endsection

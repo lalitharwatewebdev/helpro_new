@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\State;
+use App\Models\City;
 use Illuminate\Http\Request;
 
 class LabourController extends Controller
@@ -26,7 +28,22 @@ class LabourController extends Controller
      */
     public function create()
     {
-        return view("content.tables.add-labour");
+        $states = State::india()->orderBy("name")->get();
+
+        $data = compact("states");
+
+
+        return view("content.tables.add-labour",$data);
+    }
+
+  
+
+    public function getCity(Request $request){
+        $state_id = $request->query("state_id");
+
+        $data = City::where("state_id",$state_id)->get();
+
+        return response($data);
     }
 
     /**
@@ -53,18 +70,20 @@ class LabourController extends Controller
 
         $data = new User();
 
+
         
 
-        if ($request->hasFile("aadhaar_card_front")) {
-            $data->aadhaar_card_front = FileUploader::uploadFile($request->file("aadhaar_card_front"), "images/aadhar");
-        }
+        // if ($request->hasFile("aadhaar_card_front")) {
+        //     $data->aadhaar_card_front = FileUploader::uploadFile($request->file("aadhaar_card_front"), "images/aadhar");
+        // }
 
-        if ($request->hasFile("aadhaar_card_back")) {
-            $data->aadhaar_card_back = FileUploader::uploadFile($request->file("aadhaar_card_back"), "images/aadhar");
-        }
+        // if ($request->hasFile("aadhaar_card_back")) {
+        //     $data->aadhaar_card_back = FileUploader::uploadFile($request->file("aadhaar_card_back"), "images/aadhar");
+        // }
 
-        if ($request->hasFile("profile_image")) {
-            $data->profile_pic = FileUploader::uploadFile($request->file("profile_image"), "images/profile_pic");
+        if($request->hasFile("profile_pic")) {
+            // dd($request->profile_pic);
+           $data->profile_pic = FileUploader::uploadFile($request->file("profile_pic"),"/images/profile_pic");
         }
 
         $data->phone = $request->phone;

@@ -6,11 +6,13 @@ use App\DataTables\UsersDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     public function index()
     {
+      
         return view("content.tables.users");
     }
     public function store(Request $request)
@@ -21,6 +23,7 @@ class UserController extends Controller
     {
         $name = new User();
         $data = $name::where('id', $id)->first();
+        
         return response($data);
     }
 
