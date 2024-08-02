@@ -79,13 +79,13 @@ class LabourTable extends DataTableComponent
                 }),
 
             Column::make("State", "state")
-                ->format(function ($value) {
-                    return $value;
+                ->format(function ($value,$row) {
+                    return $row->states->name ?? "";
                 }),
 
             Column::make("City", "city")
-                ->format(function ($value) {
-                    return $value;
+                ->format(function ($value,$row) {
+                    return $row->cities->name ?? "";
                 }),
 
                 Column::make("Rate per Day", "rate_per_day")
@@ -178,6 +178,7 @@ class LabourTable extends DataTableComponent
     {
         $modal = User::query()->where("type", "labour")
             ->where("labour_status", $this->labour_type);
+        $modal->with("states","cities");
         return $modal;
     }
 
