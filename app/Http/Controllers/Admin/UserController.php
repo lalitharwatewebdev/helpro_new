@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
       
+       
         return view("content.tables.users");
     }
     public function store(Request $request)

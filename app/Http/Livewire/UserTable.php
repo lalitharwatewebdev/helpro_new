@@ -17,11 +17,11 @@ class UserTable extends DataTableComponent
 
     protected $model = User::class;
     public $counter = 1;
-    public $labour_type;
+    public $type;
     public function mount(Request $request)
     {
         $this->dispatchBrowserEvent('table-refreshed');
-        $this->labour_type = $request->query("labour_status");
+       
     }
 
     public function configure(): void
@@ -169,7 +169,8 @@ class UserTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        $modal = User::query()->where("type", "user");
+        $modal = User::query()->where("type","user");
+        
         $modal->with("states", "cities");
         return $modal;
     }

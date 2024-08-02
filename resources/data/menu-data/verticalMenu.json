@@ -18,16 +18,16 @@
       "slug": "",
       "submenu": [
         {
-          "url": "admin/sliders?type=user",
+          "url": "admin/sliders/user",
           "name": "User Slider",
           "icon": "eye",
-          "slug": "admin.sliders.index"
+          "slug": "admin.sliders.user"
         },
         {
-          "url": "admin/sliders?type=labour",
+          "url": "admin/sliders/labour",
           "name": "Labour Slider",
           "icon": "circle",
-          "slug": "admin.sliders.index"
+          "slug": "admin.sliders.labour"
         }
       ]
     },
@@ -43,22 +43,22 @@
       "slug": "",
       "submenu": [
         {
-          "url": "admin/labours?labour_status=pending",
+          "url": "admin/labours/pending",
           "name": "Pending Labour",
           "icon": "eye",
-          "slug": "admin.labours.index"
+          "slug": "admin.labours.pending"
         },
         {
-          "url": "admin/labours?labour_status=accepted",
+          "url": "admin/labours/accepted",
           "name": "Accepted Labour",
           "icon": "circle",
-          "slug": "admin.sliders.index"
+          "slug": "admin.labours.accepted"
         },
         {
-          "url": "admin/labours?labour_status=rejected",
+          "url": "admin/labours/rejected",
           "name": "Rejected Labour",
           "icon": "circle",
-          "slug": "admin.sliders.index"
+          "slug": "admin.labours.rejected"
         }
       ]
     },{

@@ -19,10 +19,10 @@ class SliderTable extends DataTableComponent
     protected $model = Slider::class;
     public $counter = 1;
     public $type;
-    public function mount(Request $request)
+    public function mount(Request $request,$type)
     {
         $this->dispatchBrowserEvent('table-refreshed');
-        $this->type = $request->query("type");
+        $this->type = $type;
     }
 
     public function configure(): void

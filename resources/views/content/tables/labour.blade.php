@@ -20,7 +20,7 @@
     <div class="row match-height">
         <div class="col-lg-12 col-md-12 col-sm-12">
             <x-card>
-                <livewire:labour-table />
+                <livewire:labour-table type="{{$type}}" />
             </x-card>
         </div>
     </div>
@@ -70,9 +70,9 @@
     // })
 
     function setValue(data, modal) {
-        $(`${modal} #id`).val(data.id);
-        $(`${modal} #title`).val(data.title);
-        $(`${modal} #image`).val(data.image);
+        // $(`${modal} #id`).val(data.id);
+        // $(`${modal} #title`).val(data.title);
+        // $(`${modal} #image`).val(data.image);
     
         $(modal).modal('show');
     }

@@ -14,9 +14,13 @@ class SliderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view("content.tables.slider");
+
+        $url = request()->url();
+        $type = collect(explode('/', $url))->last();
+      
+        return view("content.tables.slider",compact("type"));
     }
 
     /**

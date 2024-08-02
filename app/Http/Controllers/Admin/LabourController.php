@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\User;
 use App\Models\State;
+use App\Models\LabourImage;
 use App\Models\City;
+use App\Models\Labour;
 use Illuminate\Http\Request;
 
 class LabourController extends Controller
@@ -16,9 +19,14 @@ class LabourController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('content.tables.labour');
+      
+        $url = request()->url();
+        $type = collect(explode('/', $url))->last();
+        
+        
+        return view('content.tables.labour',compact("type"));
     }
 
     /**
@@ -30,7 +38,9 @@ class LabourController extends Controller
     {
         $states = State::india()->orderBy("name")->get();
 
-        $data = compact("states");
+        $category_data = Category::active()->get();
+
+        $data = compact("states","category_data");
 
 
         return view("content.tables.add-labour",$data);
@@ -54,7 +64,7 @@ class LabourController extends Controller
      */
     public function store(Request $request)
     {
-        // $request->validate([
+        $request->validate([
         //     "name" => "required",
         //     "email" => "required|email",
         //     "phone" => "required|max:10",
@@ -65,43 +75,71 @@ class LabourController extends Controller
         //     "bank_name" => "required",
         //     "IFSC_code" => "required",
         //     "bank_address" => "required",
-        
-        // ]);
-
+        'profile_pic' => 'required|mimes:png,jpg,jpeg,webp,svg'
+        ]);
         $data = new User();
 
 
+        if($request->profile_pic) {
+           $data->profile_pic = FileUploader::uploadFile($request->profile_pic,"images/profile_pic");
+        }
+
+        if($request->aadhaar_card_front){
+            $data->aadhaar_card_front = FileUploader::uploadFile($request->aadhaar_card_front,"images/aadhaar_card");
+        }
+
+        if($request->aadhaar_card_back){
+            $data->aadhaar_card_back = FileUploader::uploadFile($request->aadhaar_card_back,"images/aadhaar_card");
+        }
+
+
+      
+
+        // foreach($request->labour_images as $image){
+        //     LabourImage::create([
+        //         "u
+        //     ])
+        // }
+
         
 
-        // if ($request->hasFile("aadhaar_card_front")) {
-        //     $data->aadhaar_card_front = FileUploader::uploadFile($request->file("aadhaar_card_front"), "images/aadhar");
-        // }
 
-        // if ($request->hasFile("aadhaar_card_back")) {
-        //     $data->aadhaar_card_back = FileUploader::uploadFile($request->file("aadhaar_card_back"), "images/aadhar");
-        // }
-
-        if($request->hasFile("profile_pic")) {
-            // dd($request->profile_pic);
-           $data->profile_pic = FileUploader::uploadFile($request->file("profile_pic"),"/images/profile_pic");
-        }
 
         $data->phone = $request->phone;
         $data->email = $request->email;
         $data->pan_card_number = $request->pan_number;
         $data->bank_name = $request->bank_name;
         $data->IFSC_code = $request->IFSC_code;
+        $data->address = $request->address;
         $data->name = $request->name;
+        $data->state = $request->state;
+        $data->start_time = $request->start_time;
+        $data->end_time = $request->end_time;
+        $data->city = $request->city;
         $data->aadhaar_number = $request->aadhaar_number;
         $data->branch_address = $request->bank_address;
+        $data->gender = $request->gender;
      
 
         $data->rate_per_day = $request->rate_per_day;
         $data->type = "labour"; 
 
-        $data->save();
+    
 
-        return redirect("admin/labours?labour_status=pending");
+        $data->save();
+        
+        if($data){
+
+            foreach($request->labour_images as $images){
+                $labour_image = new LabourImage();
+                $labour_image->user_id = $data->id;
+                $labour_image->image = FileUploader::uploadFile($images, 'images/labour_images');
+
+                $labour_image->save();
+            }
+
+        }
+        return redirect("admin/labours/pending");
     }
 
 

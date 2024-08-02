@@ -18,7 +18,7 @@
     <section>
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
-                <form action="{{ route('admin.labours.store') }}" method="POST">
+                <x-form id="add-slider" method="POST" class="" :route="route('admin.labours.store')">
                     @csrf
                     <x-card>
                         <x-divider text="Basic Details" />
@@ -54,53 +54,106 @@
                                 </select>
                             </div>
 
+                            <div class="col-lg-4 col-md-6">
+                                <label for="">Select Gender</label>
+                                <select class="select2  form-control " name="gender">
+                                    <option value="" selected disabled>Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+
                             <div class="col-lg-4  col-md-6">
                                 <x-input name="rate_per_day" type="number" />
                             </div>
 
+                            <div class="col-lg-12 col-md-12">
+                                <x-input name="address" type="textarea" />
+                            </div>
+
 
                         </div>
-                        <x-divider text="KYC Details" />
+                        <x-divider text="Work Details" />
                         <div class="row">
                             <div class="col-lg-4 col-md-6">
-                                <x-input name="aadhaar_number" type="number" />
+                                <x-input type="time" class="start_time" name="start_time" />
                             </div>
-                            {{-- <div class="col-lg-4 col-md-6">
+
+                            <div class="col-lg-4 col-md-6">
+                                <x-input type="time" class="end_time" name="end_time" />
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <label for="">Labour Category</label>
+                                 <select class="select2 " name="category[]" multiple>
+                                    @foreach ($category_data as $data)
+                                        <option value="{{$data->id}}">{{$data->title}}</option>
+                                    @endforeach
+                                 </select>
+                            </div>
+
+
+
+                                <div class="col-lg-12 col-md-6">
+                                    <x-image-uploader name="labour_images" id="labour_images" />
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label for="">Preferred Shifts</label>
+                                    <select class="select2  form-control" name="shifts">
+                                      <option value="" disabled selected>Select Shift</option>
+                                      <option value="morning">Morning</option>
+                                      <option value="afternoon">Afternoon</option>
+                                      <option value="evening ">Evening</option>
+                                      <option value="night">Night</option>
+                                    </select>
+                                </div>
+
+
+
+                            </div>
+                            <x-divider text="KYC Details" />
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <x-input name="aadhaar_number" type="number" />
+                                </div>
+                                <div class="col-lg-4 col-md-6">
                                 <x-input-file name="aadhaar_card_front" />
                             </div>
                             <div class="col-lg-4 col-md-6">
                                 <x-input-file name="aadhaar_card_back" />
-                            </div> --}}
-                            <div class="col-lg-4 col-md-6">
-                                <x-input name="pan_number" />
                             </div>
-                        </div>
-                        <x-divider text="Bank Details" />
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6">
-                                <x-input name="bank_name" />
+                                <div class="col-lg-4 col-md-6">
+                                    <x-input name="pan_number" />
+                                </div>
                             </div>
-                            <div class="col-lg-4 col-md-6">
-                                <x-input name="IFSC_code" />
+                            <x-divider text="Bank Details" />
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <x-input name="bank_name" />
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <x-input name="IFSC_code" />
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <x-input name="bank_address" />
+                                </div>                                
                             </div>
-                            <div class="col-lg-4 col-md-6">
-                                <x-input name="bank_address" />
-                            </div>
-                            <div class="col-12 d-flex justify-content-center">
 
-
-                                <button class="btn btn-primary">Submit</button>
-
-                            </div>
-                        </div>
-
-                    </x-card>
-                </form>
+                        </x-card>
+                    </x-form>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-@endsection
+    @endsection
+    @pushonce('component-script')
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+        });
+    </script>
+@endpushonce
 @section('page-script')
     <script>
         $(document).ready(function() {
@@ -114,7 +167,7 @@
         });
 
         function setValue(data, modal) {
-            console.log(data);
+            // console.log(data);
             // $(modal + ' #id').val(data.id);
             // $(modal + ' #name').val(data.name);
             // $(modal + ' #phone').val(data.phone);
@@ -141,7 +194,8 @@
 
                         $(".city-select").empty()
 
-                        $(".city-select").append(`<option value="" selected disabled>Select City</option>`)
+                        $(".city-select").append(
+                            `<option value="" selected disabled>Select City</option>`)
 
                         response.forEach((data) => {
                             $(".city-select").append(`
@@ -152,5 +206,34 @@
                 })
             })
         })
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $(".start_time").on("change", function() {
+                let start_time = $(this).val();
+
+            });
+
+
+            $(".end_time").on("change", function() {
+                let end_time = $(this).val();
+            });
+
+
+
+
+
+
+
+        })
+    </script>
+
+    <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+
+    <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
+
+    <script>
+        $('.my-pond').filepond();
     </script>
 @endsection

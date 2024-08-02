@@ -6,13 +6,12 @@ use App\Http\Controllers\API\v1\Auth\AuthController;
 use App\Http\Controllers\API\v1\BannerController;
 use App\Http\Controllers\API\v1\BusinessSettingsController;
 use App\Http\Controllers\API\v1\CategoryController;
+use App\Http\Controllers\API\v1\LabourController;
 use App\Http\Controllers\API\v1\UserController;
 
 Route::prefix('v1')->group(function () {
 
-    Route::get('user', function(){
-        return "testing here and now";
-    });
+   
 
     Route::controller(AuthController::class)->prefix("user")->group(function(){
         Route::post("login","OtpLogin");
@@ -23,6 +22,11 @@ Route::prefix('v1')->group(function () {
         Route::get("get-state","getState");
         
     });
+
+    Route::controller(BusinessSettingsController::class)->prefix("business-settings")->group(function(){
+        Route::get("/","get");
+    });
+
 
 
     Route::group(['middleware' => "auth:sanctum"],function(){
@@ -40,10 +44,11 @@ Route::prefix('v1')->group(function () {
             Route::get("/","get");
         });
 
-        Route::controller(BusinessSettingsController::class)->prefix("business-settings")->group(function(){
+        Route::controller(LabourController::class)->prefix("labours")->group(function(){
             Route::get("/","get");
         });
 
+       
         // Route::controller(BusinessSettingsController::class)->prefix("")
     });
 

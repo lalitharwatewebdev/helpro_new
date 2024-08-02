@@ -17,11 +17,11 @@ class LabourTable extends DataTableComponent
 
     protected $model = User::class;
     public $counter = 1;
-    public $labour_type;
-    public function mount(Request $request)
+    public $type;
+    public function mount(Request $request,$type)
     {
         $this->dispatchBrowserEvent('table-refreshed');
-        $this->labour_type = $request->query("labour_status");
+        $this->type = $type;
     }
 
     public function configure(): void
@@ -177,7 +177,7 @@ class LabourTable extends DataTableComponent
     public function builder(): Builder
     {
         $modal = User::query()->where("type", "labour")
-            ->where("labour_status", $this->labour_type);
+            ->where("labour_status", $this->type);
         $modal->with("states","cities");
         return $modal;
     }

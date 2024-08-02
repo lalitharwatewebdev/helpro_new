@@ -85,7 +85,8 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::name('sliders.')
         ->prefix('sliders')
         ->controller(SliderController::class)->group(function () {
-            Route::get('/', 'index')->name('index');
+            Route::get('user', 'index')->name('user');
+             Route::get('labour', 'index')->name('labour');
             Route::get('blocked', 'index')->name('blocked');
             Route::get('destroy', 'destroy')->name('destroy');
             Route::post('store', 'store')->name('store');
@@ -98,7 +99,9 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::name('labours.')
         ->prefix('labours')
         ->controller(LabourController::class)->group(function () {
-            Route::get('/', 'index')->name('index');
+            Route::get('pending', 'index')->name('pending');
+            Route::get("accepted","index")->name("accepted");
+            Route::get("rejected","index")->name("rejected");
             Route::get('blocked', 'index')->name('blocked');
             Route::get("add","create")->name("add");
             Route::get('destroy', 'destroy')->name('destroy');

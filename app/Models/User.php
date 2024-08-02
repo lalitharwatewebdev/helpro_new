@@ -64,4 +64,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(City::class,"city");
     }
+
+    public function labourImage(){
+        return $this->hasMany(LabourImage::class,"user_id");
+    }
 }
