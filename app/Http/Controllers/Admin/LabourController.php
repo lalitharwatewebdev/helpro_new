@@ -93,18 +93,6 @@ class LabourController extends Controller
         }
 
 
-      
-
-        // foreach($request->labour_images as $image){
-        //     LabourImage::create([
-        //         "u
-        //     ])
-        // }
-
-        
-
-
-
         $data->phone = $request->phone;
         $data->email = $request->email;
         $data->pan_card_number = $request->pan_number;
@@ -136,7 +124,13 @@ class LabourController extends Controller
                 $labour_image->image = FileUploader::uploadFile($images, 'images/labour_images');
 
                 $labour_image->save();
+
+                $user_data = User::find($data->id);
+
+                $user_data->category()->attach($request->category);
             }
+
+
 
         }
         return redirect("admin/labours/pending");

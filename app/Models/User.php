@@ -68,4 +68,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function labourImage(){
         return $this->hasMany(LabourImage::class,"user_id");
     }
+
+    public function category(){
+        return $this->belongsToMany(Category::class);
+    }
 }

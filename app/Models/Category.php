@@ -14,4 +14,8 @@ class Category extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function user(){
+        return $this->belongsToMany(User::class);
+    }
 }
