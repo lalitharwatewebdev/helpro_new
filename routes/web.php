@@ -135,6 +135,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         ->prefix('users')
         ->controller(UserController::class)->group(function () {
             Route::get('/', 'index')->name('index');
+            Route::get("details","details")->name("details");
             Route::get('blocked', 'index')->name('blocked');
             Route::get('deleted', 'index')->name('deleted');
             Route::post('store', 'store')->name('store');

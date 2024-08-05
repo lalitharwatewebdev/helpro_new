@@ -68,4 +68,11 @@ class UserController extends Controller
             'table' => 'users-table',
         ]);
     }
+
+
+    public function details(Request $request){
+        $data = User::with("states","cities")->find($request->query("id"));
+
+        return view("content.tables.details-users",compact("data"));
+    }
 }

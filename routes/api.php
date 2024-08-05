@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\API\v1\AddressController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\Auth\AuthController;
 use App\Http\Controllers\API\v1\BannerController;
@@ -60,6 +60,11 @@ Route::prefix('v1')->group(function () {
 
         Route::controller(CheckoutController::class)->prefix("checkouts")->group(function(){
             Route::post("store","store");
+        });
+
+        Route::controller(AddressController::class)->prefix("addresses")->group(function(){
+            Route::post("store","store");
+            Route::get("/","get");
         });
 
 
