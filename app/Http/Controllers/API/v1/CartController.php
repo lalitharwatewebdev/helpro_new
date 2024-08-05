@@ -21,21 +21,33 @@ class CartController extends Controller
 
     public function add(Request $request){
         $id = auth()->user()->id;
+
+        
         $labour_id = $request->labour_id;
+
+
 
         $user = User::find($id);
 
-        $user->labourAttach()->attach($labour_id);
+        $check_labour_status = Cart::where("user_id",$id)->where("labour_id",$labour_id)->exists();
 
+        if($check_labour_status){
+            return response([
+                "message" => "Labour Already Added",
+                "status" => true
+            ],200);       
+
+        }
+
+
+        $user->labourAttach()->attach($labour_id);
+    
         return response([
             "user" => $user,
             "message" => "Labour Added Successfully",
             "status" => true
         ],200);
-
-
-
-        
+         
     }  
     
     public function delete(Request $request){
