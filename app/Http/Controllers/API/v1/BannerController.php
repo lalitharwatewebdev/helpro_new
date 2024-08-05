@@ -16,4 +16,13 @@ class BannerController extends Controller
             "status" => true
         ],200);
     }
+
+    public function getLabourSlider(){
+        $data = Slider::active()->where("app_type","labour")->get();
+
+        return response([
+            "data" => $data,
+            "status" => true
+        ],200);
+    }
 }

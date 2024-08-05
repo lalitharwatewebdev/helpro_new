@@ -62,6 +62,13 @@ Route::prefix('v1')->group(function () {
             Route::post("store","store");
         });
 
+
+        Route::prefix("labours")->group(function(){
+            Route::controller(BannerController::class)->prefix("banners")->group(function(){
+                Route::get("/","getLabourSlider");
+            });
+        });
+
         
 
         
