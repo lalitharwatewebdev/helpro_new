@@ -51,11 +51,13 @@ class CartController extends Controller
     }  
     
     public function delete(Request $request){
-        $id = auth()->user()->id;
+        // $id = auth()->user()->id;
 
-        $user = User::find($id);
+        // $user = User::find($id);
 
-        $user->labourAttach()->detach($request->labour_id);
+        // $user->labourAttach()->detach($request->labour_id);
+
+        Cart::where("id",$request->cart_id)->delete();
 
         return response([
             "message" => "Labour Removed Successfully",
