@@ -52,7 +52,11 @@ Route::prefix('v1')->group(function () {
 
         Route::controller(CartController::class)->prefix("carts")->group(function(){
             Route::get("/","get");
+            Route::post("store","add");
+            Route::post("delete","delete");
         });
+
+        
 
        
         // Route::controller(BusinessSettingsController::class)->prefix("")

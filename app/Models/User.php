@@ -72,4 +72,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function category(){
         return $this->belongsToMany(Category::class);
     }
+
+    public function labourAttach(){
+        return $this->belongsToMany(Labour::class,"carts","user_id","labour_id");
+    }
 }
