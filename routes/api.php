@@ -7,9 +7,11 @@ use App\Http\Controllers\API\v1\BannerController;
 use App\Http\Controllers\API\v1\BusinessSettingsController;
 use App\Http\Controllers\API\v1\CartController;
 use App\Http\Controllers\API\v1\CategoryController;
+use App\Http\Controllers\API\v1\CheckoutController;
 use App\Http\Controllers\API\v1\LabourController;
 use App\Http\Controllers\API\v1\UserController;
 use App\Models\Cart;
+use App\Models\Checkout;
 
 Route::prefix('v1')->group(function () {
 
@@ -54,6 +56,10 @@ Route::prefix('v1')->group(function () {
             Route::get("/","get");
             Route::post("store","add");
             Route::post("delete","delete");
+        });
+
+        Route::controller(CheckoutController::class)->prefix("checkouts")->group(function(){
+            Route::post("store","store");
         });
 
         
