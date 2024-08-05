@@ -186,7 +186,7 @@
 
                 $.ajax({
                     type: "GET",
-                    data: {
+                    data: {papi
                         state_id: state_id
                     },
                     url: '{{ route('admin.labours.city') }}',

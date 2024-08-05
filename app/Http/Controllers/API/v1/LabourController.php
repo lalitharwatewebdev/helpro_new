@@ -14,6 +14,8 @@ class LabourController extends Controller
         $data = User::with(["states:id,name","cities:id,name"])->active()->where("labour_status","pending")
         ->where("type","labour")->get();
 
+        
+
         return response([
             "data" => $data,
             "status" => true
