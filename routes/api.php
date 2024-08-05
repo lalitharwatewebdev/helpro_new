@@ -5,9 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\Auth\AuthController;
 use App\Http\Controllers\API\v1\BannerController;
 use App\Http\Controllers\API\v1\BusinessSettingsController;
+use App\Http\Controllers\API\v1\CartController;
 use App\Http\Controllers\API\v1\CategoryController;
 use App\Http\Controllers\API\v1\LabourController;
 use App\Http\Controllers\API\v1\UserController;
+use App\Models\Cart;
 
 Route::prefix('v1')->group(function () {
 
@@ -45,6 +47,10 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::controller(LabourController::class)->prefix("labours")->group(function(){
+            Route::get("/","get");
+        });
+
+        Route::controller(CartController::class)->prefix("carts")->group(function(){
             Route::get("/","get");
         });
 
