@@ -22,6 +22,8 @@ class CheckoutController extends Controller
         $data->end_date = $request->end_date;
         $data->start_time = $request->start_time;
         $data->end_time = $request->end_time;
+        $data->address_id = $request->address_id;
+        $data->note = $request->note;
 
         $data->save();
 
