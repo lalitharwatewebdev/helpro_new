@@ -15,14 +15,14 @@ class AuthController extends Controller
     public function register(Request $request)
     {
 
-        $request->validate([
-            'first_name' => 'required|string|min:3',
-            'second_name' => 'required',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|numeric|min:10',
-            'gender' => 'required',
-            'password' => 'required',
-        ]);
+        // $request->validate([
+        //     'first_name' => 'required|string|min:3',
+        //     'second_name' => 'required',
+        //     'email' => 'required|email|max:255',
+        //     'phone' => 'required|numeric|min:10',
+        //     'gender' => 'required',
+        //     'password' => 'required',
+        // ]);
         if (!empty($request->image)) {
             $image = FileUploader::uploadFile($request->file('image'), 'images/usersimage');
         }

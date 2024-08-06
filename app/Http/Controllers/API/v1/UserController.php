@@ -34,10 +34,10 @@ class UserController extends Controller
         $data->name = $request->username;
         $data->email = $request->email;
         $data->gender = $request->gender;
-        $data->state = $request->state;
-        $data->city = $request->city;
-        $data->address = $request->address;
-        $data->lat_long = $request->lat_long;
+        // $data->state = $request->state;
+        // $data->city = $request->city;
+        // $data->address = $request->address;
+        // $data->lat_long = $request->lat_long;
         if($request->hasFile("profile_img")){
             $data->profile_pic = FileUploader::uploadFile($request->file("profile_img"),"images/profile_pic");
         }
