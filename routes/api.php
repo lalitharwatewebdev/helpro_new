@@ -64,6 +64,8 @@ Route::prefix('v1')->group(function () {
 
         Route::controller(AddressController::class)->prefix("addresses")->group(function(){
             Route::post("store","store");
+            Route::get("edit","edit");
+            Route::post("delete","delete");
             Route::get("/","get");
         });
 

@@ -17,6 +17,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId("user_id")->nullable()->constrained()->cascadeOnDelete();
             $table->longText("address");
+            $table->foreignId("state_id")->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId("city_id")->nullable()->constrained()->cascadeOnDelete();
+            $table->string("pincode");
             $table->enum("is_primary",["yes",'no']);
             $table->timestamps();
             $table->enum('status', ['active', 'blocked'])->default('active');
