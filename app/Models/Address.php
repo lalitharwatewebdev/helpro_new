@@ -14,4 +14,12 @@ class Address extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function states(){
+        return $this->belongsTo(State::class,"state_id");
+    }
+
+    public function cities(){
+        return $this->belongsTo(City::class,"city_id");
+    }
 }

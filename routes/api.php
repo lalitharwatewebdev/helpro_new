@@ -68,6 +68,7 @@ Route::prefix('v1')->group(function () {
             Route::get("edit","edit");
             Route::post("delete","delete");
             Route::get("/","get");
+            Route::post("update","update");
         });
 
 

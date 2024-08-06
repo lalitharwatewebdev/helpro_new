@@ -11,6 +11,9 @@ class AddressController extends Controller
     public function store(Request $request){
         $id = auth()->user()->id;
 
+        if($request->isPrimary == "yes"){
+           Address::where("user_id",auth()->user()->id)->update(['is_primary'=>"no"]);
+        }
         $data = new Address();
         $data->user_id = $id;
         $data->address = $request->address;
@@ -25,6 +28,29 @@ class AddressController extends Controller
             "message" => "Address Added Successfully",
             "status" => true
         ],200);
+
+        if($request->update){
+            $address_id  = $request->id;
+            $data = Address::find($address_id);
+
+            if($request->isPrimary == "yes"){
+                Address::where("user_id",auth()->user()->id)->update(['is_primary'=>"no"]);
+             }
+             $data = Address::find($address_id);
+             $data->user_id = $id;
+             $data->address = $request->address;
+             $data->pincode = $request->pincode;
+             $data->state_id = $request->state_id;
+             $data->city_id = $request->city_id;
+             $data->is_primary = $request->isPrimary;
+             
+             $data->save();
+     
+             return response([
+                 "message" => "Address Updated Successfully",
+                 "status" => true
+             ],200);
+        }
     }
 
     public function setAddressPrimary(Request $request){
@@ -73,8 +99,10 @@ class AddressController extends Controller
         ],200);
     }
 
-    public function get(){
-        $data = Address::where("user_id",auth()->user()->id)->get();
+    public function get(Request $request){
+        $data = Address::with(['states:id,name',"cities:id,name"])->where("user_id",auth()->user()->id)->get();
+
+        
 
         return response([
             "data" => $data,
@@ -82,9 +110,15 @@ class AddressController extends Controller
         ],200);
     }
 
-    // public function update(){
-    //     $id = auth()->user()->id;
+    public function update(Request $request){
+        // $id = auth()->user()->id;
+        $address_id = $request->address_id;
+ 
+        $user_address = Address::where("id",$address_id)->first();
 
-    //     $user_address = Address::where("id","")
-    // }
+        return response([
+            "data" => $user_address,
+            "status" => true
+        ],200);
+    }
 }
