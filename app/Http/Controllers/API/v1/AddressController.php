@@ -27,6 +27,29 @@ class AddressController extends Controller
         ],200);
     }
 
+    public function setAddressPrimary(Request $request){
+        $user_address = Address::where("user_id",auth()->user()->id)->update([
+            "is_primary" => "no"
+        ]);
+
+      
+
+
+        $set_primary = Address::where("user_id",auth()->user()->id)
+        ->where("id",$request->id)->first();
+
+        $set_primary->update([
+            "is_primary" => "yes"
+        ]);
+        
+        $set_primary->save();
+
+        return response([
+            "message" => "Address set as primary",
+            "status" => true
+        ],200);
+    }
+
 
     public function edit(Request $request){
         $id = $request->query("id");
