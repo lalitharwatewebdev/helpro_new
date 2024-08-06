@@ -49,6 +49,12 @@
                     <label class="custom-control-label" for="switch-force-update-ios">Force-Update IOS</label>
                 </div>
             </div>
+
+            <x-divider text="RazorPay Key"/>
+            <div class="col-md-6 mt-3">
+           
+                <x-input name="razor_pay_key" label="Razor Pay Key  " />
+            </div>
             <div class="col-md-12 mt-3">
                 <label for="about_us">About Us</label>
                 <x-editor name="about_us" />

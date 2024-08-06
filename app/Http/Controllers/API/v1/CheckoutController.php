@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class CheckoutController extends Controller
 {
     public function store(Request $request){
-        $request->validate([\
+        $request->validate([
             "start_date" => "required",
             "end_date" => "required",
             "start_time" => "required",
