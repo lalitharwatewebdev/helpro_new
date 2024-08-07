@@ -26,6 +26,7 @@ class LabourController extends Controller
         $type = collect(explode('/', $url))->last();
         
         
+        
         return view('content.tables.labour',compact("type"));
     }
 

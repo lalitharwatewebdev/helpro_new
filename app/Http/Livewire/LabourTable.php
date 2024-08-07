@@ -1,15 +1,16 @@
 <?php
 namespace App\Http\Livewire;
 
-use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
-use Rappasoft\LaravelLivewireTables\Views\Column;
 use Excel;
-use App\Exports\CustomExport;
-use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Exports\CustomExport;
+use Illuminate\Database\Eloquent\Builder;
+use Rappasoft\LaravelLivewireTables\Views\Column;
+use Rappasoft\LaravelLivewireTables\DataTableComponent;
+use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
+
 
 
 class LabourTable extends DataTableComponent
