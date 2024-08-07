@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function get(){
+    public function get(Request $request){
+
+
+    
         $data = Category::active()->get();
 
         return response([
