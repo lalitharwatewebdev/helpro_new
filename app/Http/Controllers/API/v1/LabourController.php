@@ -16,7 +16,7 @@ class LabourController extends Controller
         if($type){
             $data = User::whereHas("category",function($query) use ($type){
                 $query->where("category_id",$type);
-            })->get();
+            })->with("category")->get();
 
             return response([
                 "data" => $data,
