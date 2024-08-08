@@ -17,6 +17,15 @@ class CheckoutController extends Controller
         $this->razorpay = $razorpay;
     }
 
+    public function randomNumber(){
+        $random = 0;
+        for($i=0;$i<6;$i++){
+            $random += $i;
+        }
+
+        return $random;
+    }
+
     public function store(Request $request){
         $request->validate([
             "start_date" => "required",
@@ -72,16 +81,22 @@ class CheckoutController extends Controller
 
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
 
-        if($fetchOrder->status() == 200){
-            Cart::where("user_id",auth()->user()->id)->whereHas("labour_id",$fetchOrder->labour_id)->delete();
+            $labour_id = Cart::where("user_id",auth()->user()->id)->get();
+        
+            $labour_data =  $labour_id->pluck("labour_id")->toArray();
             
-            if(isset($fetchOrder->labour_id)){
-                Booking::where("user_id",auth()->user()->id)->whereHas([$fetchOrder->labour_id]);
-            }
+
+            Cart::where("user_id",auth()->user()->id)->delete();
+
+        // adding to booking page
+        Booking::where("user_id",auth()->user()->id)->whereIn("labour_id",$labour_data)->update([
+            "payment_status" => "captured",
+            "otp" => $this->randomNumber()
+        ]);
+            return response([
+                "message" => "Booking Done Successfully"
+            ],200);
         }
 
-       
-      
-        return $fetchOrder;
-    }
+    
 }

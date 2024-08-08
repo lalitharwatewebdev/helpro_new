@@ -49,7 +49,7 @@ class RazorpayServiceProvider{
 
         //   return $order_id->toArray();
 
-            $status = ['paid',"captured"];
+            $status = ['paid',"captured","created"];
 
             if(in_array($order_id['status'],$status)){
                 return response([
