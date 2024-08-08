@@ -20,7 +20,7 @@ class CheckoutController extends Controller
     public function randomNumber(){
         $random = 0;
         for($i=0;$i<6;$i++){
-            $random += $i;
+            $random += rand(0,9);
         }
 
         return $random;
