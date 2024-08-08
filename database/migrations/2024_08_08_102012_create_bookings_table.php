@@ -13,14 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('razor_pay_models', function (Blueprint $table) {
+        Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId("user_id")->nullable()->constrained()->nullOnDelete();
-            $table->string("order_id")->nullable();
-            $table->json("order_data")->nullable();
-            $table->string("payment_gateway")->nullable();
-            $table->string("amount")->nullable();
-            $table->json("note")->nullable();
+            $table->foreignId("labour_id")->nullable()->constrained("users")->nullOnDelete();
             $table->timestamps();
             $table->enum('status', ['active', 'blocked'])->default('active');
         });
@@ -33,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('razor_pay_models');
+        Schema::dropIfExists('bookings');
     }
 };
