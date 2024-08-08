@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Checkout;
 use Illuminate\Http\Request;
 use App\Providers\RazorpayServiceProvider;
+use App\Models\Cart;
+use App\Models\Booking;
 
 
 class CheckoutController extends Controller
@@ -23,9 +25,24 @@ class CheckoutController extends Controller
             "end_time" => "required"
         ]);
 
-        $order = $this->razorpay->createOrder($request->amount)->toArray();
+        $user_cart = Cart::with("labour:id,rate_per_day")->where("user_id",auth()->user()->id)->select("labour_id")->get();
+        // calculating time difference
+        $diff = (strtotime($request->end_date) - strtotime($request->start_date));
 
-       
+        $date_result = abs(round($diff)/86400) + 1;
+
+        $total_labour_amount =0;
+        $booking = '';
+
+        foreach($user_cart as $cart){
+            $booking = new Booking();
+            $booking->user_id = auth()->user()->id;
+            $booking->labour_id = $cart->labour_id;
+            $total_labour_amount += intval(round($cart->labour->rate_per_day)) * $date_result;
+            $booking->total_amount = intval(round($cart->labour->rate_per_day)) * $date_result ;
+            $booking->save();
+        }
+        $order = $this->razorpay->createOrder($total_labour_amount)->toArray();
 
         $data = new Checkout();
 
@@ -40,8 +57,23 @@ class CheckoutController extends Controller
 
         return response([
             "message" => "Checkout created successfully",
-            "order" => $order['id'],
+            "order_id" => $order['id'],
             "status" => true
         ],200);
+    }
+
+    public function fetchOrder(Request $request){
+        $request->validate([
+            "order_id" => "required"
+        ]);
+
+        $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
+
+
+        if($fetchOrder->status() == 200){
+            
+        }
+
+        return $fetchOrder;
     }
 }

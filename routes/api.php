@@ -60,7 +60,8 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::controller(CheckoutController::class)->prefix("checkouts")->group(function(){
-            Route::post("create","store");
+            Route::post("store","store");
+            Route::post("fetch-order","fetchOrder");
         });
 
         Route::controller(AddressController::class)->prefix("addresses")->group(function(){
