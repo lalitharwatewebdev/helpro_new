@@ -51,7 +51,8 @@ class CheckoutController extends Controller
             $booking->user_id = auth()->user()->id;
             $booking->labour_id = $cart->labour_id;
             $total_labour_amount += intval(round($cart->labour->rate_per_day)) * $date_result;
-            $booking->total_amount = intval(round($cart->labour->rate_per_day)) * $date_result ;
+            $booking->total_amount = intval(round($cart->labour->rate_per_day)) * $date_result;
+          
             $booking->save();
         }
         $order = $this->razorpay->createOrder($total_labour_amount,"INR",$labour_arr)->toArray();

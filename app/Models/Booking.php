@@ -14,4 +14,8 @@ class Booking extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function labour(){
+        return $this->belongsTo(User::class,"labour_id");
+    }
 }
