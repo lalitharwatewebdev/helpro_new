@@ -4,6 +4,7 @@ use App\Http\Controllers\API\v1\AddressController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\Auth\AuthController;
 use App\Http\Controllers\API\v1\BannerController;
+use App\Http\Controllers\Api\v1\BookingController;
 use App\Http\Controllers\API\v1\BusinessSettingsController;
 use App\Http\Controllers\API\v1\CartController;
 use App\Http\Controllers\API\v1\CategoryController;
@@ -59,7 +60,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::controller(CheckoutController::class)->prefix("checkouts")->group(function(){
-            Route::post("store","store");
+            Route::post("create","store");
         });
 
         Route::controller(AddressController::class)->prefix("addresses")->group(function(){
@@ -69,6 +70,10 @@ Route::prefix('v1')->group(function () {
             Route::post("delete","delete");
             Route::get("/","get");
             Route::post("update","update");
+        });
+
+        Route::controller(BookingController::class)->prefix("bookings")->group(function(){
+            Route::post("create","createOrder");
         });
 
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Services;
+namespace App\Providers;
 
-use App\Models\RazorPayModel;
+
 use Razorpay\Api\Api;
 
 class RazorpayServiceProvider{
-    protected $razorpay;
+    protected $api;
     public function __construct(){
-        $this->razorpay = new Api(env("RAZORPAY_KEY"),env("RAZORPAY_SECRET"));
+        $this->api = new Api(env("RAZORPAY_KEY"),env("RAZORPAY_SECRET"));
     }
 
     public function createOrder($amount,$currency="INR"){
@@ -19,7 +19,7 @@ class RazorpayServiceProvider{
             "amount" => $amount,
         ];
         try{
-           $order =  $this->razorpay->order->create([
+           return $this->api->order->create([
                 "amount" => intval($amount * 100),
                 "currency" => $currency,
                 "receipt" => $receipt,
@@ -28,23 +28,13 @@ class RazorpayServiceProvider{
                 
                 ]);
 
-                RazorPayModel::create([
-                    "user_id" => auth()->user()->id,
-                    "order_id" => $order->id,
-                    "payment_gateway" => "razorpay",
-                    "amount" => $amount,
-                    "note" => $note
-                ]);
+                
 
-                return response([
-                    "order_id" => $order->id,
-                    "status" => true
-                ],200);
+               
         }
         catch(\Exception $e){
             return response([
                 "message" => "Something went wrong " . $e,
-                "order_id" => $order->id,
                 "status" => false
             ],400);
         }

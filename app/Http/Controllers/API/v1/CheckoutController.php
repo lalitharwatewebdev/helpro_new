@@ -5,9 +5,16 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use App\Models\Checkout;
 use Illuminate\Http\Request;
+use App\Providers\RazorpayServiceProvider;
+
 
 class CheckoutController extends Controller
 {
+    protected $razorpay;
+    public function __construct(RazorpayServiceProvider $razorpay){
+        $this->razorpay = $razorpay;
+    }
+
     public function store(Request $request){
         $request->validate([
             "start_date" => "required",
@@ -15,6 +22,10 @@ class CheckoutController extends Controller
             "start_time" => "required",
             "end_time" => "required"
         ]);
+
+        $order = $this->razorpay->createOrder($request->amount)->toArray();
+
+       
 
         $data = new Checkout();
 
@@ -29,6 +40,7 @@ class CheckoutController extends Controller
 
         return response([
             "message" => "Checkout created successfully",
+            "order" => $order['id'],
             "status" => true
         ],200);
     }
