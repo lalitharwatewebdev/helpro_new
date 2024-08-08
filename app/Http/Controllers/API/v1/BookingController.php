@@ -4,20 +4,18 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\RazorpayServiceProvider;
-
+use App\Models\Booking;
 class BookingController extends Controller
 {   
-    protected $razorpay;
-    public function __construct(RazorpayServiceProvider $razorpay){
-        $this->razorpay = $razorpay;
-    }
+    
+    public function get(){
+        $user_id = auth()->user()->id;
 
-    public function createOrder(Request $request){
-        $order = $this->razorpay->createOrder($request->amount);
+        $data = Booking::where("user_id",$user_id)->get();
 
         return response([
-            "order_id" => $order
-        ]);
+            "data" => $data,
+            "status" => true
+        ],200);
     }
 }

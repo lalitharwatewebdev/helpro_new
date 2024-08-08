@@ -27,6 +27,8 @@ class CheckoutController extends Controller
 
         $user_cart = Cart::with("labour:id,rate_per_day")->where("user_id",auth()->user()->id)->select("labour_id")->get();
         // calculating time difference
+        $labour_arr = array();
+        // return $user_cart;
         $diff = (strtotime($request->end_date) - strtotime($request->start_date));
 
         $date_result = abs(round($diff)/86400) + 1;
@@ -36,13 +38,14 @@ class CheckoutController extends Controller
 
         foreach($user_cart as $cart){
             $booking = new Booking();
+            $labour_arr[] = $cart->labour_id;
             $booking->user_id = auth()->user()->id;
             $booking->labour_id = $cart->labour_id;
             $total_labour_amount += intval(round($cart->labour->rate_per_day)) * $date_result;
             $booking->total_amount = intval(round($cart->labour->rate_per_day)) * $date_result ;
             $booking->save();
         }
-        $order = $this->razorpay->createOrder($total_labour_amount)->toArray();
+        $order = $this->razorpay->createOrder($total_labour_amount,"INR",$labour_arr)->toArray();
 
         $data = new Checkout();
 
@@ -57,7 +60,7 @@ class CheckoutController extends Controller
 
         return response([
             "message" => "Checkout created successfully",
-            "order_id" => $order['id'],
+            "order_id" => $order["id"],
             "status" => true
         ],200);
     }
@@ -69,11 +72,16 @@ class CheckoutController extends Controller
 
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
 
-
         if($fetchOrder->status() == 200){
+            Cart::where("user_id",auth()->user()->id)->whereHas("labour_id",$fetchOrder->labour_id)->delete();
             
+            if(isset($fetchOrder->labour_id)){
+                Booking::where("user_id",auth()->user()->id)->whereHas([$fetchOrder->labour_id]);
+            }
         }
 
+       
+      
         return $fetchOrder;
     }
 }

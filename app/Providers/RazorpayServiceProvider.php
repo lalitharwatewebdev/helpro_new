@@ -11,7 +11,7 @@ class RazorpayServiceProvider{
         $this->api = new Api(env("RAZORPAY_KEY"),env("RAZORPAY_SECRET"));
     }
 
-    public function createOrder($amount,$currency="INR"){
+    public function createOrder($amount,$currency="INR",$labour_id){
         $receipt = "receipt_id".time();
 
     
@@ -19,6 +19,7 @@ class RazorpayServiceProvider{
         $note = [
             "user" => auth()->user()->id,
             "amount" => $amount,
+            "labour_id" => $labour_id
         ];
 
         
@@ -44,13 +45,16 @@ class RazorpayServiceProvider{
 
     public function fetchOrder($order_id){
         try{    
-          $order_id =  $this->api->order->fetch($order_id);
+          $order_id =  $this->api->order->fetch($order_id)->toArray();
 
-            $status = ['paid',"created"];
+        //   return $order_id->toArray();
 
-            if(in_array($order_id->status,$status)){
+            $status = ['paid',"captured"];
+
+            if(in_array($order_id['status'],$status)){
                 return response([
-                    "message" => "Tranasction Successful",
+                    "message" => "Order Placed Successfully",
+                    "labour_id" => $order_id['notes']['labour_id'],
                     "status" => true
                 ],200);
             }
