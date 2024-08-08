@@ -11,7 +11,9 @@ class BookingController extends Controller
     public function get(){
         $user_id = auth()->user()->id;
 
-        $data = Booking::with("labour")->where("user_id",$user_id)->get();
+        $data = Booking::with("labour")->where("user_id",$user_id)
+        ->where("booking_status","captured")
+        ->get();
 
         return response([
             "data" => $data,
