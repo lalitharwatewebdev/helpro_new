@@ -4,7 +4,7 @@ use App\Http\Controllers\API\v1\AddressController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\Auth\AuthController;
 use App\Http\Controllers\API\v1\BannerController;
-use App\Http\Controllers\Api\v1\BookingController;
+use App\Http\Controllers\API\v1\BookingController;
 use App\Http\Controllers\API\v1\BusinessSettingsController;
 use App\Http\Controllers\API\v1\CartController;
 use App\Http\Controllers\API\v1\CategoryController;
