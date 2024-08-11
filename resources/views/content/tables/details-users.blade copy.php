@@ -11,6 +11,7 @@
             transform: scale(1) !important;
         }
     </style>
+    
 @endsection
 
 @section('content')
@@ -19,20 +20,73 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
+
+
                     <x-divider text="User Details" />
                     <div class="row">
-                        <div class="col-lg-4 col-md-6">
-                            <span> <b>Name:</b> {{$data->name}} </span>
+                        <div class="col-lg-3 col-md-6 mb-2">
+                            <span> <b>Name:</b> {{ $data->name }} </span>
                         </div>
 
-                        <div class="col-lg-4 col-md-6">
-                            <span> <b>Email:</b> {{$data->email}} </span>
-                        </div>  
+                        <div class="col-lg-3 col-md-6 mb-2">
+                            <span> <b>Email:</b> {{ $data->email }} </span>
+                        </div>
 
-                        <div class="col-lg-4 col-md-6">
-                            <span> <b>Email:</b> {{$data->phone}} </span>
-                        </div>  
+                        <div class="col-lg-3 col-md-6 mb-2">
+                            <span> <b>Phone:</b> {{ $data->phone }} </span>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 mb-2">
+                            <span> <b>Gender:</b> {{ ucFirst($data->gender) }} </span>
+                        </div>
+
+                        {{-- <div class="col-lg-3 col-md-6 mb-2">
+                            <span> <b>State:</b> {{ $data->states->name }} </span>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <span> <b>City:</b> {{ $data->cities->name }} </span>
+                        </div> --}}
+
+                        {{-- <div class="col-lg-3 col-md-6">
+                            <span> <b>Address:</b> {{ $data->address }} </span>
+                        </div> --}}
+
+                        <x-divider text="User Address" />
+                        @foreach ($data->addresses as $address)
+                            <div class="col-lg-12 col-md-6">
+                                <span> <b>Address {{ $loop->iteration }} </b>
+                                    @if ($address->is_primary == 'yes')
+                                        <span class="bg-primary rounded-pill text-white"
+                                            style="padding:2px 4px;font-size:10px">Primary</span>
+                                        {{-- <h4>saf</h4> --}}
+                                    @endif
+                                    <br>
+                                    <p>{{ $address->address }}
+                                        <br>
+                                        <span><b>State: </b>{{ $address->states->name }}</span>
+                                        <br>
+                                        <span><b>City: </b>{{ $address->cities->name }}</span>
+                                        <br>
+                                        <span><b>Pincode: </b>{{ $address->pincode }}</span>
+
+                                    </p>
+
+                                </span>
+                                <hr>
+                            </div>
+                        @endforeach
                     </div>
+                </x-card>
+
+                <x-card>
+                    <x-divider text="User Booking Details" />
+                    @php
+                        $user_id = request()->query('id');
+
+                    @endphp
+
+                    <livewire:user-booking-table user_id="{{ $user_id }}" />
                 </x-card>
             </div>
     </section>

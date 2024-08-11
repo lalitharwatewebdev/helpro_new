@@ -22,6 +22,13 @@ class Booking extends Model
 
     public function checkout()
     {
-        return $this->belongsTo(Checkout::class,"checkout_id");
+        return $this->belongsTo(Checkout::class, "checkout_id");
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, "user_id");
+    }
+
+
 }

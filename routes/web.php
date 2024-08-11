@@ -86,7 +86,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         ->prefix('sliders')
         ->controller(SliderController::class)->group(function () {
             Route::get('user', 'index')->name('user');
-             Route::get('labour', 'index')->name('labour');
+            Route::get('labour', 'index')->name('labour');
             Route::get('blocked', 'index')->name('blocked');
             Route::get('destroy', 'destroy')->name('destroy');
             Route::post('store', 'store')->name('store');
@@ -100,25 +100,26 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         ->prefix('labours')
         ->controller(LabourController::class)->group(function () {
             Route::get('pending', 'index')->name('pending');
-            Route::get("accepted","index")->name("accepted");
-            Route::get("rejected","index")->name("rejected");
+            Route::get("accepted", "index")->name("accepted");
+            Route::get("rejected", "index")->name("rejected");
             Route::get('blocked', 'index')->name('blocked');
-            Route::get("add","create")->name("add");
+            Route::get("add", "create")->name("add");
             Route::get('destroy', 'destroy')->name('destroy');
             Route::post('store', 'store')->name('store');
             Route::get('{id}/edit', "edit")->name('edit');
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::post('update', 'update')->name('update');
             Route::put('status', 'status')->name('status');
-            Route::get("get-city","getCity")->name("city");
+            Route::get("get-city", "getCity")->name("city");
+            Route::get('details', "details")->name("details");
         });
 
-        Route::name('subscriptions.')
+    Route::name('subscriptions.')
         ->prefix('subscriptions')
         ->controller(SubscriptionController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('blocked', 'index')->name('blocked');
-            Route::get("add","create")->name("add");
+            Route::get("add", "create")->name("add");
             Route::get('destroy', 'destroy')->name('destroy');
             Route::post('store', 'store')->name('store');
             Route::get('{id}/edit', "edit")->name('edit');
@@ -135,7 +136,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         ->prefix('users')
         ->controller(UserController::class)->group(function () {
             Route::get('/', 'index')->name('index');
-            Route::get("details","details")->name("details");
+            Route::get("details", "details")->name("details");
             Route::get('blocked', 'index')->name('blocked');
             Route::get('deleted', 'index')->name('deleted');
             Route::post('store', 'store')->name('store');

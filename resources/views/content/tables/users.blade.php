@@ -11,6 +11,10 @@
             transform: scale(1) !important;
         }
     </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 @endsection
 
 @section('content')
@@ -19,7 +23,7 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                    <livewire:user-table  />
+                    <livewire:user-table />
                 </x-card>
             </div>
         </div>
@@ -38,11 +42,11 @@
         <x-form id="edit-user-modal" method="POST" class="" :route="route('admin.users.update')">
             <div class="col-md-12 col-12 ">
                 <x-input name="name" />
-                <x-input name="email"/>
+                <x-input name="email" />
                 <x-input name="id" />
                 <x-input name="phone" type="number" />
             </div>
-            
+
         </x-form>
     </x-side-modal>
 @endsection

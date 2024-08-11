@@ -15,7 +15,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use \Znck\Eloquent\Traits\BelongsToThrough;
 
     protected $guarded = [];
-    
+
 
 
     /**
@@ -57,23 +57,31 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function states()
     {
-        return $this->belongsTo(State::class,"state");
+        return $this->belongsTo(State::class, "state");
     }
 
     public function cities()
     {
-        return $this->belongsTo(City::class,"city");
+        return $this->belongsTo(City::class, "city");
     }
 
-    public function labourImage(){
-        return $this->hasMany(LabourImage::class,"user_id");
+    public function labourImage()
+    {
+        return $this->hasMany(LabourImage::class, "user_id");
     }
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsToMany(Category::class);
     }
 
-    public function labourAttach(){
-        return $this->belongsToMany(Labour::class,"carts","user_id","labour_id");
+    public function labourAttach()
+    {
+        return $this->belongsToMany(Labour::class, "carts", "user_id", "labour_id");
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class, "user_id");
     }
 }

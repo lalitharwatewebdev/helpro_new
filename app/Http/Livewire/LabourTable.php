@@ -19,7 +19,7 @@ class LabourTable extends DataTableComponent
     protected $model = User::class;
     public $counter = 1;
     public $type;
-    public function mount(Request $request,$type)
+    public function mount(Request $request, $type)
     {
         $this->dispatchBrowserEvent('table-refreshed');
         $this->type = $type;
@@ -73,23 +73,23 @@ class LabourTable extends DataTableComponent
                     return $value;
                 }),
 
-         
+
             Column::make("Mobile No", "phone")
                 ->format(function ($value) {
                     return $value;
                 }),
 
             Column::make("State", "state")
-                ->format(function ($value,$row) {
+                ->format(function ($value, $row) {
                     return $row->states->name ?? "";
                 }),
 
             Column::make("City", "city")
-                ->format(function ($value,$row) {
+                ->format(function ($value, $row) {
                     return $row->cities->name ?? "";
                 }),
 
-                Column::make("Rate per Day", "rate_per_day")
+            Column::make("Rate per Day", "rate_per_day")
                 ->format(function ($value) {
                     return round($value);
                 }),
@@ -104,8 +104,13 @@ class LabourTable extends DataTableComponent
                 })
                 ->html(),
 
-        
 
+            Column::make("View", "id")
+                ->format(function ($value, $row) {
+                    return '<a href=' . route('admin.labours.details', ["id" => $value]) . '  class="btn btn-icon btn-icon rounded-circle btn-warning waves-effect">
+                    <span><i class="fa-solid fa-eye"></i></span>
+                </a>';
+                })->html(),
 
             Column::make('Actions')
                 ->label(function ($row, Column $column) {
@@ -179,7 +184,7 @@ class LabourTable extends DataTableComponent
     {
         $modal = User::query()->where("type", "labour")
             ->where("labour_status", $this->type);
-        $modal->with("states","cities");
+        $modal->with("states", "cities");
         return $modal;
     }
 

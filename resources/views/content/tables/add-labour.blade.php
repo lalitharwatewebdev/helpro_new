@@ -10,7 +10,17 @@
         .dropdown-menu {
             transform: scale(1) !important;
         }
+
+        #map {
+            height: 380px;
+        }
     </style>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 @endsection
 
 @section('content')
@@ -34,6 +44,7 @@
                             </div>
                             <div class="col-lg-4  col-md-6">
                                 <x-input-file name="profile_pic" />
+                                <x-input name="lat_long" class="lat_long" required type="hidden" />
                             </div>
                             <div class="col-lg-4 col-md-6">
                                 <label for="">Select State</label>
@@ -73,6 +84,8 @@
 
 
                         </div>
+                        <x-divider text="Co-ordinate" />
+                        <div id="map"></div>
                         <x-divider text="Work Details" />
                         <div class="row">
                             <div class="col-lg-4 col-md-6">
@@ -85,69 +98,69 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <label for="">Labour Category</label>
-                                 <select class="select2 " name="category[]" multiple>
+                                <select class="select2 " name="category[]" multiple>
                                     @foreach ($category_data as $data)
-                                        <option value="{{$data->id}}">{{$data->title}}</option>
+                                        <option value="{{ $data->id }}">{{ $data->title }}</option>
                                     @endforeach
-                                 </select>
+                                </select>
                             </div>
 
 
 
-                                <div class="col-lg-12 col-md-6">
-                                    <x-image-uploader name="labour_images" id="labour_images" />
-                                </div>
-
-                                <div class="col-lg-4 col-md-6">
-                                    <label for="">Preferred Shifts</label>
-                                    <select class="select2  form-control" name="shifts">
-                                      <option value="" disabled selected>Select Shift</option>
-                                      <option value="morning">Morning</option>
-                                      <option value="afternoon">Afternoon</option>
-                                      <option value="evening ">Evening</option>
-                                      <option value="night">Night</option>
-                                    </select>
-                                </div>
-
-
-
+                            <div class="col-lg-12 col-md-6">
+                                <x-image-uploader name="labour_images" id="labour_images" />
                             </div>
-                            <x-divider text="KYC Details" />
-                            <div class="row">
-                                <div class="col-lg-4 col-md-6">
-                                    <x-input name="aadhaar_number" type="number" />
-                                </div>
-                                <div class="col-lg-4 col-md-6">
+
+                            <div class="col-lg-4 col-md-6">
+                                <label for="">Preferred Shifts</label>
+                                <select class="select2  form-control" name="shifts">
+                                    <option value="" disabled selected>Select Shift</option>
+                                    <option value="morning">Morning</option>
+                                    <option value="afternoon">Afternoon</option>
+                                    <option value="evening ">Evening</option>
+                                    <option value="night">Night</option>
+                                </select>
+                            </div>
+
+
+
+                        </div>
+                        <x-divider text="KYC Details" />
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="aadhaar_number" type="number" />
+                            </div>
+                            <div class="col-lg-4 col-md-6">
                                 <x-input-file name="aadhaar_card_front" />
                             </div>
                             <div class="col-lg-4 col-md-6">
                                 <x-input-file name="aadhaar_card_back" />
                             </div>
-                                <div class="col-lg-4 col-md-6">
-                                    <x-input name="pan_number" />
-                                </div>
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="pan_number" />
                             </div>
-                            <x-divider text="Bank Details" />
-                            <div class="row">
-                                <div class="col-lg-4 col-md-6">
-                                    <x-input name="bank_name" />
-                                </div>
-                                <div class="col-lg-4 col-md-6">
-                                    <x-input name="IFSC_code" />
-                                </div>
-                                <div class="col-lg-4 col-md-6">
-                                    <x-input name="bank_address" />
-                                </div>                                
+                        </div>
+                        <x-divider text="Bank Details" />
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="bank_name" />
                             </div>
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="IFSC_code" />
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <x-input name="bank_address" />
+                            </div>
+                        </div>
 
-                        </x-card>
-                    </x-form>
-                </div>
+                    </x-card>
+                </x-form>
             </div>
-        </section>
+        </div>
+    </section>
 
-    @endsection
-    @pushonce('component-script')
+@endsection
+@pushonce('component-script')
     <script>
         $(document).ready(function() {
             $('.select2').select2();
@@ -234,6 +247,28 @@
     <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
 
     <script>
-        $('.my-pond').filepond();
+        var map = L.map('map').setView([19.0760, 72.8777], 13);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        var currentMarker = null;
+
+        function onMapClick(e) {
+            if (currentMarker !== null) {
+                map.removeLayer(currentMarker);
+            }
+
+            currentMarker = L.marker(e.latlng).addTo(map);
+            alert("You clicked the map at Latitude: " + e.latlng.lat + ", Longitude: " + e.latlng.lng);
+
+            var lat_long = document.querySelector(".lat_long")
+            lat_long.value = e.latlng.lat + "," + e.latlng.lng
+
+            currentMarker.bindPopup("You clicked the map at " + e.latlng.toString()).openPopup();
+        }
+
+        map.on('click', onMapClick);
     </script>
 @endsection
