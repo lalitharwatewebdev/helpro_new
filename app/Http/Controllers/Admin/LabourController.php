@@ -65,12 +65,7 @@ class LabourController extends Controller
         return response($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -116,6 +111,7 @@ class LabourController extends Controller
         $data->aadhaar_number = $request->aadhaar_number;
         $data->branch_address = $request->bank_address;
         $data->gender = $request->gender;
+        $data->labour_status = "accepted";
 
 
         $data->rate_per_day = $request->rate_per_day;
@@ -126,17 +122,19 @@ class LabourController extends Controller
         $data->save();
 
         if ($data) {
+            if ($request->labour_images) {
+                foreach ($request->labour_images as $images) {
+                    $labour_image = new LabourImage();
+                    $labour_image->user_id = $data->id;
+                    $labour_image->image = FileUploader::uploadFile($images, 'images/labour_images');
 
-            foreach ($request->labour_images as $images) {
-                $labour_image = new LabourImage();
-                $labour_image->user_id = $data->id;
-                $labour_image->image = FileUploader::uploadFile($images, 'images/labour_images');
+                    $labour_image->save();
 
-                $labour_image->save();
+                    $user_data = User::find($data->id);
 
-                $user_data = User::find($data->id);
+                    $user_data->category()->attach($request->category);
+                }
 
-                $user_data->category()->attach($request->category);
             }
 
 

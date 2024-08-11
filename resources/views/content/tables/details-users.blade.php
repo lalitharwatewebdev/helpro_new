@@ -40,6 +40,17 @@
                             <span> <b>Gender:</b> {{ ucFirst($data->gender) }} </span>
                         </div>
 
+                        <div class="col-lg-3 col-md-6 mb-2">
+                            <span> <b>Profile Image:</b> 
+                                @if (!is_null($data->profile_pic))
+                                <img src="{{ asset("$data->profile_pic") }}" class="view-on-click  rounded-circle"
+                                    style="width:40px">
+                            @else
+                                <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
+                                    style="width:40px">
+                            @endif </span>
+                        </div>
+
                         {{-- <div class="col-lg-3 col-md-6 mb-2">
                             <span> <b>State:</b> {{ $data->states->name }} </span>
                         </div>

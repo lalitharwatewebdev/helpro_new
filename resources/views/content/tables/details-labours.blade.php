@@ -55,7 +55,7 @@
                         <div class="col-lg-3 col-md-6">
                             <span> <b>Profile Image:</b>
                                 @if (!is_null($data->profile_pic))
-                                    <img src="{{ $data->profile_pic }}" class="view-on-click  rounded-circle"
+                                    <img src="{{ asset("$data->profile_pic") }}" class="view-on-click  rounded-circle"
                                         style="width:40px">
                                 @else
                                     <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
@@ -77,8 +77,8 @@
                         <div class="col-lg-4 col-md-6 mb-2">
                             <span> <b>Aadhaar Card Front:</b>
                                 @if (!is_null($data->aadhaar_card_front))
-                                    <img src="{{ $data->aadhaar_card_front }}" class="view-on-click  rounded-circle"
-                                        style="width:40px">
+                                    <img src="{{ asset("$data->aadhaar_card_front") }}"
+                                        class="view-on-click  rounded-circle" style="width:40px">
                                 @else
                                     <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
                                         style="width:40px">
@@ -89,8 +89,8 @@
                         <div class="col-lg-4 col-md-6 mb-2">
                             <span> <b>Aadhaar Card Back:</b>
                                 @if (!is_null($data->aadhaar_card_back))
-                                    <img src="{{ $data->aadhaar_card_back }}" class="view-on-click  rounded-circle"
-                                        style="width:40px">
+                                    <img src="{{ asset("$data->aadhaar_card_back") }}"
+                                        class="view-on-click  rounded-circle" style="width:40px">
                                 @else
                                     <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
                                         style="width:40px">
