@@ -17,9 +17,9 @@ class BookingController extends Controller
             ->where("payment_status", "captured")
             ->get();
 
-            // $groupedByCheckout = $data->groupBy(function ($booking) {
-            //     return $booking->checkout->id; // or use another unique attribute from checkout
-            // });
+        //     $groupedByCheckout = $data->groupBy(function ($booking) {
+        //         return $booking->checkout->id; // or use another unique attribute from checkout
+        //     });
 
         // $result = Booking::whereHas("checkout",function($query){
         //     $query->where("user_id",auth()->user()->id)->get();
