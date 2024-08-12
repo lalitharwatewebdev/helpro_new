@@ -56,6 +56,7 @@ class CategoryController extends Controller
             'header' => 'Added',
             'message' => 'Added successfully',
             'table' => 'category-table',
+            "reload" => true
         ]);
 
 
@@ -113,6 +114,7 @@ class CategoryController extends Controller
             'header' => 'Success!',
             'message' => 'Category Updated successfully',
             'table' => 'category-table',
+            "reload" => true
         ]);
     }
 

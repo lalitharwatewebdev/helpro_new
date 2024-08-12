@@ -70,13 +70,13 @@ class LabourTable extends DataTableComponent
 
             Column::make("Name", "name")
                 ->format(function ($value) {
-                    return $value;
+                    return $value ?? "";
                 }),
 
 
             Column::make("Mobile No", "phone")
                 ->format(function ($value) {
-                    return $value;
+                    return $value ?? "";
                 }),
 
             Column::make("State", "state")
@@ -91,7 +91,7 @@ class LabourTable extends DataTableComponent
 
             Column::make("Rate per Day", "rate_per_day")
                 ->format(function ($value) {
-                    return round($value);
+                    return round($value) ?? "";
                 }),
 
             Column::make('profile_pic')

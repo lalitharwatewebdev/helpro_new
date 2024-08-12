@@ -3,6 +3,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Booking;
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
@@ -66,37 +67,37 @@ class LabourBookingTable extends DataTableComponent
 
             Column::make("User Name", 'user_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->user->name;
+                    return $row->user->name ?? "";
                 })
                 ->html(),
 
             Column::make("Total Amount", 'total_amount')
                 ->format(function ($value, $row, Column $column) {
-                    return $value;
+                    return $value ?? "";
                 })
                 ->html(),
 
             Column::make("Start Date", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->start_date;
+                    return $row->checkout->start_date ?? "";
                 })
                 ->html(),
 
             Column::make("End Date", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->end_date;
-                })
+                    return $row->checkout->end_date ?? "";
+                }) 
                 ->html(),
 
             Column::make("Start Time", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->start_time;
+                    return $row->checkout->start_time ?? "";
                 })
                 ->html(),
 
             Column::make("End Time", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->end_time;
+                    return $row->checkout->end_time ?? "";
                 })
                 ->html(),
 

@@ -60,6 +60,7 @@ class SliderController extends Controller
             'header' => 'Added',
             'message' => 'Added successfully',
             'table' => 'slider-table',
+            "reload"  => true
         ]);
 
     }
@@ -126,6 +127,7 @@ class SliderController extends Controller
             'header' => 'Success!',
             'message' => 'Slider Updated successfully',
             'table' => 'slider-table',
+            "reload" => true
         ]);
     }
 

@@ -51,6 +51,7 @@ class SubscriptionController extends Controller
             'header' => 'Added',
             'message' => 'Added successfully',
             'table' => 'subscription-table',
+            "reload" => true
         ]);
 
 
@@ -85,6 +86,7 @@ class SubscriptionController extends Controller
         return response([
             "message" => "Subscription Updated",
             'table' => 'subscription-table',
+            "reload" => true
         ]);
 
     }

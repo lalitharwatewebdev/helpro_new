@@ -42,6 +42,7 @@ class UserController extends Controller
         return response([
             'message' => 'user updated successfully',
             'table' => 'users-table',
+            "reload" => true
         ]);
     }
 
