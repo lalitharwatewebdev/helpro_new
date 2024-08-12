@@ -61,11 +61,18 @@
           "slug": "admin.labours.rejected"
         }
       ]
-    },{
+    },
+    {
       "url": "admin/subscriptions",
       "name": "Subscription Management",
       "icon": "<i data-feather='user'></i>",
       "slug": "admin.subscriptions.index"
+    },
+    {
+      "url": "admin/transactions",
+      "name": "Transaction Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "admin.transactions.index"
     },
     {
       "url": "admin/business-settings",

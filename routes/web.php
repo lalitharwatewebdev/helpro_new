@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -103,6 +104,22 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
             Route::get("accepted", "index")->name("accepted");
             Route::get("rejected", "index")->name("rejected");
             Route::get('blocked', 'index')->name('blocked');
+            Route::get("add", "create")->name("add");
+            Route::get('destroy', 'destroy')->name('destroy');
+            Route::post('store', 'store')->name('store');
+            Route::get('{id}/edit', "edit")->name('edit');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::post('update', 'update')->name('update');
+            Route::put('status', 'status')->name('status');
+            Route::get("get-city", "getCity")->name("city");
+            Route::get('details', "details")->name("details");
+        });
+
+
+        Route::name('transactions.')
+        ->prefix('transactions')
+        ->controller(TransactionController::class)->group(function () {
+            Route::get("/","index")->name("index");
             Route::get("add", "create")->name("add");
             Route::get('destroy', 'destroy')->name('destroy');
             Route::post('store', 'store')->name('store');

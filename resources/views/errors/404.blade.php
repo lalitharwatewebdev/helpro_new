@@ -22,7 +22,7 @@ $configData = Helper::applClasses();
     <!-- Error page-->
     <div class="misc-wrapper">
         <a class="brand-logo align-items-center" href="javascript:void(0);">
-            <img src="{{ asset('images/logo/logo.png') }}" alt="logo" height="50" width="50">
+            <img src="{{ asset('images/logo/MDServices.png') }}" alt="logo" height="50" width="50">
             <h2 class="brand-text text-primary ml-1 mb-0">{{ env('APP_NAME') }}</h2>
         </a>
         <div class="misc-inner p-2 p-sm-3">
