@@ -171,7 +171,6 @@
                                     <x-divider text="User Booking Details" />
                                     @php
                                         $user_id = request()->query('id');
-
                                     @endphp
 
                                     <livewire:labour-booking-table user_id="{{ $user_id }}" />

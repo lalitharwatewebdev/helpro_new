@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Livewire;
 
 use App\Models\Booking;
@@ -86,7 +87,7 @@ class LabourBookingTable extends DataTableComponent
             Column::make("End Date", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
                     return $row->checkout->end_date ?? "";
-                }) 
+                })
                 ->html(),
 
             Column::make("Start Time", 'checkout_id')
@@ -98,6 +99,30 @@ class LabourBookingTable extends DataTableComponent
             Column::make("End Time", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
                     return $row->checkout->end_time ?? "";
+                })
+                ->html(),
+
+            Column::make("Address", 'checkout_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->checkout->address->address ?? "";
+                })
+                ->html(),
+
+            Column::make("State", 'checkout_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->checkout->address->states->name ?? "";
+                })
+                ->html(),
+
+            Column::make("State", 'checkout_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->checkout->address->cities->name ?? "";
+                })
+                ->html(),
+
+            Column::make("Notes", 'checkout_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->checkout->note ?? "";
                 })
                 ->html(),
 
@@ -183,10 +208,7 @@ class LabourBookingTable extends DataTableComponent
         return $modal;
     }
 
-    public function refresh(): void
-    {
-
-    }
+    public function refresh(): void {}
     public function status($type)
     {
         $this->setFilter('status', $type);

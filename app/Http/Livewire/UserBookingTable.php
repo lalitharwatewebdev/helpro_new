@@ -78,76 +78,53 @@ class UserBookingTable extends DataTableComponent
 
             Column::make("Start Date", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->start_date;
+                    return $row->checkout->start_date ?? "";
                 })
                 ->html(),
 
             Column::make("End Date", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->end_date;
+                    return $row->checkout->end_date ?? "";
                 })
                 ->html(),
 
             Column::make("Start Time", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->start_time;
+                    return $row->checkout->start_time ?? "";
                 })
                 ->html(),
 
             Column::make("End Time", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->end_time;
+                    return $row->checkout->end_time ??  "";
                 })
                 ->html(),
 
-            // Column::make("End Time", 'checkout_id')
-            //     ->format(function ($value, $row, Column $column) {
-            //         return $row->checkout->end_;
-            //     })
-            //     ->html(),
+                Column::make("Address", 'checkout_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->checkout->address->address ??  "";
+                })
+                ->html(),
 
+                Column::make("State", 'checkout_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->checkout->address->states->name ??  "";
+                })
+                ->html(),
 
+                Column::make("City", 'checkout_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->checkout->address->cities->name ??  "";
+                })
+                ->html(),
 
+                Column::make("Notes", 'checkout_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->checkout->note ??  "";
+                })
+                ->html(),
 
-            // Column::make('image')
-            //     ->format(function ($row) {
-            //         if ($row) {
-            //             return '<img src="' . asset($row) . '" class="view-on-click  rounded-circle">';
-            //         } else {
-            //             return '<img src="' . asset('images/placeholder.jpg') . '" class="view-on-click  rounded-circle">';
-            //         }
-            //     })
-            //     ->html(),
-
-            // Column::make('Created at', 'created_at')
-            // ->format(function ($value) {
-            //     return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
-
-            // })
-            // ->html()
-            // ->collapseOnTablet()
-            // ->sortable(),
-            // Column::make('Actions')
-            //     ->label(function ($row, Column $column) {
-            //         $delete_route = route('admin.category.destroy', $row->id);
-            //         $edit_route = route('admin.category.edit', $row->id);
-            //         $edit_callback = 'setValue';
-            //         $modal = '#edit-category-modal';
-            //         return view('content.table-component.action', compact('edit_route', 'delete_route', 'edit_callback', 'modal'));
-            //     }),
-            // Column::make('status')
-            //     ->format(function ($value, $data, Column $column) {
-            //         $route = route('admin.category.status');
-            //         return view('content.table-component.switch', compact('data', 'route'));
-            // }),
-            // Column::make('Updated at', 'updated_at')
-            //     ->format(function ($value) {
-            //        return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
-
-            //     })
-            //     ->html()
-            //     ->collapseOnTablet()
-            //     ->sortable(),
+          
         ];
     }
 
@@ -164,21 +141,13 @@ class UserBookingTable extends DataTableComponent
                     $builder->where('status', $value);
                 }),
 
-            // TextFilter::make('Name')
-            //     ->config([
-            //         'placeholder' => 'Search Name',
-            //         'maxlength' => '25',
-            //     ])
-            //     ->filter(function (Builder $builder, string $value) {
-            //         $builder->where('categorys.name', 'like', '%' . $value . '%');
-            //     }),
         ];
     }
 
     public function builder(): Builder
     {
         $modal = Booking::query();
-        $modal->with("checkout", "labour");
+        $modal->with("checkout:", "labour");
         return $modal;
     }
 
