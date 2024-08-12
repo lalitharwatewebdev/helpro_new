@@ -19,134 +19,169 @@
     <section>
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
-                <x-card>
-
-
-                    <x-divider text="Labour Basic Details" />
-                    <div class="row">
-                        <div class="col-lg-3 col-md-6 mb-2">
-                            <span> <b>Name:</b> {{ $data->name }} </span>
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-center" id="headingOne">
+                            <h5 class="mb-0 text-center display-4">
+                                <button class="btn btn-link fw-bold " data-toggle="collapse" data-target="#collapseOne"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                    <span>Labour Details</span>
+                                </button>
+                            </h5>
                         </div>
 
-                        <div class="col-lg-3 col-md-6 mb-2">
-                            <span> <b>Email:</b> {{ $data->email }} </span>
-                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                <x-card>
 
-                        <div class="col-lg-3 col-md-6 mb-2">
-                            <span> <b>Phone:</b> {{ $data->phone }} </span>
-                        </div>
 
-                        <div class="col-lg-3 col-md-6 mb-2">
-                            <span> <b>Gender:</b> {{ ucFirst($data->gender) }} </span>
-                        </div>
+                                    <x-divider text="Labour Basic Details" />
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-6 mb-2">
+                                            <span> <b>Name:</b> {{ $data->name }} </span>
+                                        </div>
 
-                        <div class="col-lg-3 col-md-6 mb-2">
-                            <span> <b>State:</b> {{ $data->states->name ?? '' }} </span>
-                        </div>
+                                        <div class="col-lg-3 col-md-6 mb-2">
+                                            <span> <b>Email:</b> {{ $data->email }} </span>
+                                        </div>
 
-                        <div class="col-lg-3 col-md-6">
-                            <span> <b>City:</b> {{ $data->cities->name ?? '' }} </span>
-                        </div>
+                                        <div class="col-lg-3 col-md-6 mb-2">
+                                            <span> <b>Phone:</b> {{ $data->phone }} </span>
+                                        </div>
 
-                        <div class="col-lg-3 col-md-6">
-                            <span> <b>Address:</b> {{ $data->address }} </span>
-                        </div>
+                                        <div class="col-lg-3 col-md-6 mb-2">
+                                            <span> <b>Gender:</b> {{ ucFirst($data->gender) }} </span>
+                                        </div>
 
-                        <div class="col-lg-3 col-md-6">
-                            <span> <b>Profile Image:</b>
-                                @if (!is_null($data->profile_pic))
-                                    <img src="{{ asset("$data->profile_pic") }}" class="view-on-click  rounded-circle"
-                                        style="width:40px">
-                                @else
-                                    <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
-                                        style="width:40px">
-                                @endif
-                            </span>
-                        </div>
+                                        <div class="col-lg-3 col-md-6 mb-2">
+                                            <span> <b>State:</b> {{ $data->states->name ?? '' }} </span>
+                                        </div>
 
-                        <x-divider text="Labour KYC Details" />
+                                        <div class="col-lg-3 col-md-6">
+                                            <span> <b>City:</b> {{ $data->cities->name ?? '' }} </span>
+                                        </div>
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Aadhaar Number:</b> {{ $data->aadhaar_number }} </span>
-                        </div>
+                                        <div class="col-lg-3 col-md-6">
+                                            <span> <b>Address:</b> {{ $data->address }} </span>
+                                        </div>
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>PAN Number:</b> {{ $data->pan_card_number }} </span>
-                        </div>
+                                        <div class="col-lg-3 col-md-6">
+                                            <span> <b>Profile Image:</b>
+                                                @if (!is_null($data->profile_pic))
+                                                    <img src="{{ asset("$data->profile_pic") }}"
+                                                        class="view-on-click  rounded-circle" style="width:40px">
+                                                @else
+                                                    <img src="{{ asset('images/placeholder.jpg') }}"
+                                                        class="view-on-click   rounded-circle" style="width:40px">
+                                                @endif
+                                            </span>
+                                        </div>
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Aadhaar Card Front:</b>
-                                @if (!is_null($data->aadhaar_card_front))
-                                    <img src="{{ asset("$data->aadhaar_card_front") }}"
-                                        class="view-on-click  rounded-circle" style="width:40px">
-                                @else
-                                    <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
-                                        style="width:40px">
-                                @endif
-                            </span>
-                        </div>
+                                        <x-divider text="Labour KYC Details" />
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Aadhaar Card Back:</b>
-                                @if (!is_null($data->aadhaar_card_back))
-                                    <img src="{{ asset("$data->aadhaar_card_back") }}"
-                                        class="view-on-click  rounded-circle" style="width:40px">
-                                @else
-                                    <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
-                                        style="width:40px">
-                                @endif
-                            </span>
-                        </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Aadhaar Number:</b> {{ $data->aadhaar_number }} </span>
+                                        </div>
 
-                        <x-divider text="Labour Bank Details" />
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Bank Name:</b> {{ $data->bank_name }} </span>
-                        </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>PAN Number:</b> {{ $data->pan_card_number }} </span>
+                                        </div>
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>IFSC Code:</b> {{ $data->IFSC_code }} </span>
-                        </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Aadhaar Card Front:</b>
+                                                @if (!is_null($data->aadhaar_card_front))
+                                                    <img src="{{ asset("$data->aadhaar_card_front") }}"
+                                                        class="view-on-click  rounded-circle" style="width:40px">
+                                                @else
+                                                    <img src="{{ asset('images/placeholder.jpg') }}"
+                                                        class="view-on-click   rounded-circle" style="width:40px">
+                                                @endif
+                                            </span>
+                                        </div>
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Bank Address:</b> {{ $data->branch_address }} </span>
-                        </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Aadhaar Card Back:</b>
+                                                @if (!is_null($data->aadhaar_card_back))
+                                                    <img src="{{ asset("$data->aadhaar_card_back") }}"
+                                                        class="view-on-click  rounded-circle" style="width:40px">
+                                                @else
+                                                    <img src="{{ asset('images/placeholder.jpg') }}"
+                                                        class="view-on-click   rounded-circle" style="width:40px">
+                                                @endif
+                                            </span>
+                                        </div>
 
-                        <x-divider text="Work Details" />
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Rate per Day:</b> {{ $data->rate_per_day }} </span>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Start Time:</b> {{ $data->start_time }} </span>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>End Time:</b> {{ $data->end_time }} </span>
-                        </div>
+                                        <x-divider text="Labour Bank Details" />
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Bank Name:</b> {{ $data->bank_name }} </span>
+                                        </div>
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Qualification: </b> {{ $data->qualification }} </span>
-                        </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>IFSC Code:</b> {{ $data->IFSC_code }} </span>
+                                        </div>
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Preferred Shift: </b> {{ $data->preferred_shift }} </span>
-                        </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Bank Address:</b> {{ $data->branch_address }} </span>
+                                        </div>
 
-                        <div class="col-lg-4 col-md-6 mb-2">
-                            <span> <b>Labour Status: </b> {{ $data->labour_status }} </span>
-                        </div>
+                                        <x-divider text="Work Details" />
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Rate per Day:</b> {{ $data->rate_per_day }} </span>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Start Time:</b> {{ $data->start_time }} </span>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>End Time:</b> {{ $data->end_time }} </span>
+                                        </div>
 
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Qualification: </b> {{ $data->qualification }} </span>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Preferred Shift: </b> {{ $data->preferred_shift }} </span>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Labour Status: </b> {{ $data->labour_status }} </span>
+                                        </div>
+
+                                    </div>
+                                </x-card>
+                            </div>
+                        </div>
                     </div>
-                </x-card>
+                </div>
 
-                <x-card>
-                    <x-divider text="User Booking Details" />
-                    @php
-                        $user_id = request()->query('id');
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-center" id="headingOne">
+                            <h5 class="mb-0 text-center display-4">
+                                <button class="btn btn-link fw-bold " data-toggle="collapse" data-target="#collapseTwo"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                    <span>Labour Booked Details</span>
+                                </button>
+                            </h5>
+                        </div>
 
-                    @endphp
+                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                <x-card>
+                                    <x-divider text="User Booking Details" />
+                                    @php
+                                        $user_id = request()->query('id');
 
-                    <livewire:labour-booking-table user_id="{{ $user_id }}" />
-                </x-card>
+                                    @endphp
+
+                                    <livewire:labour-booking-table user_id="{{ $user_id }}" />
+                                </x-card>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
     </section>
 
 @endsection

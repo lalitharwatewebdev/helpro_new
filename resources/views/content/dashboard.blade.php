@@ -153,11 +153,15 @@
     type: 'area'
   },
   series: [{
-    name: 'sales',
+    name: 'users',
     data: @json($user_count)
   }],
   xaxis: {
     categories: @json($user_date)
+  },
+  title: {
+    text: 'Users',
+    align: 'left'
   }
 }
 
@@ -172,11 +176,15 @@ chart.render();
     type: 'area'
   },
   series: [{
-    name: 'sales',
+    name: 'labours',
     data: @json($labour_count)
   }],
   xaxis: {
     categories: @json($labour_date)
+  },
+  title: {
+    text: 'Labours',
+    align: 'left'
   }
 }
 
