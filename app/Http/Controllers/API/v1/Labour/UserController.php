@@ -48,7 +48,7 @@ class UserController extends Controller
     public function history(){
        
 
-        $booking_data = Booking::where("labour_id",auth()->user()->id)->latest()->get();
+        $booking_data = Booking::with("user:id,name")->where("user_id",auth()->user()->id)->latest()->get();
 
         return response([
             "data" => $booking_data,

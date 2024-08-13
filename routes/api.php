@@ -101,7 +101,7 @@ Route::prefix('v1')->group(function () {
 
         Route::group(['middleware' => "auth:sanctum"], function () {
             Route::controller(LabourAuthController::class)->group(function () {
-                Route::post("sign-up", "store");
+                Route::post("sign-up", "signUp");
                 Route::post("logout", "logOut");
             });
 

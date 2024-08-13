@@ -75,7 +75,7 @@ class AuthController extends Controller
         $data->email = $request->email;
         $data->state = $request->state;
         $data->city = $request->city;
-        $data->type = $request->type;
+       
         $data->gender = strtolower($request->gender);
         $data->lat_long = $request->lat_long;
         $data->address = $request->address;
