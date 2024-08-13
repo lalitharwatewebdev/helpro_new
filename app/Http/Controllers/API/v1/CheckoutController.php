@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Providers\RazorpayServiceProvider;
 use App\Models\Cart;
 use App\Models\Booking;
-
+use App\Models\BusinessSetting;
 
 class CheckoutController extends Controller
 {
@@ -30,7 +30,13 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
-        
+
+        $business_settings = BusinessSetting::pluck("value","key")->toArray();
+
+        $services_charges = $business_settings->service_charges;
+
+
+
         $request->validate([
             "start_date" => "required",
             "end_date" => "required",
@@ -54,8 +60,8 @@ class CheckoutController extends Controller
             $labour_arr[] = $cart->labour_id;
             $booking->user_id = auth()->user()->id;
             $booking->labour_id = $cart->labour_id;
-            $total_labour_amount += intval(round($cart->labour->rate_per_day)) * $date_result ;
-            $booking->total_amount = intval(round($cart->labour->rate_per_day)) * $date_result;
+            $total_labour_amount += intval(round($cart->labour->rate_per_day)) * $date_result + intval($services_charges) ;
+            $booking->total_amount = intval(round($cart->labour->rate_per_day)) * $date_result + intval($services_charges);
 
             $booking->save();
         }

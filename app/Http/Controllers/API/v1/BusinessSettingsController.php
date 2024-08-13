@@ -8,7 +8,7 @@ use App\Models\BusinessSetting;
 class BusinessSettingsController extends Controller
 {
     public function get(){
-        $data = BusinessSetting::pluck("value","key");
+        $data = BusinessSetting::pluck("value","key")->toArray();
 
         return response([
             "data" => $data,
