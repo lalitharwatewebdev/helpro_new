@@ -21,10 +21,11 @@ class UserController extends Controller
     public function activeStatus(Request $request){
         $data = User::find(auth()->user()->id);
 
-        $data->is_online = !$data->is_online;
-
+        $data->is_online = $data->is_online == "yes" ? "no" :"yes";
+        $data->save();
         return response([
             "message" => "Online Status Updated Successfully",
+            "online_status" => $data->is_online,
             "status" => true
         ],200);
     }

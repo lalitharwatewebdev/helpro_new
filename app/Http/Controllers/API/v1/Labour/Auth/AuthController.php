@@ -10,10 +10,11 @@ use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
 class AuthController extends Controller
 {
 
-    public function otpLogin(Request $request){
+    public function OtpLogin(Request $request){
+
         $request->validate([
-            "phone" => "required|numeric",
-            "device_id" => "required"
+            // "phone" => "required|numeric",
+            // "device_id" => "required"
         ]);
 
         $type = "old";
@@ -36,7 +37,8 @@ class AuthController extends Controller
             }
             $token = $user->createToken("user")->plainTextToken;
             $user->update([
-                "device_id" => $request->device_id
+                "device_id" => $request->device_id,
+                "type" => $request->type
             ]);
 
             return response([
@@ -61,7 +63,11 @@ class AuthController extends Controller
                 "status" => true
             ],200);
         }
+
+        
+
     }
+
 
     public function signUp(Request $request){
         $data = User::find(auth()->user()->id);

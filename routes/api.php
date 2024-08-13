@@ -93,7 +93,7 @@ Route::prefix('v1')->group(function () {
 
     // labour authController
     Route::prefix("labour")->group(function () {
-        Route::controller(LabourAuthController::class)->group(function () {
+        Route::controller(AuthController::class)->group(function () {
             Route::post("login", "OtpLogin");
         });
 
@@ -105,14 +105,14 @@ Route::prefix('v1')->group(function () {
                 Route::post("logout", "logOut");
             });
 
-        });
-        Route::controller(LabourUserController::class)->group(function () {
-            Route::get("profile", "profile");
-            Route::post("online-status", "activeStatus");
-            Route::get("/", "get");
-            Route::get("history", "history");
-            Route::get("accepted-booking","acceptedBooking");
-            Route::get('rejected-booking',"rejectedBooking");
+            Route::controller(LabourUserController::class)->group(function () {
+                Route::get("profile", "profile");
+                Route::post("online-status", "activeStatus");
+                Route::get("/", "get");
+                Route::get("history", "history");
+                Route::get("accepted-booking","acceptedBooking");
+                Route::get('rejected-booking',"rejectedBooking");
+            });
         });
     });
 });

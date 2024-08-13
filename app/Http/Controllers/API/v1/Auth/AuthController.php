@@ -52,7 +52,7 @@ class AuthController extends Controller
 
         $request->validate([
             // "phone" => "required|numeric",
-            "device_id" => "required"
+            // "device_id" => "required"
         ]);
 
         $type = "old";
@@ -75,7 +75,8 @@ class AuthController extends Controller
             }
             $token = $user->createToken("user")->plainTextToken;
             $user->update([
-                "device_id" => $request->device_id
+                "device_id" => $request->device_id,
+                "type" => $request->type
             ]);
 
             return response([
