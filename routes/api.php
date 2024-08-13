@@ -22,6 +22,8 @@ Route::prefix('v1')->group(function () {
         Route::post("login","OtpLogin");
     });
 
+
+    
     Route::controller(UserController::class)->prefix("user")->group(function(){
         Route::get("get-city","getCity");
         Route::get("get-state","getState");
@@ -105,4 +107,19 @@ Route::prefix('v1')->group(function () {
     //         Route::post('store' , 'store');
     //     });
     // });
+
+
+    // labour authController
+    Route::controller(AuthController::class)->prefix("labour")->group(function(){
+        Route::post("login","OtpLogin");
+    });
+
+    Route::group(['middleware' => "auth:sanctum"],function(){
+        Route::controller(UserController::class)->prefix("labour")->group(function(){
+            Route::post("sign-up","store");
+            Route::get("/","profile");
+            Route::post("logout","logOut");
+        });
+    });
+
 });

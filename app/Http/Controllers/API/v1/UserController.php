@@ -34,6 +34,7 @@ class UserController extends Controller
         $data->name = $request->username;
         $data->email = $request->email;
         $data->gender = $request->gender;
+        $data->type = $request->type;
         // $data->state = $request->state;
         // $data->city = $request->city;
         // $data->address = $request->address;
