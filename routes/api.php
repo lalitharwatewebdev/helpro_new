@@ -14,6 +14,9 @@ use App\Http\Controllers\API\v1\UserController;
 use App\Models\Cart;
 use App\Models\Checkout;
 
+
+use App\Http\Controllers\API\v1\Labour\Auth\AuthController as LabourAuthController;
+
 Route::prefix('v1')->group(function () {
 
    
@@ -110,15 +113,17 @@ Route::prefix('v1')->group(function () {
 
 
     // labour authController
-    Route::controller(AuthController::class)->prefix("labour")->group(function(){
-        Route::post("login","OtpLogin");
-    });
+    Route::prefix("labour")->group(function(){
 
-    Route::group(['middleware' => "auth:sanctum"],function(){
-        Route::controller(UserController::class)->prefix("labour")->group(function(){
-            Route::post("sign-up","store");
-            Route::get("/","profile");
-            Route::post("logout","logOut");
+        Route::controller(LabourAuthController::class)->group(function(){
+            Route::post("login","OtpLogin");
+        });
+    
+        Route::group(['middleware' => "auth:sanctum"],function(){
+            Route::controller(LabourAuthController::class)->group(function(){
+                Route::post("sign-up","store");
+                Route::post("logout","logOut");
+            });
         });
     });
 
