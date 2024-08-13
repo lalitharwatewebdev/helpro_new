@@ -11,8 +11,7 @@ use App\Http\Controllers\API\v1\CategoryController;
 use App\Http\Controllers\API\v1\CheckoutController;
 use App\Http\Controllers\API\v1\LabourController;
 use App\Http\Controllers\API\v1\UserController;
-use App\Models\Cart;
-use App\Models\Checkout;
+
 
 
 use App\Http\Controllers\API\v1\Labour\Auth\AuthController as LabourAuthController;
