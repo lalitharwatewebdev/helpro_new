@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Http\Controllers\Admin\BusinessSettingController;
+use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LabourController;
@@ -152,6 +153,21 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::name('users.')
         ->prefix('users')
         ->controller(UserController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get("details", "details")->name("details");
+            Route::get('blocked', 'index')->name('blocked');
+            Route::get('deleted', 'index')->name('deleted');
+            Route::post('store', 'store')->name('store');
+            Route::get('{id}/edit', "edit")->name('edit');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::post('update', 'update')->name('update');
+            Route::put('status', 'status')->name('status');
+        });
+
+
+    Route::name('carts.')
+        ->prefix('carts')
+        ->controller(CartController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get("details", "details")->name("details");
             Route::get('blocked', 'index')->name('blocked');

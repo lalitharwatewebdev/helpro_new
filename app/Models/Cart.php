@@ -19,6 +19,11 @@ class Cart extends Model
         return $this->belongsTo(User::class,"labour_id");
     }
 
+
+    public function user(){
+        return $this->belongsTo(User::class,"user_id");
+    }
+
     
 
 

@@ -63,6 +63,12 @@
       ]
     },
     {
+      "url": "admin/carts",
+      "name": "Cart Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "admin.carts.index"
+    },
+    {
       "url": "admin/subscriptions",
       "name": "Subscription Management",
       "icon": "<i data-feather='user'></i>",
