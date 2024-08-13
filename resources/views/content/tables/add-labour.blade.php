@@ -87,6 +87,7 @@
                         <x-divider text="Co-ordinate" />
                         <div id="map"></div>
                         <x-divider text="Work Details" />
+                        <div id="output"></div>
                         <div class="row">
                             <div class="col-lg-4 col-md-6">
                                 <x-input type="time" class="start_time" name="start_time" />
@@ -168,6 +169,57 @@
     </script>
 @endpushonce
 @section('page-script')
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initMap">
+    </script>
+
+<script>
+    var map;
+    var circle;
+
+    // Initialize the map
+    function initMap() {
+        var mapOptions = {
+            center: { lat: 19.0760, lng: 72.8777 }, // Default center position
+            zoom: 8 // Default zoom level
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        // Add a click event listener to the map
+        map.addListener('click', function(event) {
+            var lat = event.latLng.lat();
+            var lng = event.latLng.lng();
+
+            // Define the radius (in meters)
+            var radius = 5000; // Example: 1000 meters
+
+            // Remove the previous circle if it exists
+            if (circle) {
+                circle.setMap(null);
+            }
+
+            // Create a new circle
+            circle = new google.maps.Circle({
+                center: { lat: lat, lng: lng },
+                radius: radius,
+                map: map,
+                fillColor: '#FF0000',
+                fillOpacity: 0.35,
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2
+            });
+
+            // Output the center and radius
+            // entering latitude
+            document.getElementById("latitude").innerHTML = lat
+            document.getElementById("longitude").value = lng
+            document.getElementById("radius").value = radius
+
+           
+        });
+    }
+</script>
     <script>
         $(document).ready(function() {
             // $('#users-table_wrapper .dt-buttons').append(
@@ -247,28 +299,28 @@
     <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
 
     <script>
-        var map = L.map('map').setView([19.0760, 72.8777], 13);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
+        // var map = L.map('map').setView([19.0760, 72.8777], 13);
+        // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //     maxZoom: 19,
+        //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        // }).addTo(map);
 
-        var currentMarker = null;
+        // var currentMarker = null;
 
-        function onMapClick(e) {
-            if (currentMarker !== null) {
-                map.removeLayer(currentMarker);
-            }
+        // function onMapClick(e) {
+        //     if (currentMarker !== null) {
+        //         map.removeLayer(currentMarker);
+        //     }
 
-            currentMarker = L.marker(e.latlng).addTo(map);
-            alert("You clicked the map at Latitude: " + e.latlng.lat + ", Longitude: " + e.latlng.lng);
+        //     currentMarker = L.marker(e.latlng).addTo(map);
+        //     alert("You clicked the map at Latitude: " + e.latlng.lat + ", Longitude: " + e.latlng.lng);
 
-            var lat_long = document.querySelector(".lat_long")
-            lat_long.value = e.latlng.lat + "," + e.latlng.lng
+        //     var lat_long = document.querySelector(".lat_long")
+        //     lat_long.value = e.latlng.lat + "," + e.latlng.lng
 
-            currentMarker.bindPopup("You clicked the map at " + e.latlng.toString()).openPopup();
-        }
+        //     currentMarker.bindPopup("You clicked the map at " + e.latlng.toString()).openPopup();
+        // }
 
-        map.on('click', onMapClick);
+        // map.on('click', onMapClick);
     </script>
 @endsection

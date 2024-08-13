@@ -68,6 +68,13 @@
       "icon": "<i data-feather='user'></i>",
       "slug": "admin.promo-code.index"
     },
+
+    {
+      "url": "admin/areas",
+      "name": "Area Service Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "admin.areas.index"
+    },
     {
       "url": "admin/carts",
       "name": "Cart Management",

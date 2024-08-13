@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Areas;
+use App\Models\Category;
+use Illuminate\Http\Request;
+
+class AreaController extends Controller
+{
+    public function index()
+    {
+        return view("content.tables.areas");
+    }
+
+    public function addAreas()
+    {
+        $categories = Category::active()->get();
+        return view("content.tables.add-area-service", compact("categories"));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            "latitude" => "required",
+            "longitude" => "required",
+            'category' => 'required',
+            "radius" => "required",
+            "price" => "required|numeric"
+        ]);
+
+        $data = new Areas();
+
+        $data->price = $request->price;
+        $data->radius = $request->radius;
+        $data->latitude = $request->latitude;
+        $data->longitude = $request->longitude;
+        $data->category_id = $request->category;
+
+        $data->save();
+
+        return redirect()->route("admin.areas.index");
+    }
+
+    public function destroy($id)
+    {
+        Areas::find($id)->delete();
+
+        return response([
+            "message" => "Area Deleted Successfully",
+            "reload" => true
+        ]);
+    }
+}
