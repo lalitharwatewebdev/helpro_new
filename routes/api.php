@@ -90,13 +90,19 @@ Route::prefix('v1')->group(function () {
             });
         });
 
+    });
+
+
+
     // labour authController
     Route::prefix("labour")->group(function(){
         Route::controller(LabourAuthController::class)->group(function(){
             Route::post("login","OtpLogin");
         });
 
-        Route::group(['middleware' => "auth:sanctum"],function(){
+    });
+
+    Route::group(['middleware' => "auth:sanctum"],function(){
             Route::controller(LabourAuthController::class)->group(function(){
                 Route::post("sign-up","store");
                 Route::post("logout","logOut");
@@ -108,7 +114,9 @@ Route::prefix('v1')->group(function () {
                 Route::get("/","get");
                 Route::get("history","history");
             });
-        });
+    });
+   
     });
 
-});
+
+

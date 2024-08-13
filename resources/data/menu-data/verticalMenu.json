@@ -63,6 +63,12 @@
       ]
     },
     {
+      "url": "admin/promo-code",
+      "name": "Promo Code Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "admin.promo-code.index"
+    },
+    {
       "url": "admin/carts",
       "name": "Cart Management",
       "icon": "<i data-feather='user'></i>",
