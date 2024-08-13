@@ -16,6 +16,7 @@ use App\Http\Controllers\API\v1\UserController;
 
 use App\Http\Controllers\API\v1\Labour\Auth\AuthController as LabourAuthController;
 use App\Http\Controllers\API\v1\Labour\UserController as LabourUserController;
+use App\Http\Controllers\Api\v1\PromoCodeController;
 
 Route::prefix('v1')->group(function () {
 
@@ -43,6 +44,10 @@ Route::prefix('v1')->group(function () {
             Route::post("sign-up", "store");
             Route::get("/", "profile");
             Route::post("logout", "logOut");
+        });
+
+        Route::controller(PromoCodeController::class)->prefix("promo-code")->group(function(){
+            Route::get("/","get");
         });
 
         Route::controller(BannerController::class)->prefix("banner")->group(function () {
