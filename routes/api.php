@@ -90,35 +90,12 @@ Route::prefix('v1')->group(function () {
             });
         });
 
-        
-
-        
-
-       
-        // Route::controller(BusinessSettingsController::class)->prefix("")
-    });
-
-    // Route::controller(AuthController::class)->prefix('user')->group(function () {
-    //     Route::post('register', 'register');
-    //     Route::post('login', 'loginOne');
-    // });
-    // Route::group(['middleware' => 'auth:sanctum'], function () {
-    //     Route::controller(PostController::class)->prefix('post')->group(function(){
-    //         Route::post('store', 'store')->name('store');
-    //     });
-
-    //     Route::controller(FavouriteController::class)->prefix('favourite')->group(function(){
-    //         Route::post('store' , 'store');
-    //     });
-    // });
-
-
     // labour authController
     Route::prefix("labour")->group(function(){
         Route::controller(LabourAuthController::class)->group(function(){
             Route::post("login","OtpLogin");
         });
-        
+
         Route::group(['middleware' => "auth:sanctum"],function(){
             Route::controller(LabourAuthController::class)->group(function(){
                 Route::post("sign-up","store");
