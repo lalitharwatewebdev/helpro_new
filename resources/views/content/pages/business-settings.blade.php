@@ -50,10 +50,15 @@
                 </div>
             </div>
 
-            <x-divider text="RazorPay Key"/>
             <div class="col-md-6 mt-3">
            
-                <x-input name="razor_pay_key" label="Razor Pay Key  " />
+                <x-input name="razor_pay_key" :required="false" label="Razor Pay Key  " />
+            </div>
+
+
+            <div class="col-md-6 mt-3">
+           
+                <x-input name="service_charges" type="number" label="Services Charges" />
             </div>
             <div class="col-md-12 mt-3">
                 <label for="about_us">About Us</label>

@@ -30,6 +30,7 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        
         $request->validate([
             "start_date" => "required",
             "end_date" => "required",
@@ -53,7 +54,7 @@ class CheckoutController extends Controller
             $labour_arr[] = $cart->labour_id;
             $booking->user_id = auth()->user()->id;
             $booking->labour_id = $cart->labour_id;
-            $total_labour_amount += intval(round($cart->labour->rate_per_day)) * $date_result;
+            $total_labour_amount += intval(round($cart->labour->rate_per_day)) * $date_result ;
             $booking->total_amount = intval(round($cart->labour->rate_per_day)) * $date_result;
 
             $booking->save();

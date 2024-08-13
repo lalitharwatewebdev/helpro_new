@@ -12,7 +12,7 @@ class AuthController extends Controller
 
     public function otpLogin(Request $request){
         $request->validate([
-            // "phone" => "required|numeric",
+            "phone" => "required|numeric",
             "device_id" => "required"
         ]);
 
