@@ -112,6 +112,8 @@ Route::prefix('v1')->group(function () {
             Route::post("online-status", "activeStatus");
             Route::get("/", "get");
             Route::get("history", "history");
+            Route::get("accepted-booking","acceptedBooking");
+            Route::get('rejected-booking',"rejectedBooking");
         });
     });
 });

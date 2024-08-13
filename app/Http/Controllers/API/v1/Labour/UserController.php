@@ -54,4 +54,21 @@ class UserController extends Controller
             "status" => true
         ],200);
     }
+
+    public function acceptedBooking(){
+        $data = Booking::where("user_id",auth()->user()->id)->get();
+
+        return response([
+            "data" => $data,
+            "status" => true
+        ],200);
+    }
+
+    public function rejectedBooking(){
+        $data = Booking::where("user_id",auth()->user()->id)->get();
+        return response([
+            "data" => $data,
+            "status" => true
+        ],200);
+    }
 }
