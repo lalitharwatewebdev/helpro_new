@@ -57,7 +57,7 @@ class UserController extends Controller
     }
 
     public function acceptedBooking(){
-        $data = Booking::where("user_id",auth()->user()->id)->get();
+        $data = Booking::where("labour_id",auth()->user()->id)->where("payment_status","captured")->get();
 
         return response([
             "data" => $data,
@@ -66,7 +66,7 @@ class UserController extends Controller
     }
 
     public function rejectedBooking(){
-        $data = Booking::where("user_id",auth()->user()->id)->get();
+        $data = Booking::where("labour_id   ",auth()->user()->id)->get();
         return response([
             "data" => $data,
             "status" => true
