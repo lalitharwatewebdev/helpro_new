@@ -61,11 +61,13 @@
     // })
 
     function setValue(data, modal) {
-        $(`${modal} #id`).val(data.id);
-        $(`${modal} #title`).val(data.title);
-        // $(`${modal} #image`).val(data.image);
+        // $(`${modal} #id`).val(data.id);
+        // $(`${modal} #title`).val(data.title);
+        // // $(`${modal} #image`).val(data.image);
     
-        $(modal).modal('show');
+        // $(modal).modal('show');
+
+        // window.location.href = "{{route("admin.areas.edit",data.id)}}"
     }
 
 </script>

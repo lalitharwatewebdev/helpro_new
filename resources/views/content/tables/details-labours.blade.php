@@ -32,23 +32,27 @@
 
                         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
-                                <x-form id="add-slider" method="POST" class="" :route="route('admin.labours.update')">
-                                    @csrf
-                                    <x-card>
-                                        <div class="row ">
-                                            <div class="col-md-12">
-                                                <select name="labour_status" class="form-control" id="">
-                                                    <option value="">Pending</option>
-                                                    <option value="">Approved</option>
-                                                    <option value="">Rejected</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </x-card>
-                                </x-form>
+
                                 <x-card>
-
-
+                                    <div class="d-flex justify-content-center">
+                                        <div class="col-md-6">
+                                            <x-form x-form id="add-slider" method="POST" class="" :route="route('admin.labours.update')">
+                                                <x-input type="hidden" name="id" value="{{$data->id}}"/>
+                                                <label for="">Labour Type</label>
+                                                <select name="type" class="form-control select2" id="">
+                                                    <option value="pending"
+                                                        {{ $data->labour_status == 'pending' ? 'selected' : '' }}>Pending
+                                                    </option>
+                                                    <option value="accepted"
+                                                        {{ $data->labour_status == 'accepted' ? 'selected' : '' }}>Approved
+                                                    </option>
+                                                    <option value="rejected"
+                                                        {{ $data->labour_status == 'rejected' ? 'selected' : '' }}>Rejected
+                                                    </option>
+                                                </select>
+                                            </x-form>
+                                        </div>
+                                    </div>
                                     <x-divider text="Labour Basic Details" />
                                     <div class="row">
                                         <div class="col-lg-3 col-md-6 mb-2">
@@ -163,6 +167,7 @@
 
                                     </div>
                                 </x-card>
+
                             </div>
                         </div>
                     </div>

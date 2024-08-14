@@ -93,7 +93,7 @@ class AreasTable extends DataTableComponent
             Column::make('Actions')
                 ->label(function ($row, Column $column) {
                     $delete_route = route('admin.areas.destroy', $row->id);
-                    $edit_route = route('admin.areas.edit', $row->id);
+                    $edit_route = route('admin.areas.edit',$row->id);
                     $edit_callback = 'setValue';
                     $modal = '#edit-areas-modal';
                     return view('content.table-component.action', compact('edit_route', 'delete_route', 'edit_callback', 'modal'));

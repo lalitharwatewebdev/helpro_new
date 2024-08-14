@@ -175,9 +175,16 @@ class LabourController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        User::find($request->id)->update([
+            "labour_status" => $request->type
+        ]);
+
+        return response([
+
+            "message" => "Labour Updated Successfully"
+        ]);
     }
 
     /**

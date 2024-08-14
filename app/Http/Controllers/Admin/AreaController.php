@@ -52,4 +52,10 @@ class AreaController extends Controller
             "reload" => true
         ]);
     }
+
+    public function edit($id){
+       $data  =  Areas::find($id);
+        // dd($data);
+       return view("content.tables.edit-area-service",compact("data"));
+    }
 }
