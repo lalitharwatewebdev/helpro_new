@@ -98,7 +98,7 @@ Route::prefix('v1')->group(function () {
 
     // labour authController
     Route::prefix("labour")->group(function () {
-        Route::controller(AuthController::class)->group(function () {
+        Route::controller(LabourAuthController::class)->group(function () {
             Route::post("login", "OtpLogin");
         });
 

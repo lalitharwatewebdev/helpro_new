@@ -32,6 +32,20 @@
 
                         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
+                                <x-form id="add-slider" method="POST" class="" :route="route('admin.labours.update')">
+                                    @csrf
+                                    <x-card>
+                                        <div class="row ">
+                                            <div class="col-md-12">
+                                                <select name="labour_status" class="form-control" id="">
+                                                    <option value="">Pending</option>
+                                                    <option value="">Approved</option>
+                                                    <option value="">Rejected</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </x-card>
+                                </x-form>
                                 <x-card>
 
 
