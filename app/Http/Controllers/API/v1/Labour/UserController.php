@@ -35,6 +35,7 @@ class UserController extends Controller
 
         $booking_amount_data = Booking::where("labour_id",$labour_id)->sum("total_amount");
         $total_booking_accepted = Booking::where("labour_id",auth()->user()->id)->where("payment_status","captured")->count();
+        // $total_rejected_booking = Booking::where("")
 
 
         return response([
@@ -48,7 +49,9 @@ class UserController extends Controller
     public function history(){
        
 
-        $booking_data = Booking::with("user:id,name")->where("labour_id",auth()->user()->id)->latest()->get();
+        $booking_data = Booking::with("user:id,name")->where("labour_id",auth()->user()->id)->
+        where("payment_status","captured")->
+        latest()->get();
 
         return response([
             "data" => $booking_data,
