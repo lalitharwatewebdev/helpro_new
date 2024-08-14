@@ -57,7 +57,7 @@ class CategoryController extends Controller
         $lonMax = rad2deg($lonFrom + $lonDelta);
 
         // Get areas in bounding box
-        $areas = Areas::where('category_id', $category_id)
+        $areas = Areas::with("category:id,title,image")->where('category_id', $category_id)
             ->whereBetween('latitude', [$latMin, $latMax])
             ->whereBetween('longitude', [$lonMin, $lonMax])
             ->get()
