@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Booking;
+use App\Models\RejectedBooking;
 
 class UserController extends Controller
 {
@@ -34,7 +35,7 @@ class UserController extends Controller
         $labour_id = auth()->user()->id;
 
         $booking_amount_data = Booking::where("labour_id",$labour_id)->sum("total_amount");
-        $total_booking_accepted = Booking::where("labour_id",auth()->user()->id)->where("payment_status","captured")->count();
+        $total_booking_accepted = RejectedBooking::where("labour_id",auth()->user()->id)->count();
         // $total_rejected_booking = Booking::where("")
 
 
@@ -69,7 +70,7 @@ class UserController extends Controller
     }
 
     public function rejectedBooking(){
-        $data = Booking::where("labour_id",auth()->user()->id)->get();
+        $data = Booking::with("user:id,name")->where("labour_id",auth()->user()->id)->get();
         return response([
             "data" => $data,
             "status" => true

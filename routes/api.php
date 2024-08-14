@@ -15,6 +15,7 @@ use App\Http\Controllers\API\v1\UserController;
 
 
 use App\Http\Controllers\API\v1\Labour\Auth\AuthController as LabourAuthController;
+use App\Http\Controllers\Api\v1\Labour\RejectBookingController;
 use App\Http\Controllers\API\v1\Labour\UserController as LabourUserController;
 use App\Http\Controllers\Api\v1\PromoCodeController;
 
@@ -109,6 +110,10 @@ Route::prefix('v1')->group(function () {
             Route::controller(LabourAuthController::class)->group(function () {
                 Route::post("sign-up", "signUp");
                 Route::post("logout", "logOut");
+            });
+
+            Route::controller(RejectBookingController::class)->group(function(){
+                Route::post("reject-booking","rejectBooking");
             });
 
             Route::controller(LabourUserController::class)->group(function () {
