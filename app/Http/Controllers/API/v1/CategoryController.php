@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Areas;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -18,5 +19,77 @@ class CategoryController extends Controller
             "data" => $data,
             "status" => true  
         ],200);
+    }
+
+    public function getArea(Request $request)
+    {
+        $category_id = $request->query("category_id");
+        $lat_long = $request->query("lat_long");
+        $radius = 5;
+        
+        // Validate inputs
+        if (!$category_id || !$lat_long || !$radius) {
+            return response()->json(['error' => 'Missing parameters'], 400);
+        }
+
+        // Parse lat_long into latitude and longitude
+        list($latitude, $longitude) = explode(',', $lat_long);
+
+        // Ensure latitude and longitude are valid
+        if (!is_numeric($latitude) || !is_numeric($longitude) || !is_numeric($radius)) {
+            return response()->json(['error' => 'Invalid parameters'], 400);
+        }
+
+        // Query to get areas within a rough bounding box around the center point
+        $earthRadius = 6371; // Earth radius in kilometers
+
+        // Convert latitude and longitude from degrees to radians
+        $latFrom = deg2rad($latitude);
+        $lonFrom = deg2rad($longitude);
+
+        // Calculate bounding box
+        $latDelta = $radius / $earthRadius;
+        $lonDelta = $radius / ($earthRadius * cos($latFrom));
+
+        $latMin = rad2deg($latFrom - $latDelta);
+        $latMax = rad2deg($latFrom + $latDelta);
+        $lonMin = rad2deg($lonFrom - $lonDelta);
+        $lonMax = rad2deg($lonFrom + $lonDelta);
+
+        // Get areas in bounding box
+        $areas = Areas::where('category_id', $category_id)
+            ->whereBetween('latitude', [$latMin, $latMax])
+            ->whereBetween('longitude', [$lonMin, $lonMax])
+            ->get()
+            ->filter(function ($area) use ($latitude, $longitude, $radius) {
+                // Calculate distance to see if within radius
+                $distance = $this->haversineGreatCircleDistance(
+                    $latitude, $longitude,
+                    $area->latitude, $area->longitude
+                );
+                return $distance <= $radius;
+            });
+
+        return response([
+            "data" => $areas,
+            "status" => true
+        ], 200);
+    }
+
+
+    private function haversineGreatCircleDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // Radius of the Earth in kilometers
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
     }
 }

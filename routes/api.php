@@ -56,6 +56,7 @@ Route::prefix('v1')->group(function () {
 
         Route::controller(CategoryController::class)->prefix("category")->group(function () {
             Route::get("/", "get");
+            Route::get('get-area',"getArea");
         });
 
         Route::controller(LabourController::class)->prefix("labours")->group(function () {
