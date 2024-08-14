@@ -52,13 +52,13 @@
 
             <div class="col-md-6 mt-3">
            
-                <x-input name="razor_pay_key" :required="false" label="Razor Pay Key  " />
+                <x-input name="razor_pay_key" value="{{ $data['razor_pay_key'] ?? '' }}" :required="false" label="Razor Pay Key  " />
             </div>
 
 
             <div class="col-md-6 mt-3">
            
-                <x-input name="service_charges" type="number" label="Services Charges" />
+                <x-input name="service_charges" value="{{ $data['service_charges'] ?? '' }}" type="number" label="Services Charges" />
             </div>
             <div class="col-md-12 mt-3">
                 <label for="about_us">About Us</label>
