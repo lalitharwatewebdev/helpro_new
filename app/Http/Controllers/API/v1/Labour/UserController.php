@@ -32,7 +32,7 @@ class UserController extends Controller
 
     public function get(){
         $labour_id = auth()->user()->id;
-        
+
         $booking_amount_data = Booking::where("labour_id",$labour_id)->sum("total_amount");
         $total_booking_accepted = Booking::where("labour_id",auth()->user()->id)->where("payment_status","captured")->count();
 
@@ -48,7 +48,7 @@ class UserController extends Controller
     public function history(){
        
 
-        $booking_data = Booking::with("user:id,name")->where("user_id",auth()->user()->id)->latest()->get();
+        $booking_data = Booking::with("user:id,name")->where("labour_id",auth()->user()->id)->latest()->get();
 
         return response([
             "data" => $booking_data,
@@ -57,7 +57,7 @@ class UserController extends Controller
     }
 
     public function acceptedBooking(){
-        $data = Booking::where("labour_id",auth()->user()->id)->where("payment_status","captured")->get();
+        $data = Booking::with("user:id,name")->where("labour_id",auth()->user()->id)->where("payment_status","captured")->get();
 
         return response([
             "data" => $data,
