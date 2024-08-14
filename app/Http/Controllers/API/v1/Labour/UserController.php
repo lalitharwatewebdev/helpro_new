@@ -35,13 +35,15 @@ class UserController extends Controller
         $labour_id = auth()->user()->id;
 
         $booking_amount_data = Booking::where("labour_id",$labour_id)->sum("total_amount");
-        $total_booking_accepted = RejectedBooking::where("labour_id",auth()->user()->id)->count();
-        // $total_rejected_booking = Booking::where("")
+        $total_booking_accepted = Booking::where("labour_id",auth()->user()->id)->where("payment_status","captured")->count();
+        $total_rejected_booking = RejectedBooking::with("checkout")->where("labour_id",auth()->user()->id)->get();
 
 
         return response([
             "total_amount" => $booking_amount_data,
             "total_booking_accepted" =>   $total_booking_accepted,
+            "total_booking_rejected" => $total_rejected_booking,
+            "ip" => request()->ip(),
             "status" => true
         ],200);
     }
