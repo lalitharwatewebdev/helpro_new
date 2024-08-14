@@ -67,7 +67,6 @@
     
         // $(modal).modal('show');
 
-        // window.location.href = "{{route("admin.areas.edit",data.id)}}"
     }
 
 </script>
