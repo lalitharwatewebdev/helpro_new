@@ -29,7 +29,7 @@
                         @csrf
 
                         <div class="col-lg-4 col-md-6">
-                            <x-input name="latitude"  />
+                            <x-input name="latitude" />
                         </div>
 
                         <div class="col-lg-4 col-md-6">
@@ -41,13 +41,16 @@
                         <div class="col-lg-4 col-md-6">
                             <x-input name="price" type="number" />
                         </div>
+                        <div class="col-lg-4 col-md-6">
+                            <x-input name="area_name" />
+                        </div>
 
                         <div class="col-lg-4 col-md-6">
                             <label for="">Category</label>
                             <select name="category" id="" class="form-control select2">
                                 <option value="" selected>Select Category</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{$category->id}}">{{$category->title}}</option>
+                                    <option value="{{ $category->id }}">{{ $category->title }}</option>
                                 @endforeach
                             </select>
                         </div>

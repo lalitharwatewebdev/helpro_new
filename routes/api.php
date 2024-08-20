@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\LabourBusinessSettings;
 use App\Http\Controllers\API\v1\AddressController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\Auth\AuthController;
@@ -15,9 +16,11 @@ use App\Http\Controllers\API\v1\UserController;
 
 
 use App\Http\Controllers\API\v1\Labour\Auth\AuthController as LabourAuthController;
-use App\Http\Controllers\Api\v1\Labour\RejectBookingController;
+use App\Http\Controllers\API\v1\Labour\RejectBookingController;
+use App\Http\Controllers\API\v1\Labour\SliderController;
 use App\Http\Controllers\API\v1\Labour\UserController as LabourUserController;
-use App\Http\Controllers\Api\v1\PromoCodeController;
+use App\Http\Controllers\API\v1\PromoCodeController;
+use PhpOffice\PhpSpreadsheet\RichText\Run;
 
 Route::prefix('v1')->group(function () {
 
@@ -36,9 +39,14 @@ Route::prefix('v1')->group(function () {
 
     Route::controller(BusinessSettingsController::class)->prefix("business-settings")->group(function () {
         Route::get("/", "get");
+        Route::get("labour","labourGet");
     });
 
+    // Route::controller(LabourBusinessSettings::class)->prefix("labour-business")
 
+    Route::controller(CategoryController::class)->prefix("category")->group(function () {
+        Route::get("/", "get");
+    });
 
     Route::group(['middleware' => "auth:sanctum"], function () {
         Route::controller(UserController::class)->prefix("user")->group(function () {
@@ -55,10 +63,7 @@ Route::prefix('v1')->group(function () {
             Route::get("/", 'get');
         });
 
-        Route::controller(CategoryController::class)->prefix("category")->group(function () {
-            Route::get("/", "get");
-            Route::get('get-area',"getArea");
-        });
+        
 
         Route::controller(LabourController::class)->prefix("labours")->group(function () {
             Route::get("/", "get");
@@ -70,9 +75,14 @@ Route::prefix('v1')->group(function () {
             Route::post("delete", "delete");
         });
 
+        Route::controller(CategoryController::class)->prefix("category")->group(function () {
+            Route::post('get-area',"getArea");
+        });
+
         Route::controller(CheckoutController::class)->prefix("checkouts")->group(function () {
             Route::post("store", "store");
             Route::post("fetch-order", "fetchOrder");
+            Route::get("get-booking","bookingData");
         });
 
         Route::controller(AddressController::class)->prefix("addresses")->group(function () {
@@ -112,6 +122,8 @@ Route::prefix('v1')->group(function () {
                 Route::post("logout", "logOut");
             });
 
+            // Route::controller(SliderController::class)->grou
+
             Route::controller(RejectBookingController::class)->group(function(){
                 Route::post("reject-booking","rejectBooking");
             });
@@ -123,6 +135,8 @@ Route::prefix('v1')->group(function () {
                 Route::get("history", "history");
                 Route::get("accepted-booking","acceptedBooking");
                 Route::get('rejected-booking',"rejectedBooking");
+                Route::post("accept-user-booking","AcceptedUserBooking");
+                Route::post("reject-user-booking","rejectUserBooking");
             });
         });
     });

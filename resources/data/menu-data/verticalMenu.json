@@ -94,10 +94,26 @@
       "slug": "admin.transactions.index"
     },
     {
-      "url": "admin/business-settings",
-      "name": "Business Settings",
+    "name": "Labour Management",
       "icon": "<i data-feather='user'></i>",
-      "slug": "admin.business-settings.index"
-    }
+      "slug": "",
+      "submenu": [ 
+
+        {
+          "url": "admin/business-settings",
+          "name": "User Business Settings",
+          "icon": "<i data-feather='user'></i>",
+          "slug": "admin.business-settings.index"
+        },
+    
+          {
+            "url": "admin/labour-business-settings",
+            "name": "Labour Business Settings",
+            "icon": "<i data-feather='user'></i>",
+            "slug": "admin.labour-business-settings.index"
+          }
+      
+
+      ] }
   ]
 }

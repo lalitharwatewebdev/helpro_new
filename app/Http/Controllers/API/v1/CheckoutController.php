@@ -7,7 +7,10 @@ use App\Models\Checkout;
 use Illuminate\Http\Request;
 use App\Providers\RazorpayServiceProvider;
 use App\Models\Cart;
+use App\Models\Areas;
 use App\Models\Booking;
+use App\Models\BookingRequest;
+use Razorpay\Api\Api;
 use App\Models\BusinessSetting;
 
 class CheckoutController extends Controller
@@ -30,13 +33,8 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
-
-        $business_settings = BusinessSetting::pluck("value","key")->toArray();
-
-        $services_charges = $business_settings->service_charges;
-
-
-
+        $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+        $services_charges =  $business_settings['service_charges'];
         $request->validate([
             "start_date" => "required",
             "end_date" => "required",
@@ -44,47 +42,59 @@ class CheckoutController extends Controller
             "end_time" => "required"
         ]);
 
-        $user_cart = Cart::with("labour:id,rate_per_day")->where("user_id", auth()->user()->id)->select("labour_id")->get();
-        // calculating time difference
-        $labour_arr = array();
-        // return $user_cart;
-        $diff = (strtotime($request->end_date) - strtotime($request->start_date));
+        // $user = Cart::with("labour:id,rate_per_day")
+        //     ->where("user_id", auth()->user()->id)
+        //     ->select("labour_id")
+        //     ->get();
 
+        $area = Areas::find($request->area_id);
+        // return $area;
+
+        $labour_arr = [];
+        $diff = (strtotime($request->end_date) - strtotime($request->start_date));
         $date_result = abs(round($diff) / 86400) + 1;
 
-        $total_labour_amount = 0;
-        $booking = '';
-
-        foreach ($user_cart as $cart) {
-            $booking = new Booking();
-            $labour_arr[] = $cart->labour_id;
-            $booking->user_id = auth()->user()->id;
-            $booking->labour_id = $cart->labour_id;
-            $total_labour_amount += intval(round($cart->labour->rate_per_day)) * $date_result + intval($services_charges) ;
-            $booking->total_amount = intval(round($cart->labour->rate_per_day)) * $date_result + intval($services_charges);
-
-            $booking->save();
-        }
-        $order = $this->razorpay->createOrder($total_labour_amount, "INR", $labour_arr)->toArray();
+        $amount = (intval($area->price) * intval($request->quantity)) * $date_result + $services_charges;
 
         $data = new Checkout();
-
         $data->start_date = $request->start_date;
         $data->end_date = $request->end_date;
         $data->start_time = $request->start_time;
         $data->end_time = $request->end_time;
         $data->address_id = $request->address_id;
         $data->user_id = auth()->user()->id;
+        $data->category_id = $request->category_id;
+        $data->area_id = $request->area_id;
+        $data->labour_quantity = $request->quantity;
         $data->note = $request->note;
-
         $data->save();
 
-        return response([
+        $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+
+        $booking = new Booking();
+        // $labour_arr[] = $cart->labour_id;
+        $booking->user_id = auth()->user()->id;
+        // $booking->labour_id = $cart->labour_id;
+        // $booking->total_amount = $amount - $services_charges;
+        $booking->total_amount = $amount;
+        $booking->service_charges = $services_charges;
+        $booking->checkout_id = $data->id;
+        $booking->quantity_required =  $request->quantity;
+        $booking->otp = mt_rand(111111, 999999);
+        $booking->save();
+
+
+
+        $booking_request = new BookingRequest();
+
+        return response()->json([
             "message" => "Checkout created successfully",
-            "order_id" => $order["id"],
+            "order_id" => $order['id'],
+            "checkout_id" => $data->id,
             "status" => true
         ], 200);
     }
+
 
     public function fetchOrder(Request $request)
     {
@@ -92,24 +102,68 @@ class CheckoutController extends Controller
             "order_id" => "required"
         ]);
 
+        $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
 
-        $labour_id = Cart::where("user_id", auth()->user()->id)->get();
-
-        $labour_data = $labour_id->pluck("labour_id")->toArray();
 
 
-        Cart::where("user_id", auth()->user()->id)->delete();
+        if ($fetchOrder['status'] == 'true') {
+            Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder->order_id->notes->checkout_id)->update([
+                "payment_status" => "captured",
+                "otp" => mt_rand(111111, 999999),
+            ]);
+            return response([
+                "message" => "Booking Done Successfully"
+            ], 200);
+        } else {
+            return response([
+                "message" => "Transaction Failure"
+            ], 200);
+        }
+
+        // $labour_id = Cart::where("user_id", auth()->user()->id)->get();
+
+        // $labour_data = $labour_id->pluck("labour_id")->toArray();
+
+
+
 
         // adding to booking page
-        Booking::where("user_id", auth()->user()->id)->whereIn("labour_id", $labour_data)->update([
-            "payment_status" => "captured",
-            "otp" => $this->randomNumber()
-        ]);
-        return response([
-            "message" => "Booking Done Successfully"
+
+
+        // $booking_data = Booking::with('user',"checkout")->where("user_id",auth()->user()->id)->get();
+
+        // return response([
+        //     "data" => $booking_data,
+        //     "status" => true
+        //     ],200);
+
+    }
+
+    public function bookingData()
+    {
+        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout.address'])
+            ->where('payment_status', 'captured')
+            ->where('user_id', auth()->user()->id)
+            ->latest()
+            ->get();
+
+        // Iterate through each booking to update the status if needed
+        // foreach ($data as $booking) {
+        //     if ($booking->current_quantity == $booking->quantity_required) {
+        //         $booking->booking_status = 'complete';
+        //         $booking->save(); // Save the updated status to the database
+        //     }
+        // }
+
+        // Return the updated data
+        return response()->json([
+            'data' => $data,
+            'status' => true,
         ], 200);
     }
 
 
+   
 }

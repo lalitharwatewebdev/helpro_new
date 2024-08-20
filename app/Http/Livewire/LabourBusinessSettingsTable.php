@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Livewire;
 
-use App\Models\Areas;
+use App\Models\LabourBusinessSettings;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
@@ -11,10 +11,10 @@ use App\Exports\CustomExport;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 
         
-class AreasTable extends DataTableComponent
+class LabourBusinessSettingsTable extends DataTableComponent
 {
 
-    protected $model = Areas::class;
+    protected $model = LabourBusinessSettings::class;
     public $counter = 1;
     public function mount()
     {
@@ -35,7 +35,7 @@ class AreasTable extends DataTableComponent
             ->setDefaultSort('id', 'desc')
             ->setEmptyMessage('No Result Found')
             ->setTableAttributes([
-                'id' => 'areas-table',
+                'id' => 'labourbusinesssettings-table',
             ])
             ->setBulkActions([
                 'exportSelected' => 'Export',
@@ -44,7 +44,7 @@ class AreasTable extends DataTableComponent
                 'toolbar-right-end' => 'content.rapasoft.add-button',
                 'toolbar-left-end' => [
                     'content.rapasoft.active-inactive', [
-                        'route' => 'admin.areas.index',
+                        'route' => 'admin.labourbusinesssettingss.index',
                     ]
                 ]
             ]);
@@ -53,62 +53,24 @@ class AreasTable extends DataTableComponent
     public function columns(): array
     {
         return [
-            
+            Column::make('Actions')
+                ->label(function ($row, Column $column) {
+                    $delete_route = route('admin.labourbusinesssettingss.destroy', $row->id);
+                    $edit_route = route('admin.labourbusinesssettingss.edit', $row->id);
+                    $edit_callback = 'setValue';
+                    $modal = '#edit-labourbusinesssettings-modal';
+                    return view('content.table-component.action', compact('edit_route', 'delete_route', 'edit_callback', 'modal'));
+                }),
+            Column::make('status')
+                ->format(function ($value, $data, Column $column) {
+                    $route = route('admin.labourbusinesssettingss.status');
+                    return view('content.table-component.switch', compact('data', 'route'));
+                }),
             Column::make('SrNo.', 'id')
             ->format(function ($value, $row, Column $column) {
                 return (($this->page - 1) * $this->getPerPage()) + ($this->counter++);
             })
             ->html(),
-
-            Column::make('Latitude', 'latitude')
-            ->format(function ($value, $row, Column $column) {
-                return $value;
-            })
-            ->html(),
-
-            Column::make('Longtitude', 'longitude')
-            ->format(function ($value, $row, Column $column) {
-                return $value;
-            })
-            ->html(),
-
-            Column::make('Radius', 'radius')
-            ->format(function ($value, $row, Column $column) {
-                return $value;
-            })
-            ->html(),
-
-            Column::make('Price', 'price')
-            ->format(function ($value, $row, Column $column) {
-                return $value;
-            })
-            ->html(),
-            
-             Column::make('Area Name', 'area_name')
-            ->format(function ($value, $row, Column $column) {
-                return $value;
-            })
-            ->html(),
-
-            Column::make('Category', 'category_id')
-            ->format(function ($value, $row, Column $column) {
-                return $row->category->title ?? "";
-            })
-            ->html(),
-
-            Column::make('Actions')
-                ->label(function ($row, Column $column) {
-                    $delete_route = route('admin.areas.destroy', $row->id);
-                    $edit_route = route('admin.areas.edit',$row->id);
-                    $edit_callback = 'setValue';
-                    $modal = '#edit-areas-modal';
-                    return view('content.table-component.action', compact('edit_route', 'delete_route', 'edit_callback', 'modal'));
-                }),
-            Column::make('status')
-                ->format(function ($value, $data, Column $column) {
-                    $route = route('admin.areas.status');
-                    return view('content.table-component.switch', compact('data', 'route'));
-                }),
                  
                 
                 // Column::make('image')
@@ -121,14 +83,14 @@ class AreasTable extends DataTableComponent
                 // })
                 // ->html(),
 
-                // Column::make('Location', 'created_at')
-                // ->format(function ($value) {
-                //     return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
+                Column::make('Created at', 'created_at')
+                ->format(function ($value) {
+                    return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
 
-                // })
-                // ->html()
-                // ->collapseOnTablet()
-                // ->sortable(),
+                })
+                ->html()
+                ->collapseOnTablet()
+                ->sortable(),
             // Column::make('Updated at', 'updated_at')
             //     ->format(function ($value) {
             //        return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
@@ -159,15 +121,14 @@ class AreasTable extends DataTableComponent
             //         'maxlength' => '25',
             //     ])
             //     ->filter(function (Builder $builder, string $value) {
-            //         $builder->where('areas.name', 'like', '%' . $value . '%');
+            //         $builder->where('labourbusinesssettingss.name', 'like', '%' . $value . '%');
             //     }),
         ];
     }
 
     public function builder(): Builder
     {
-        $modal = Areas::query();
-        $modal->with("category");
+        $modal = LabourBusinessSettings::query();
         return $modal;
     }
 
@@ -182,8 +143,8 @@ class AreasTable extends DataTableComponent
 
     public function exportSelected()
     {
-        $modelData = new Areas;
-        return Excel::download(new CustomExport($this->getSelected(), $modelData), 'areas.xlsx');
+        $modelData = new LabourBusinessSettings;
+        return Excel::download(new CustomExport($this->getSelected(), $modelData), 'labourbusinesssettingss.xlsx');
     }
 }
         

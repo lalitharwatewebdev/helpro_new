@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1\Labour\Auth;
+namespace App\Http\Controllers\API\v1\Labour\Auth;
 
 use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
@@ -67,47 +67,46 @@ class AuthController extends Controller
                     "status" => true
                 ],200);
             }
-           
-        
-
-        
-
     }
-
 
     public function signUp(Request $request){
         $data = User::find(auth()->user()->id);
+        // return $data;
         $data->name = $request->name;        
         $data->email = $request->email;
         $data->state = $request->state;
-        $data->phone = $request->phone;
+        $data->city = $request->city;
         if($request->profile_image){
-            $data->profile_image = FileUploader::uploadFile($request->profile_image,"images/profile_pic");
+            $data->profile_pic = FileUploader::uploadFile($request->profile_image,"images/profile_pic");
         }
-
         if($request->aadhaar_card_front){
             $data->aadhaar_card_front = FileUploader::uploadFile($request->aadhaar_card_front,"images/aadhaar_card");
         }
-
         if($request->aadhaar_card_back){
             $data->aadhaar_card_back = FileUploader::uploadFile($request->aadhaar_card_back,"images/aadhaar_card");
         }
-
         $data->aadhaar_number = $request->aadhaar_number;
         $data->pan_card_number = $request->pan_number;
         $data->bank_name = $request->bank_name;
         $data->branch_address = $request->bank_address;
-
         $data->pan_card_number = $request->pan_number;
-        $data->category = $request->category_id;
+        if($request->pan_front){
+            $data->pan_front = FileUploader::uploadFile($request->pan_front,"images/pan_card");
+        }
+        // $data->category = $request->category_id;
         $data->category()->attach($request->category);
         $data->gender = strtolower($request->gender);
         $data->lat_long = $request->lat_long;
         $data->address = $request->address;
         $data->start_time = $request->start_time;
         $data->end_time = $request->end_time;
-        $data->preferred_shift = strtolower($request->preferred_shifts);
-        $data->rate_per_day = $request->rate_per_day;
+        $data->IFSC_code = $request->ifsc_code;
+       
+        // $data->preferred_shift = strtolower($request->preferred_shifts);
+        $data->availability = $request->days_available;
+        $data->qualification = $request->qualification;
+        // $data->rate_per_day = $request->rate_per_day;
+        $data->account_number = $request->account_number;
         $data->save();
 
         return response([
@@ -124,5 +123,5 @@ class AuthController extends Controller
             "message" => "Labour Logout Successfully",
             "status" => true
         ],200);
-    }
+    }   
 }

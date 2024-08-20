@@ -27,6 +27,7 @@ class AreaController extends Controller
             "longitude" => "required",
             'category' => 'required',
             "radius" => "required",
+            "area_name" => "required",
             "price" => "required|numeric"
         ]);
 
@@ -37,6 +38,7 @@ class AreaController extends Controller
         $data->latitude = $request->latitude;
         $data->longitude = $request->longitude;
         $data->category_id = $request->category;
+        $data->area_name = $request->area_name;
 
         $data->save();
 
@@ -53,9 +55,10 @@ class AreaController extends Controller
         ]);
     }
 
-    public function edit($id){
-       $data  =  Areas::find($id);
+    public function edit($id)
+    {
+        $data = Areas::find($id);
         // dd($data);
-       return view("content.tables.edit-area-service",compact("data"));
+        return view("content.tables.edit-area-service", compact("data"));
     }
 }

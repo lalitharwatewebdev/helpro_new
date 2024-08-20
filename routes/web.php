@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BusinessSettingController;
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LabourBusinessSettings;
 use App\Http\Controllers\Admin\LabourController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\SliderController;
@@ -43,6 +44,13 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::name('business-settings.')
         ->prefix('business-settings')
         ->controller(BusinessSettingController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('store', 'store')->name('store');
+        });
+
+        Route::name('labour-business-settings.')
+        ->prefix('labour-business-settings')
+        ->controller(LabourBusinessSettings::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('store', 'store')->name('store');
         });
