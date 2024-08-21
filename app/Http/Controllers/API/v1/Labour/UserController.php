@@ -40,6 +40,10 @@ class UserController extends Controller
 
     public function get()
     {
+        $earthRadius = 6371; 
+        $latitude = 19.1985893;
+        $longitude = 72.955762;
+
         $labour_id = auth()->user();
         $categories =  $labour_id->category()->first();
         $category_id =  $categories->pivot->category_id;
@@ -54,10 +58,7 @@ class UserController extends Controller
 
         $total_booking_accepted = AcceptedBooking::where("labour_id", auth()->user()->id)->count();
         $total_rejected_booking = RejectedBooking::where("labour_id", auth()->user()->id)->count();
-        // return Booking::where("user_id",auth()->user()->id)->get();
-        $earthRadius = 6371; // Earth radius in kilometers
-        $latitude = 19.1985893;
-        $longitude = 72.955762;
+
 
         // Convert latitude and longitude from degrees to radians
         $latFrom = deg2rad($latitude);
@@ -90,31 +91,33 @@ class UserController extends Controller
             })->first();
 
         // getting checkout id as per user location
-        $checkout = Checkout::where("area_id", $area->id)
-            ->where("category_id", $category_id)->first();
+        $checkouts = Checkout::where("area_id", $area->id)
+            ->where("category_id", $category_id)->get();
 
-        $booking =  Booking::where("checkout_id", $checkout->id)->first();
+            // return $checkout;
+            // foreach($checkouts as $checkout){
+            //     $get_bookings =  Booking::where("checkout_id", $checkout->id)->first();
+            //     $current_user_booking = BookingRequest::where("booking_id",$get_bookings->id)->first();
+                
+            //     // this is checking to see if required quantity does not match current _current
+            //     // if ($get_bookings->quantity_required != $get_bookings->current_quantity && !$current_user_booking) {
+            //     //     $request_booking = new BookingRequest();
+            //     //     $request_booking->user_id = auth()->user()->id;
+            //     //     $request_booking->area_id = $area->id;
+            //     //     $request_booking->checkout_id = $checkout->id;
+            //     //     $request_booking->category_id = $category_id;
+            //     //     $request_booking->booking_id = $get_bookings->id;
+            //     //     $request_booking->save();
+            //     // }
+            // }
 
-        // checking if request booking is present for the current user
-        $current_user_booking = BookingRequest::where("booking_id", $booking->id)->where("user_id", auth()->user()->id)->first();
+             
 
-
-
-        // this is checking to see if required quantity does not match current _current
-        if ($booking->quantity_required != $booking->current_quantity && !$current_user_booking) {
-            $request_booking = new BookingRequest();
-            $request_booking->user_id = auth()->user()->id;
-            $request_booking->area_id = $area->id;
-            $request_booking->checkout_id = $checkout->id;
-            $request_booking->category_id = $category_id;
-            $request_booking->booking_id = $booking->id;
-            $request_booking->save();
-        }
-
+        // getting total amount of user booking
         $bookings = BookingRequest::with("checkout", "checkout.user:id,name", "checkout.address.states:id,name", "checkout.address.cities:id,name", "checkout.area")->where("user_id", auth()->user()->id)
             ->where("category_id", $category_id)->get();
 
-        // return $bookings;
+        
 
         foreach ($bookings as $booking) {
             $start_date = $booking->checkout->start_time;

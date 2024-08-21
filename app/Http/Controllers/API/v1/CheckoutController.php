@@ -7,6 +7,7 @@ use App\Models\Checkout;
 use Illuminate\Http\Request;
 use App\Providers\RazorpayServiceProvider;
 use App\Models\Cart;
+use App\Models\AcceptedBooking;
 use App\Models\Areas;
 use App\Models\Booking;
 use App\Models\BookingRequest;
@@ -71,8 +72,8 @@ class CheckoutController extends Controller
 
         $order = $this->razorpay->createOrder($amount, "INR", $data->id);
 
-    
-        
+
+
 
         $booking = new Booking();
         // $labour_arr[] = $cart->labour_id;
@@ -112,7 +113,7 @@ class CheckoutController extends Controller
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
         // return $fetchOrder;
 
-        if ($fetchOrder['status'] == true){
+        if ($fetchOrder['status'] == true) {
             Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
                 "payment_status" => "captured",
                 "otp" => mt_rand(111111, 999999),
@@ -147,27 +148,37 @@ class CheckoutController extends Controller
 
     public function bookingData()
     {
+        // Fetch booking data with related models
         $data = Booking::with(['checkout.category', 'checkout.area', 'checkout.address'])
             ->where('payment_status', 'captured')
             ->where('user_id', auth()->user()->id)
             ->latest()
             ->get();
 
-        // Iterate through each booking to update the status if needed
-        // foreach ($data as $booking) {
-        //     if ($booking->current_quantity == $booking->quantity_required) {
-        //         $booking->booking_status = 'complete';
-        //         $booking->save(); // Save the updated status to the database
-        //     }
-        // }
+     
+        $processedData = $data->map(function ($booking) {
 
-        // Return the updated data
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-        ], 200);
+           
+            if ($booking->current_quantity == $booking->quantity_required) {
+                $booking->booking_status = "completed";
+            }
+
+           
+            $labours = AcceptedBooking::with('labour:id,name,phone')
+                ->where("booking_id", $booking->id)
+                ->get();
+
+           
+            $booking->labours = $labours;
+
+          
+            return $booking;
+        });
+
+        
+        return response([
+            "data" => $data,
+            "status" => true
+        ],200);
     }
-
-
-   
 }
