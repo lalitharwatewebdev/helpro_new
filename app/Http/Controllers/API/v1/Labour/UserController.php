@@ -49,7 +49,8 @@ class UserController extends Controller
         $total_amount = $booking_amount_data->sum(function($acceptedBooking){
             return $acceptedBooking->booking->total_amount; 
         });
-        // $total_booking_accepted = Booking::where("labour_id", auth()->user()->id)->where("payment_status", "captured")->count();
+
+      
 
         $total_booking_accepted = AcceptedBooking::where("labour_id", auth()->user()->id)->count();
         $total_rejected_booking = RejectedBooking::where("labour_id", auth()->user()->id)->count();
@@ -101,13 +102,6 @@ class UserController extends Controller
 
         // this is checking to see if required quantity does not match current _current
         if ($booking->quantity_required != $booking->current_quantity && !$current_user_booking) {
-            // $data = [
-
-            //     "required" => $booking->quantity_required,
-
-            //     "current" => $booking->current_quantity
-            // ];
-            // return $data;
             $request_booking = new BookingRequest();
             $request_booking->user_id = auth()->user()->id;
             $request_booking->area_id = $area->id;
@@ -130,11 +124,7 @@ class UserController extends Controller
 
             $labour_quantity = $booking->checkout->labour_quantity;
             $area_price = $booking->checkout->area->price;
-
-
-
             $final_price = ($area_price * $date_result) / $labour_quantity;
-
             $booking->labour_total_amount = round($final_price, 2);
         }
 
@@ -148,32 +138,55 @@ class UserController extends Controller
             "total_rejected_booking" => $total_rejected_booking,
             "status" => true
         ], 200);
-    }
+    }   
 
 
     public function history()
     {
         // Fetch accepted and rejected bookings
-        $accepted_bookings = AcceptedBooking::with("booking.checkout.address.states:id,name","booking.checkout.address.cities:id,name","booking.checkout.user:id,name,phone,lat_long")
+        $accepted_bookings = AcceptedBooking::with("booking.checkout.address.states:id,name", "booking.checkout.address.cities:id,name", "booking.checkout.user:id,name,phone,lat_long")
             ->where("labour_id", auth()->user()->id)
             ->latest()
             ->get();
 
-        $rejected_bookings = RejectedBooking::with("booking.checkout.address.states:id,name","booking.checkout.address.cities:id,name","booking.checkout.user:id,name,phone,lat_long")
+        $rejected_bookings = RejectedBooking::with("booking.checkout.address.states:id,name", "booking.checkout.address.cities:id,name", "booking.checkout.user:id,name,phone,lat_long")
             ->where("labour_id", auth()->user()->id)
             ->latest()
             ->get();
 
-       
+
         $combined_bookings = $accepted_bookings->merge($rejected_bookings);
 
-       
         $sorted_bookings = $combined_bookings->sortByDesc('created_at');
 
-        
+
         $formatted_bookings = $sorted_bookings->values()->all();
 
-       
+
+        $results = [];
+
+        foreach ($formatted_bookings as $booking) {
+            $bookingData = $booking->booking;
+            $start_date = $booking->booking->checkout->start_date;
+            $end_date = $booking->booking->checkout->end_date;
+            $diff = (strtotime($start_date) - strtotime($end_date));
+            $date_result = abs(round($diff) / 86400) + 1;
+            $labour_quantity = $booking->booking->checkout->labour_quantity;
+            $area_price = $booking->booking->checkout->area->price;
+
+            $final_price = ($area_price * $date_result) / $labour_quantity;
+
+            $bookingData->labour_total_amount = round($final_price, 2);
+            $results[] = $bookingData;
+           
+        }
+
+    
+
+        // Optionally, you can sort $results if needed, e.g., by start_date
+        $sorted_results = collect($results)->sortByDesc('start_date')->values()->all();
+
+
 
         return response([
             "data" => $formatted_bookings,
