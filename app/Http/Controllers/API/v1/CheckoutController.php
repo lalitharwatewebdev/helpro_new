@@ -11,6 +11,7 @@ use App\Models\AcceptedBooking;
 use App\Models\Areas;
 use App\Models\Booking;
 use App\Models\BookingRequest;
+use App\Models\Category;
 use Razorpay\Api\Api;
 use App\Models\BusinessSetting;
 
@@ -162,15 +163,13 @@ class CheckoutController extends Controller
             }
 
            
-            $labours = AcceptedBooking::with('labour')
+            $labours = AcceptedBooking::with('labour:id,name,email,phone,profile_pic,otp')
                 ->where("booking_id", $booking->id)
                 ->get();
 
-                $labours->map(function($labour){
-                    $labour->otp= mt_rand(111111,999999);
-                    return $labour;
-                });
-
+            // $processedCategory = $labours->map(function($labours){
+            //     $booking->labours->category = Category::where("id",$labours->id)->first();
+            // });
            
             $booking->labours = $labours;
 
