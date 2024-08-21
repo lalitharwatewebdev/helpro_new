@@ -28,7 +28,7 @@ class CategoryController extends Controller
     {
         $category_id = $request->category_id;
         $lat_long = $request->lat_long;
-        $radius = 5;
+        $radius = 100;
 
         // Validate inputs
         if (!$category_id || !$lat_long || !$radius) {

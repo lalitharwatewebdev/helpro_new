@@ -257,7 +257,7 @@ class UserController extends Controller
                 "labour_id" => auth()->user()->id,
                 "booking_id" => $booking_id
             ]);
-            Booking::where("booking_id", $booking_id)->increment("current_quantity", 1);
+            Booking::where("id", $booking_id)->increment("current_quantity", 1);
 
             BookingRequest::where("user_id", auth()->user()->id)->where("booking_id", $booking_id)->delete();
 
