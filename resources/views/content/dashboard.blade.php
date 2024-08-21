@@ -187,14 +187,18 @@
 <script>
     var options = {
   chart: {
-    type: 'area'
+    type: 'line'
   },
+  colors:['#de1058', '#de1058', '#de1058'],
   series: [{
     name: 'users',
     data: @json($user_count)
   }],
   xaxis: {
     categories: @json($user_date)
+  },
+  stroke: {
+    curve: 'smooth',
   },
   title: {
     text: 'Users',
@@ -210,8 +214,21 @@ chart.render();
 <script>
     var labour = {
   chart: {
-    type: 'area'
+    type: 'line'
   },
+  colors:['#de1058', '#de1058', '#de1058'],
+  stroke: {
+    curve: 'smooth',
+  },
+  dropShadow: {
+        enabled: false,
+        enabledOnSeries: undefined,
+        top: 0,
+        left: 0,
+        blur: 3,
+        color: '#000',
+        opacity: 0.35
+    },
   series: [{
     name: 'labours',
     data: @json($labour_count)

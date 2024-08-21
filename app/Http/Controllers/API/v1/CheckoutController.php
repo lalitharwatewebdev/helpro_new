@@ -157,16 +157,19 @@ class CheckoutController extends Controller
 
      
         $processedData = $data->map(function ($booking) {
-
-           
             if ($booking->current_quantity > 0) {
                 $booking->booking_status = "accepted";
             }
 
            
-            $labours = AcceptedBooking::with('labour:id,name,phone')
+            $labours = AcceptedBooking::with('labour')
                 ->where("booking_id", $booking->id)
                 ->get();
+
+                $labours->map(function($labour){
+                    $labour->otp= mt_rand(111111,999999);
+                    return $labour;
+                });
 
            
             $booking->labours = $labours;
