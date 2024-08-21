@@ -149,7 +149,7 @@ class CheckoutController extends Controller
     public function bookingData()
     {
         // Fetch booking data with related models
-        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout.address'])
+        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout.address.states:id,name','checkout.address.cities:id,name'])
             ->where('payment_status', 'captured')
             ->where('user_id', auth()->user()->id)
             ->latest()
@@ -159,8 +159,8 @@ class CheckoutController extends Controller
         $processedData = $data->map(function ($booking) {
 
            
-            if ($booking->current_quantity == $booking->quantity_required) {
-                $booking->booking_status = "completed";
+            if ($booking->current_quantity > 0) {
+                $booking->booking_status = "accepted";
             }
 
            
