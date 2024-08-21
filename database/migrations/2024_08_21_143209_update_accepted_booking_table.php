@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string("account_number")->nullable();
+        Schema::table('accepted_bookings', function (Blueprint $table) {
+            $table->string("labour_booking_status")->default("accepted");
         });
     }
 
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('accepted_bookings', function (Blueprint $table) {
             //
         });
     }

@@ -45,20 +45,26 @@ class RazorpayServiceProvider{
 
     public function fetchOrder($order_id){
         try{    
-          $order_id =  $this->api->order->fetch($order_id)->toArray();
+            // return $order_id;
+          $order =  $this->api->order->fetch($order_id)->toArray();
+         
+
           
-     
+        //   return $order['id'];
 
-            $status = ['paid',"captured",'created'];
+            $status = ['paid',"captured"];
 
-            if(in_array($order_id['status'],$status)){
-                return response([
+            if(in_array($order['status'],$status)){
+
+                return [
                     "message" => "Order Placed Successfully",
-                    "labour_id" => $order_id['notes']['checkout_id'],
-                    "order_id" => $order_id,
-                    
+                    "checkout_id" => $order['notes']['checkout_id'],            
                     "status" => true
-                ],200);
+
+                ];
+             
+
+                // return $order_id;
             }
             else{
                 return response([

@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string("account_number")->nullable();
+        Schema::table('rejected_bookings', function (Blueprint $table) {
+            $table->foreignId("booking_id")->nullable()->constrained()->nullOnDelete(); 
         });
     }
-
+    
     /**
      * Reverse the migrations.
      *
@@ -25,8 +25,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('rejected_bookings', function (Blueprint $table) {
             //
+            $table->dropForeign("checkout_id");
         });
     }
 };

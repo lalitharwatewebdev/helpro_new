@@ -44,11 +44,15 @@ class UserController extends Controller
         $categories =  $labour_id->category()->first();
         $category_id =  $categories->pivot->category_id;
         $radius = 5;
-        $booking_amount_data = Booking::where("labour_id", auth()->user()->id)->sum("total_amount");
+        $booking_amount_data = AcceptedBooking::with("booking")->where("labour_id", auth()->user()->id)->get();
+
+        $total_amount = $booking_amount_data->sum(function($acceptedBooking){
+            return $acceptedBooking->booking->total_amount; 
+        });
         // $total_booking_accepted = Booking::where("labour_id", auth()->user()->id)->where("payment_status", "captured")->count();
 
-        $total_booking_accepted = AcceptedBooking::where("labour_id",auth()->user()->id)->count();
-        $total_rejected_booking = RejectedBooking::where("labour_id",auth()->user()->id)->count();
+        $total_booking_accepted = AcceptedBooking::where("labour_id", auth()->user()->id)->count();
+        $total_rejected_booking = RejectedBooking::where("labour_id", auth()->user()->id)->count();
         // return Booking::where("user_id",auth()->user()->id)->get();
         $earthRadius = 6371; // Earth radius in kilometers
         $latitude = 19.1985893;
@@ -91,11 +95,19 @@ class UserController extends Controller
         $booking =  Booking::where("checkout_id", $checkout->id)->first();
 
         // checking if request booking is present for the current user
-
         $current_user_booking = BookingRequest::where("booking_id", $booking->id)->where("user_id", auth()->user()->id)->first();
 
-        if ($booking->quantity_required != $booking->current_quantity && !$current_user_booking) {
 
+
+        // this is checking to see if required quantity does not match current _current
+        if ($booking->quantity_required != $booking->current_quantity && !$current_user_booking) {
+            // $data = [
+
+            //     "required" => $booking->quantity_required,
+
+            //     "current" => $booking->current_quantity
+            // ];
+            // return $data;
             $request_booking = new BookingRequest();
             $request_booking->user_id = auth()->user()->id;
             $request_booking->area_id = $area->id;
@@ -105,11 +117,33 @@ class UserController extends Controller
             $request_booking->save();
         }
 
-        $booking = BookingRequest::with("checkout","checkout.user:id,name","checkout.address.states:id,name","checkout.address.cities:id,name")->where("user_id", auth()->user()->id)->get();
+        $bookings = BookingRequest::with("checkout", "checkout.user:id,name", "checkout.address.states:id,name", "checkout.address.cities:id,name", "checkout.area")->where("user_id", auth()->user()->id)
+            ->where("category_id", $category_id)->get();
+
+        // return $bookings;
+
+        foreach ($bookings as $booking) {
+            $start_date = $booking->checkout->start_time;
+            $end_date = $booking->checkout->end_time;
+            $diff = (strtotime($start_date) - strtotime($end_date));
+            $date_result = abs(round($diff) / 86400) + 1;
+
+            $labour_quantity = $booking->checkout->labour_quantity;
+            $area_price = $booking->checkout->area->price;
+
+
+
+            $final_price = ($area_price * $date_result) / $labour_quantity;
+
+            $booking->labour_total_amount = round($final_price, 2);
+        }
+
+
+
 
         return response([
-            "bookings" => $booking,
-            "total_amount" => $booking_amount_data,
+            "bookings" => $bookings,
+            "total_amount" => $total_amount,
             "total_booking_accepted" =>   $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,
             "status" => true
@@ -119,19 +153,37 @@ class UserController extends Controller
 
     public function history()
     {
+        // Fetch accepted and rejected bookings
+        $accepted_bookings = AcceptedBooking::with("booking.checkout.address.states:id,name","booking.checkout.address.cities:id,name","booking.checkout.user:id,name,phone,lat_long")
+            ->where("labour_id", auth()->user()->id)
+            ->latest()
+            ->get();
 
+        $rejected_bookings = RejectedBooking::with("booking.checkout.address.states:id,name","booking.checkout.address.cities:id,name","booking.checkout.user:id,name,phone,lat_long")
+            ->where("labour_id", auth()->user()->id)
+            ->latest()
+            ->get();
 
-        $booking_data = Booking::with("user:id,name")->where("labour_id", auth()->user()->id)->where("payment_status", "captured")->latest()->get();
+       
+        $combined_bookings = $accepted_bookings->merge($rejected_bookings);
+
+       
+        $sorted_bookings = $combined_bookings->sortByDesc('created_at');
+
+        
+        $formatted_bookings = $sorted_bookings->values()->all();
+
+       
 
         return response([
-            "data" => $booking_data,
+            "data" => $formatted_bookings,
             "status" => true
         ], 200);
     }
 
     public function acceptedBooking()
     {
-        $data = Booking::with("user:id,name")->where("labour_id", auth()->user()->id)->where("payment_status", "captured")->get();
+        $data = AcceptedBooking::with("booking.checkout.address")->where("labour_id", auth()->user()->id)->get();
 
         return response([
             "data" => $data,
@@ -164,35 +216,46 @@ class UserController extends Controller
         return $earthRadius * $c;
     }
 
-    // function to accept the user booking
-    public function AcceptedUserBooking(Request $request){
-        $user_id = auth()->user()->id;
-
-        $accept_booking = new AcceptedBooking();
-        $accept_booking->labour_id = $user_id;
-        $accept_booking->booking_id = $request->booking_id;
-        $accept_booking->save();
-
-        return response([
-            "message" => "Booking Accepted Successfully",
-            "status" => true
-        ],200);
+    // function to accept and reject the user booking
+    public function acceptRejectBooking(Request $request)
+    {
+        $action = $request->action;
+        $booking_id = $request->booking_id;
 
 
-    }
 
-    public function rejectUserBooking(Request $request){
-        $user_id = auth()->user()->id;
+        if (strtolower($action) == "rejected") {
+            $reject_data = RejectedBooking::create([
+                "labour_id" => auth()->user()->id,
+                "booking_id" => $booking_id,
+            ]);
 
-        $rejectBooking  = new RejectedBooking();
+            BookingRequest::where("user_id", auth()->user()->id)->where("booking_id", $booking_id)->delete();
+            return response([
+                "message" => "Booking Rejected",
+                "status" => true
+            ], 200);
+        }
+        if (strtolower($action) == 'accepted') {
+            $accept_data = AcceptedBooking::create([
+                "labour_id" => auth()->user()->id,
+                "booking_id" => $booking_id
+            ]);
+            Booking::where("booking_id", $booking_id)->increment("current_quantity", 1);
 
-        $rejectBooking->labour_id = $user_id;
-        $rejectBooking->booking_id = $request->booking_id;
-        $rejectBooking->save();
+            BookingRequest::where("user_id", auth()->user()->id)->where("booking_id", $booking_id)->delete();
 
-        return response([
-            "message" => "Booking Rejected",
-            "status" => true
-        ],200);
+            return response([
+                "message" => "Booking Accepted",
+                "status" => true
+            ], 200);
+        }
+
+        // else{
+        //     return response([
+        //         "message" => "Invalid Parameter",
+        //         "stat"
+        //     ])
+        // }
     }
 }

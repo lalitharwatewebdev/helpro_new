@@ -137,6 +137,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('rejected-booking',"rejectedBooking");
                 Route::post("accept-user-booking","AcceptedUserBooking");
                 Route::post("reject-user-booking","rejectUserBooking");
+                Route::post("accept-reject-booking",'acceptRejectBooking');
             });
         });
     });

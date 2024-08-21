@@ -71,6 +71,9 @@ class CheckoutController extends Controller
 
         $order = $this->razorpay->createOrder($amount, "INR", $data->id);
 
+    
+        
+
         $booking = new Booking();
         // $labour_arr[] = $cart->labour_id;
         $booking->user_id = auth()->user()->id;
@@ -85,7 +88,9 @@ class CheckoutController extends Controller
 
 
 
-        $booking_request = new BookingRequest();
+        // $booking_request = new BookingRequest();
+
+
 
         return response()->json([
             "message" => "Checkout created successfully",
@@ -105,11 +110,10 @@ class CheckoutController extends Controller
         $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
 
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
+        // return $fetchOrder;
 
-
-
-        if ($fetchOrder['status'] == 'true') {
-            Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder->order_id->notes->checkout_id)->update([
+        if ($fetchOrder['status'] == true){
+            Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
                 "payment_status" => "captured",
                 "otp" => mt_rand(111111, 999999),
             ]);

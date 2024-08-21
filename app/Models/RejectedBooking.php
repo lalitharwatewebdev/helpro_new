@@ -19,5 +19,13 @@ class RejectedBooking extends Model
         return $this->belongsTo(checkout::class,"checkout_id");
     }
 
+    public function labour(){
+        return $this->belongsTo(User::class,"labour_id");
+    }
+
+    public function booking(){
+        return $this->belongsTo(Booking::class,"booking_id");
+    }
+
     
 }
