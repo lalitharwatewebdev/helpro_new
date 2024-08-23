@@ -26,6 +26,8 @@ class AuthController extends Controller
         if (!empty($request->image)) {
             $image = FileUploader::uploadFile($request->file('image'), 'images/usersimage');
         }
+
+       
         // return $image;
         $user = User::create([
             'first_name' => $request->first_name,
@@ -55,6 +57,8 @@ class AuthController extends Controller
             // "device_id" => "required"
         ]);
 
+        \Log::info($request->token);
+
         $type = "old";
 
           $auth = app('firebase.auth');
@@ -68,15 +72,16 @@ class AuthController extends Controller
         $uid = $verifiedIdToken->claims()->get('sub');
         $firebase_user = $auth->getUser($uid);
         $phone = substr($firebase_user->phoneNumber, 3);
-        $user = User::where('phone', $request->phone)->first();
+        $user = User::where('phone', $request->phone)->where("type","user")->first();
         if(!empty($user)){
             if($user->name == null){
                 $type = "new";
+                
             }
             $token = $user->createToken("user")->plainTextToken;
             $user->update([
                 "device_id" => $request->device_id,
-                "type" => $request->type
+                "type" => "user"
             ]);
 
             return response([
@@ -90,7 +95,7 @@ class AuthController extends Controller
             $data = User::create([
                 "phone" => $request->phone,
                 "device_id" => $request->device_id,
-                "type" => $request->type
+                "type" => "user"
             ]);
             $token = $data->createToken("user")->plainTextToken;
 

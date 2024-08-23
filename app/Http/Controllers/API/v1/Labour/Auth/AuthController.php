@@ -94,7 +94,7 @@ class AuthController extends Controller
             $data->pan_front = FileUploader::uploadFile($request->pan_front,"images/pan_card");
         }
         // $data->category = $request->category_id;
-        $data->category()->attach($request->category);
+        $data->category()->attach($request->category_id);
         $data->gender = strtolower($request->gender);
         $data->lat_long = $request->lat_long;
         $data->address = $request->address;

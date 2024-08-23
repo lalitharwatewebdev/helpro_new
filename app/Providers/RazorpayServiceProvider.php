@@ -4,17 +4,24 @@ namespace App\Providers;
 
 
 use Razorpay\Api\Api;
+use App\Models\RazorPayModel;
+use App\Models\Wallet;
 
-class RazorpayServiceProvider{
+use Razorpay\Api\Payout;
+
+class RazorpayServiceProvider
+{
     protected $api;
-    public function __construct(){
-        $this->api = new Api(env("RAZORPAY_KEY"),env("RAZORPAY_SECRET"));
+    public function __construct()
+    {
+        $this->api = new Api(env("RAZORPAY_KEY"), env("RAZORPAY_SECRET"));
     }
 
-    public function createOrder($amount,$currency="INR",$checkout_id){
-        $receipt = "receipt_id".time();
+    public function createOrder($amount, $currency = "INR", $checkout_id)
+    {
+        $receipt = "receipt_id" . time();
 
-    
+
 
         $note = [
             "user" => auth()->user()->id,
@@ -22,63 +29,130 @@ class RazorpayServiceProvider{
             "checkout_id" => $checkout_id
         ];
 
-        
 
-        try{
+
+        try {
             $order = $this->api->order->create([
-                "amount" =>  $amount  ,
+                "amount" =>  $amount * 100,
                 "currency" => $currency,
                 "receipt" => $receipt,
                 "payment_capture" => 1,
                 "notes" => $note
-                ]);
+            ]);
 
             return $order;
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             return response([
                 "message" => "Something went wrong " . $e,
                 "status" => false
-            ],400);
+            ], 400);
         }
     }
 
-    public function fetchOrder($order_id){
-        try{    
+    public function fetchOrder($order_id)
+    {
+        try {
             // return $order_id;
-          $order =  $this->api->order->fetch($order_id)->toArray();
-         
+            $order =  $this->api->order->fetch($order_id)->toArray();
 
-          
-        //   return $order['id'];
 
-            $status = ['paid',"captured","created"];
 
-            if(in_array($order['status'],$status)){
+            //   return $order['id'];
+
+            $status = ['paid', "captured", "created"];
+
+            if (in_array($order['status'], $status)) {
 
                 return [
                     "message" => "Order Placed Successfully",
-                    "checkout_id" => $order['notes']['checkout_id'],            
+                    "checkout_id" => $order['notes']['checkout_id'],
                     "status" => true
 
                 ];
-             
+
 
                 // return $order_id;
-            }
-            else{
+            } else {
                 return response([
                     "message" => "Tranasction Failure",
                     "status" => false
-                ],400);
+                ], 400);
             }
-        }
-
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             return response([
                 "message" => "Something went wrong " . $e,
                 "status" => false
-            ],400);
+            ], 400);
         }
+    }
+
+    public function createWalletOrder($amount)
+    {
+        $receipt = "receipt_id" . time();
+
+        try {
+
+
+
+            $order = $this->api->order->create([
+                "amount" => $amount * 100,
+                "currency" => "INR",
+                "receipt" => $receipt,
+            ]);
+
+            RazorPayModel::create([
+                "user_id" => auth()->user()->id,
+                "payment_gateway" => "razorpay",
+                "order_id" => $order['id'],
+                "amount" => $amount,
+            ]);
+
+            return $order;
+        } catch (\Exception $e) {
+            return response([
+                "message" => "Something went wrong " . $e,
+                "status" => false
+            ], 400);
+        }
+    }
+
+    public function fetchWalletOrder($order_id){
+        $fetch_order = $this->api->order->fetch($order_id);
+       
+        $status = ['paid',"captured","created"];
+
+        if(in_array($fetch_order['status'],$status)){
+            $wallet = Wallet::where("user_id",auth()->user()->id)->first();
+
+            if($wallet){
+                $wallet->increment("amount",$fetch_order["amount"]/100);
+            }
+            else{
+                Wallet::create([
+                    "user_id" => auth()->user()->id,
+                    "amount" => $fetch_order['amount'] / 100
+                ]);
+            }
+
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public function createPayout($amount,$account_number,$ifsc_code){
+        $payout = $this->api->payout->create([
+            "amount" => $amount * 100,
+            "currency" => "INR",
+            "method" => "bank_account",
+            "bank_account" => [
+                "account_number" => $account_number,
+                "ifsc_code" => $ifsc_code
+            ],
+            "description" => "Payment to " . $account_number
+        ]);
+
+        return $payout->id;
     }
 }

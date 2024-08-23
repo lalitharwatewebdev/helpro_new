@@ -4,26 +4,26 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
+use App\Models\BusinessSetting;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Models\City;
 use App\Models\State;
 
 class UserController extends Controller
 {
-    public function store(Request $request){
-        // $request->validate([
-        //     "username" => "required",
-        //     "phone" => "required|numeric",
-        //     "email" => "required|email",
-        //     "gender" => "required",
-        //     "state" => "required",
-        //     "city" => "required",
-        //     "address" => "required",
-        //     "image" => "file|mimes:jg,jpeg,webp,png"
-        // ]);
+    public function referralGenerator($username){
+      
+        return strtoupper(substr($username,0,5)).mt_rand(1111,9999);
+    }
 
+    public function store(Request $request){
+      
         $data = User::where("id",auth()->user()->id)->first();
+
+        $buinsess_settings = BusinessSetting::pluck("value","key");
+        $welcome_wallet = $buinsess_settings['welcome_wallet_amount'];
 
         if(empty($data)){
             return response([
@@ -34,15 +34,22 @@ class UserController extends Controller
         $data->name = $request->username;
         $data->email = $request->email;
         $data->gender = $request->gender;
-        $data->type = $request->type;
         $data->state = $request->state;
         $data->city = $request->city;
         $data->address = $request->address;
         $data->lat_long = $request->lat_long;
+        $data->referral_code = $this->referralGenerator($request->username);
         if($request->hasFile("profile_img")){
             $data->profile_pic = FileUploader::uploadFile($request->file("profile_img"),"images/profile_pic");
         }
         $data->save();
+
+        if($data){
+            Wallet::create([
+                "user_id" => auth()->user()->id,
+                "amount" => $welcome_wallet,
+            ]);
+        }
 
 
         return response([

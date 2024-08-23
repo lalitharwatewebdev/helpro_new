@@ -88,6 +88,8 @@ class CheckoutController extends Controller
         $booking->otp = mt_rand(111111, 999999);
         $booking->save();
 
+        
+
 
 
         // $booking_request = new BookingRequest();
@@ -128,22 +130,7 @@ class CheckoutController extends Controller
             ], 200);
         }
 
-        // $labour_id = Cart::where("user_id", auth()->user()->id)->get();
-
-        // $labour_data = $labour_id->pluck("labour_id")->toArray();
-
-
-
-
-        // adding to booking page
-
-
-        // $booking_data = Booking::with('user',"checkout")->where("user_id",auth()->user()->id)->get();
-
-        // return response([
-        //     "data" => $booking_data,
-        //     "status" => true
-        //     ],200);
+       
 
     }
 

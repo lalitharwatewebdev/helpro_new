@@ -50,15 +50,25 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mt-3">
+            <div class="col-md-4 mt-3">
            
                 <x-input name="razor_pay_key" value="{{ $data['razor_pay_key'] ?? '' }}" :required="false" label="Razor Pay Key  " />
             </div>
 
 
-            <div class="col-md-6 mt-3">
+            <div class="col-md-4 mt-3">
            
                 <x-input name="service_charges" value="{{ $data['service_charges'] ?? '' }}" type="number" label="Services Charges" />
+            </div>
+
+            <div class="col-md-4 mt-3">
+           
+                <x-input name="welcome_wallet_amount" value="{{ $data['welcome_wallet_amount'] ?? '' }}" type="number" label="Welcome Wallet Amount" />
+            </div>
+
+            <div class="col-md-4 mt-3">
+           
+                <x-input name="referral_amount" value="{{ $data['referral_amount'] ?? '' }}" type="number" label="Referral Amount" />
             </div>
             <div class="col-md-12 mt-3">
                 <label for="about_us">About Us</label>
