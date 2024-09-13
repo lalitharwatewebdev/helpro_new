@@ -11,6 +11,7 @@ class BannerController extends Controller
 {
     public function get()
     {
+        // dfsdf
         $title = "New Job Available";
         $message = "You have a new job available.";
         $device_ids = "ejJ3zy3cTXyIy2grqij5Dn:APA91bG51347uKQcAhOQEfxNw4dTLYmqARnSa05eDjt5oZqXkDSF6MV9Bb2F1dyIwRj5boAQAv313KQyvRYtCNz-GSrmLN-3_CjWmR0YcDRsqNF9TNOeU2hfnV3axTzR5kXw3WurHLd8";
