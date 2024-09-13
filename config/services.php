@@ -35,4 +35,9 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect'      => env('GOOGLE_REDIRECT')
     ],
+
+    'fcm' => [
+        'key' => env('FCM_SERVER_KEY'),
+    ],
+
 ];

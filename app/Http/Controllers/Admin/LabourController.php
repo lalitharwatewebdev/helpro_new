@@ -11,6 +11,7 @@ use App\Models\LabourImage;
 use App\Models\City;
 use App\Models\Labour;
 use Illuminate\Http\Request;
+use App\Jobs\SendNotificationJob;
 
 class LabourController extends Controller
 {
@@ -176,15 +177,20 @@ class LabourController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request)
-    {
+    {   
+        $user = User::where("id",$request->id)->first();
         User::find($request->id)->update([
             "labour_status" => $request->type
         ]);
+
+        SendNotificationJob::dispatch("Congraluations","Your Labour Account was Approved",$user->device_id);
+
 
         return response([
 
             "message" => "Labour Updated Successfully"
         ]);
+
     }
 
     /**

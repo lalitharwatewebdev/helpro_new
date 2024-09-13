@@ -10,20 +10,27 @@ use App\Models\User;
 use App\Models\Wallet;
 use App\Models\City;
 use App\Models\State;
+use App\Models\Transactions;
+use App\Models\ReferralMaster;
 
 class UserController extends Controller
 {
     public function referralGenerator($username){
       
-        return strtoupper(substr($username,0,5)).mt_rand(1111,9999);
+        return strtoupper(substr($username,0,5)).mt_rand(11,99);
     }
 
     public function store(Request $request){
-      
+        $user_referral = '';
         $data = User::where("id",auth()->user()->id)->first();
 
         $buinsess_settings = BusinessSetting::pluck("value","key");
-        $welcome_wallet = $buinsess_settings['welcome_wallet_amount'];
+        $referral_amount = $buinsess_settings['referral_amount'];
+        $referral_via_amount = $buinsess_settings['referral_via_amount'];
+
+        if($request->referral){
+            $user_referral = User::where("referral_code",$request->referral)->first();
+        }
 
         if(empty($data)){
             return response([
@@ -42,15 +49,71 @@ class UserController extends Controller
         if($request->hasFile("profile_img")){
             $data->profile_pic = FileUploader::uploadFile($request->file("profile_img"),"images/profile_pic");
         }
-        $data->save();
 
-        if($data){
-            Wallet::create([
+        if($request->referral){
+            $is_refer = ReferralMaster::where("referral_user_id",$user_referral->id)->where("user_id",auth()->user()->id)->first();
+            if($is_refer){
+                return response([
+                    "message" => "Referral Code Already Redeemed",
+                    "status" => true
+                ],200);
+            }
+            else{
+                ReferralMaster::create([
+                    "referral_user_id" => $user_referral->id,
+                    "user_id" => auth()->user()->id
+                ]);
+            }
+    
+            if($user_referral->referral_code == auth()->user()->referral_code){
+                return response([
+                    "message" => "You cannot use this referral code",
+                    "status" => false
+                ],400);
+            }
+    
+            if($user_referral){
+                // adding to authenticated user
+                Transactions::create([
+                "amount" => $referral_amount,
+                "transaction_type" => "credited",
                 "user_id" => auth()->user()->id,
-                "amount" => $welcome_wallet,
-            ]);
+                "remark" => "Added to wallet via referral"
+                ]);
+
+                $wallet = Wallet::firstOrCreate([
+                    ["user_id" => auth()->user()->id],
+                    ["amount" => 0]
+                ]);
+
+                $wallet->increment("amount",intval($referral_amount));
+
+
+    
+                // adding to referral user
+                Transactions::create([
+                    "amount" => $referral_via_amount,
+                    "transaction_type" => "credited",
+                    "remark" => "Added to wallet via referral",
+                    "user_id" => $user_referral->id
+                ]);
+
+                $wallet = Wallet::firstOrCreate([
+                    ["user_id" => $user_referral->id],
+                    ["amount" => 0]
+                ]);
+
+                $wallet->increment("amount",intval($referral_via_amount));
+            }
+            else{
+                return response([
+                    "message" => "Invalid Referral Code"
+                ],200);
+            }
         }
 
+
+        $data->save();
 
         return response([
             "message" => "User Data Added Successfully",
@@ -59,8 +122,14 @@ class UserController extends Controller
     }
 
     public function profile(){
+       
+        $wallet_amount = Wallet::where("user_id",auth()->user()->id)->first();
+        
         $user_id = auth()->user()->id;
-        $data = User::with("states","cities")->where("id",$user_id)->first(); 
+        $data = User::with("states","cities")->where("id",$user_id)->first();
+        if($data){
+            $data->wallet_amount = $wallet_amount->amount ?? 0;
+        }
         return response([
             "data" => $data,
             "status" => true

@@ -16,6 +16,8 @@
     "guzzlehttp/guzzle": "^7.0.1",
     "hammerstone/fast-paginate": "^0.1.7",
     "intervention/image": "^2.7",
+    "kawankoding/laravel-fcm": "*",
+    "kreait/firebase-php": "^6.9",
     "kreait/laravel-firebase": "^4.2",
     "laravel/framework": "^9.0",
     "laravel/sanctum": "^2.15",

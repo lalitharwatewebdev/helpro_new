@@ -13,6 +13,9 @@ use App\Http\Controllers\API\v1\CategoryController;
 use App\Http\Controllers\API\v1\CheckoutController;
 use App\Http\Controllers\API\v1\LabourController;
 use App\Http\Controllers\API\v1\UserController;
+use App\Http\Controllers\API\v1\PromoCodeController;
+use App\Http\Controllers\API\v1\ReferralController;
+use App\Http\Controllers\API\v1\WalletController;
 
 
 
@@ -20,19 +23,18 @@ use App\Http\Controllers\API\v1\Labour\Auth\AuthController as LabourAuthControll
 use App\Http\Controllers\API\v1\Labour\RejectBookingController;
 use App\Http\Controllers\API\v1\Labour\SliderController;
 use App\Http\Controllers\API\v1\Labour\WalletController as LabourWalletController;
-use App\Http\Controllers\API\v1\Labour\UserController as LabourUserController;
-use App\Http\Controllers\API\v1\PromoCodeController;
-use App\Http\Controllers\API\v1\ReferralController;
-use App\Http\Controllers\API\v1\WalletController;
-
-use PhpOffice\PhpSpreadsheet\RichText\Run;
+use App\Http\Controllers\API\v1\Labour\LabourController as LabourUserController;
+use App\Http\Controllers\API\v1\LabourRedeemController;
 
 Route::prefix('v1')->group(function () {
 
 
 
     Route::controller(AuthController::class)->prefix("user")->group(function () {
-        Route::post("login", "OtpLogin");
+        // Route::post("login", "OtpLogin");
+        Route::post("otp-login","OTPLogin");
+        Route::post("get-otp","generateOTP");
+        Route::post("google-login","googleLogin");
     });
 
 
@@ -53,8 +55,10 @@ Route::prefix('v1')->group(function () {
         Route::get("/", "get");
     });
 
-    
 
+    Route::controller(BannerController::class)->prefix("banner")->group(function () {
+            Route::get("/", 'get');
+        });
     Route::group(['middleware' => "auth:sanctum"], function () {
         Route::controller(UserController::class)->prefix("user")->group(function () {
             Route::post("sign-up", "store");
@@ -65,12 +69,6 @@ Route::prefix('v1')->group(function () {
         Route::controller(PromoCodeController::class)->prefix("promo-code")->group(function () {
             Route::get("/", "get");
         });
-
-        Route::controller(BannerController::class)->prefix("banner")->group(function () {
-            Route::get("/", 'get');
-        });
-
-
 
         Route::controller(LabourController::class)->prefix("labours")->group(function () {
             Route::get("/", "get");
@@ -119,6 +117,7 @@ Route::prefix('v1')->group(function () {
         Route::controller(WalletController::class)->prefix("wallets")->group(function(){
             Route::post("add-amount","createAmount");
             Route::post("fetch-amount","fetchAmount");
+            Route::get("wallet-transactions","walletTransaction");
         });
     });
 
@@ -127,7 +126,10 @@ Route::prefix('v1')->group(function () {
     // labour authController
     Route::prefix("labour")->group(function () {
         Route::controller(LabourAuthController::class)->group(function () {
-            Route::post("login", "OtpLogin");
+            // Route::post("login", "OtpLogin");
+        Route::post("get-otp", "generateOTP");
+        Route::post("otp-login", 'OTPLogin');
+        Route::post("google-login","googleLogin");
         });
 
 
@@ -158,6 +160,12 @@ Route::prefix('v1')->group(function () {
 
             Route::controller(LabourWalletController::class)->prefix("wallets")->group(function(){
                 Route::post("redeem-wallet-amount","redeemAmount");
+                Route::get("transactions","transactions");
+            });
+
+            Route::controller(LabourRedeemController::class)->prefix("redeem")->group(function(){
+                Route::post("redeem-amount","redeemAmount");
+                Route::get("redeem-history","getHistory");
             });
         });
     });

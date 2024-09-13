@@ -13,6 +13,12 @@
       "slug": "admin.category.index"
     },
     {
+      "url": "admin/redeem",
+      "name": "Redeem Management",
+      "icon": "<span class='material-symbols-outlined'>category</span>",
+      "slug": "admin.redeem.index"
+    },
+    {
       "name": "Slider Management",
       "icon": "<i data-feather='user'></i>",
       "slug": "",
@@ -68,7 +74,6 @@
       "icon": "<i data-feather='user'></i>",
       "slug": "admin.promo-code.index"
     },
-
     {
       "url": "admin/areas",
       "name": "Area Service Management",
@@ -94,7 +99,7 @@
       "slug": "admin.transactions.index"
     },
     {
-    "name": "Labour Management",
+    "name": "Business Settings",
       "icon": "<i data-feather='user'></i>",
       "slug": "",
       "submenu": [ 

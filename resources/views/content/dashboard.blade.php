@@ -35,7 +35,7 @@
     </section>
     <section id="dashboard-card">
         <div class="row match-height">
-            <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+            <div onclick="location.href='{{ route('admin.users.index') }}'" class="col-lg-3 col-sm-6 col-12">
                 <div class="card cursor-pointer">
                     <div class="card-header">
                         <div>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
             </div>
-            <div onclick="location.href='{{ route('admin.home.index') }}?table[filters][status]=active&table[filters][approval_status]='"
+            <div onclick="location.href='{{ route('admin.labours.pending') }}?table[filters][status]=active&table[filters][approval_status]='"
                 class="col-lg-3 col-sm-6 col-12">
                 <div class="card cursor-pointer">
                     <div class="card-header">
@@ -70,7 +70,7 @@
                     </div>
                 </div>
             </div>
-            <div onclick="location.href='{{ route('admin.home.index') }}?table[filters][status]=active&table[filters][approval_status]='"
+            <div onclick="location.href='{{ route('admin.sliders.user') }}?table[filters][status]=active&table[filters][approval_status]='"
             class="col-lg-3 col-sm-6 col-12">
             <div class="card cursor-pointer">
                 <div class="card-header">
@@ -88,7 +88,7 @@
                 </div>
             </div>
         </div>
-        <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+        <div onclick="location.href='{{ route('admin.sliders.labour') }}'" class="col-lg-3 col-sm-6 col-12">
             <div class="card cursor-pointer">
                 <div class="card-header">
                     <div>
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+        <div onclick="location.href='{{ route('admin.category.index') }}'" class="col-lg-3 col-sm-6 col-12">
             <div class="card cursor-pointer">
                 <div class="card-header">
                     <div>
@@ -123,7 +123,7 @@
                 </div>
             </div>
         </div>
-        <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+        <div onclick="location.href='{{ route('admin.subscriptions.index') }}'" class="col-lg-3 col-sm-6 col-12">
             <div class="card cursor-pointer">
                 <div class="card-header">
                     <div>
@@ -141,7 +141,7 @@
             </div>
         </div>
 
-        <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+        <div onclick="location.href='{{ route('admin.business-settings.index') }}'" class="col-lg-3 col-sm-6 col-12">
             <div class="card cursor-pointer">
                 <div class="card-header">
                     <div>
@@ -160,7 +160,7 @@
         </div>
 
 
-        <div onclick="location.href='{{ route('admin.home.index') }}'" class="col-lg-3 col-sm-6 col-12">
+        <div onclick="location.href='{{ route('admin.promo-code.index') }}'" class="col-lg-3 col-sm-6 col-12">
             <div class="card cursor-pointer">
                 <div class="card-header">
                     <div>

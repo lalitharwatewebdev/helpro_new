@@ -8,14 +8,12 @@ use App\Models\Areas;
 use App\Models\BookingRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Jobs\SendNotificationJob;
 
 class CategoryController extends Controller
 {
     public function get(Request $request)
     {
-
-
-
         $data = Category::active()->get();
 
         return response([
@@ -29,6 +27,10 @@ class CategoryController extends Controller
         $category_id = $request->category_id;
         $lat_long = $request->lat_long;
         $radius = 100;
+        
+        
+        
+        
 
         // Validate inputs
         if (!$category_id || !$lat_long || !$radius) {
@@ -87,6 +89,13 @@ class CategoryController extends Controller
                 $labour->type = 'labour';
                 return $labour;
             });
+            $title = "New Job Available";
+            $message = "You have a new job available.";
+            $device_ids = "ejJ3zy3cTXyIy2grqij5Dn:APA91bG51347uKQcAhOQEfxNw4dTLYmqARnSa05eDjt5oZqXkDSF6MV9Bb2F1dyIwRj5boAQAv313KQyvRYtCNz-GSrmLN-3_CjWmR0YcDRsqNF9TNOeU2hfnV3axTzR5kXw3WurHLd8";
+            $additional_data = ["key" => "sdfsdf"];
+
+$firebaseService = new SendNotificationJob();
+$firebaseService->sendNotification($device_ids,$title,$message,$additional_data);
 
 
         $responseData = [
@@ -97,7 +106,8 @@ class CategoryController extends Controller
 
         return response([
             "data" => $responseData,
-            "status" => true
+            "status" => true,
+            "comment" => "sdsdf"
         ], 200);
     }
 

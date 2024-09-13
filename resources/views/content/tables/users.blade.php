@@ -43,7 +43,7 @@
             <div class="col-md-12 col-12 ">
                 <x-input name="name" />
                 <x-input name="email" />
-                <x-input name="id" />
+                <x-input name="id" type="hidden" />
                 <x-input name="phone" type="number" />
             </div>
 
@@ -66,8 +66,8 @@
             console.log(data);
             $(modal + ' #id').val(data.id);
             $(modal + ' #name').val(data.name);
-            // $(modal + ' #phone').val(data.phone);
-            // $(modal + ' #email').val(data.email);
+             $(modal + ' #phone').val(data.phone);
+             $(modal + ' #email').val(data.email);
             // $(modal + ' #phone').val(data.phone);
             // $(modal + ' #address').val(data.address);
             // $(modal + ' [name=gender][value=' + data.gender + ']').prop('checked', true).trigger('change');

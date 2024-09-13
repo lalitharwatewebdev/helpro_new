@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Providers\RazorpayServiceProvider;
+use App\Models\Wallet;
+use App\Models\Transactions;
 
 class WalletController extends Controller
 {
@@ -28,6 +30,7 @@ class WalletController extends Controller
 
         $fetch_wallet_order  = $this->razorpay->fetchWalletOrder($order_id);
 
+    
         if($fetch_wallet_order){
             return response([
                 "message" => "Amount Added to the wallet",
@@ -40,6 +43,17 @@ class WalletController extends Controller
             "message" => "Transaction Failure",
             "status" => false
         ],400);
+    }
+
+
+    public function walletTransaction(Request $request){
+        $user = auth()->user()->id;
+        $user_transactions  = Transactions::where("user_id",$user)->latest()->get();
+        
+        return response([
+            "data" => $user_transactions,
+            "status" => true
+        ],200);
     }
 
     

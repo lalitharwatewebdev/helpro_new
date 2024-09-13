@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+
 
 use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\BusinessSettingController;
@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LabourBusinessSettings;
 use App\Http\Controllers\Admin\LabourController;
+use App\Http\Controllers\Admin\LabourRedeemController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\StudentController;
@@ -217,6 +218,25 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
             Route::post('update', 'update')->name('update');
             Route::put('status', 'status')->name('status');
         });
+        
+        
+         Route::name('redeem.')
+        ->prefix('redeem')
+        ->controller(LabourRedeemController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get("{id}/accept-redeem",'acceptLabourRedeem')->name("accept-redeem");
+            Route::get("add-services","addAreas")->name("add-areas");
+            Route::get("details", "details")->name("details");
+            Route::get('blocked', 'index')->name('blocked');
+            Route::get('deleted', 'index')->name('deleted');
+            Route::post('store', 'store')->name('store');
+            Route::get('{id}/edit', "edit")->name('edit');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::post('update', 'update')->name('update');
+            Route::put('status', 'status')->name('status');
+        });
+
+        
 
     // Route::name('sliders.')
     //     ->prefix('sliders')

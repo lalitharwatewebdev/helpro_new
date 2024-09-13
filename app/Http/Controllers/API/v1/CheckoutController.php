@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Checkout;
 use Illuminate\Http\Request;
 use App\Providers\RazorpayServiceProvider;
-use App\Models\Cart;
 use App\Models\AcceptedBooking;
 use App\Models\Areas;
 use App\Models\Booking;
-use App\Models\BookingRequest;
-use App\Models\Category;
 use Razorpay\Api\Api;
+use App\Models\Wallet;
 use App\Models\BusinessSetting;
+use App\Models\Transactions;
 
 class CheckoutController extends Controller
 {
@@ -35,6 +34,7 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        $is_razorpay = true;
         $business_settings = BusinessSetting::pluck("value", "key")->toArray();
         $services_charges =  $business_settings['service_charges'];
         $request->validate([
@@ -44,13 +44,10 @@ class CheckoutController extends Controller
             "end_time" => "required"
         ]);
 
-        // $user = Cart::with("labour:id,rate_per_day")
-        //     ->where("user_id", auth()->user()->id)
-        //     ->select("labour_id")
-        //     ->get();
+      
 
         $area = Areas::find($request->area_id);
-        // return $area;
+   
 
         $labour_arr = [];
         $diff = (strtotime($request->end_date) - strtotime($request->start_date));
@@ -68,38 +65,81 @@ class CheckoutController extends Controller
         $data->category_id = $request->category_id;
         $data->area_id = $request->area_id;
         $data->labour_quantity = $request->quantity;
+        $data->alternate_number = $request->alternate_number;
         $data->note = $request->note;
         $data->save();
 
-        $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+
+
+        $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
+
+    
+
+        if ($request->use_wallet == "yes") {
+
+
+            if($user_wallet->amount == 0){
+                
+                $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+                $is_razorpay = true;
+            }
+
+            if ($user_wallet->amount < $amount) {
+                
+                $partial_amount = $amount - $user_wallet->amount;
+                
+                $user_wallet->decrement("amount",$user_wallet->amount);
+
+
+                
+                $order = $this->razorpay->createOrder($partial_amount, "INR", $data->id);
+
+                
+               
+                $is_razorpay = true;
+                
+            }
+            else{
+                $is_razorpay = false;
+                $user_wallet->decrement("amount", $amount);
+            }
+            
+            Transactions::create([
+                "user_id" => auth()->user()->id,
+                "amount" => $amount,
+                "remark" => "Labours Purchased",
+                "transaction_type" => "debited"
+            ]);
+            
+            
+        } else {
+            $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+        }
+
+     
 
 
 
 
         $booking = new Booking();
-        // $labour_arr[] = $cart->labour_id;
         $booking->user_id = auth()->user()->id;
-        // $booking->labour_id = $cart->labour_id;
-        // $booking->total_amount = $amount - $services_charges;
         $booking->total_amount = $amount;
         $booking->service_charges = $services_charges;
+        if ($request->use_wallet == 'yes') {
+            $booking->payment_status = 'captured';
+        }
         $booking->checkout_id = $data->id;
         $booking->quantity_required =  $request->quantity;
         $booking->otp = mt_rand(111111, 999999);
         $booking->save();
 
-        
-
-
-
-        // $booking_request = new BookingRequest();
-
 
 
         return response()->json([
-            "message" => "Checkout created successfully",
-            "order_id" => $order['id'],
+            "message" => "Booking created successfully",
+            "order_id" => $order['id'] ?? null,
             "checkout_id" => $data->id,
+            "is_razorpay" => $is_razorpay,
             "status" => true
         ], 200);
     }
@@ -111,11 +151,8 @@ class CheckoutController extends Controller
             "order_id" => "required"
         ]);
 
-        $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
-
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
-        // return $fetchOrder;
-
+       
         if ($fetchOrder['status'] == true) {
             Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
                 "payment_status" => "captured",
@@ -129,45 +166,51 @@ class CheckoutController extends Controller
                 "message" => "Transaction Failure"
             ], 200);
         }
-
-       
-
     }
 
     public function bookingData()
     {
         // Fetch booking data with related models
-        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout.address.states:id,name','checkout.address.cities:id,name'])
+        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout.address.states:id,name', 'checkout.address.cities:id,name'])
             ->where('payment_status', 'captured')
             ->where('user_id', auth()->user()->id)
             ->latest()
             ->get();
 
-     
+
         $processedData = $data->map(function ($booking) {
             if ($booking->current_quantity > 0) {
+
                 $booking->booking_status = "accepted";
+                
             }
 
-           
+
             $labours = AcceptedBooking::with('labour:id,name,email,phone,profile_pic,otp')
                 ->where("booking_id", $booking->id)
                 ->get();
 
+            
+            
+
+            
+
             // $processedCategory = $labours->map(function($labours){
             //     $booking->labours->category = Category::where("id",$labours->id)->first();
             // });
-           
-            $booking->labours = $labours;
 
           
+
+            $booking->labours = $labours;
+
+
             return $booking;
         });
 
-        
+
         return response([
             "data" => $data,
             "status" => true
-        ],200);
+        ], 200);
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Wallet;
 use App\Http\Controllers\Controller;
 use App\Models\BusinessSetting;
 use App\Models\ReferralMaster;
+use App\Models\Transactions;
 use Illuminate\Http\Request;
 
 class ReferralController extends Controller
@@ -41,37 +42,32 @@ class ReferralController extends Controller
         }
 
         if($user){
-            // if referral code user is present in db increment his wallet
-            $wallet = Wallet::where("user_id",$user->id)->first();
+            // adding to authenticated user
+            Transactions::create([
+            "amount" => $referral_amount,
+            "transaction_type" => "credited",
+            "user_id" => auth()->user()->id,
+            "remark" => "Added to wallet via referral"
+            ]);
 
-            if($wallet){
-
-                Wallet::find($wallet->id)->increment("amount",$referral_amount);
-            }
-            else{
-                Wallet::create([
-                    "user_id" => $user->id,
-                    "amount" => $referral_amount->value
-                ]);
-            }
-
-            // and also increment the authenticated user wallet
-            $user_wallet = Wallet::where("user_id",auth()->user()->id)->first();
-            if($user_wallet){
-                Wallet::find($user_wallet->id)->increment("amount",$referral_amount);
-            }
-            else{
-                Wallet::create([
-                    "user_id" => auth()->user()->id,
-                    "amount" => $referral_amount->value
-                ]);
-            }
-
+            // adding to referral user
+            Transactions::create([
+                "amount" => $referral_amount,
+                "transaction_type" => "credited",
+                "remark" => "Added to wallet via referral",
+                "user_id" => $user->id
+            ]);
             return response([
                 "message" => "Wallet Incremented",
                 "status" => true
             ],200);
         }
+
+
+
+     
+
+      
         else{
             return response([
                 "message" => "Invalid Referral Code",
