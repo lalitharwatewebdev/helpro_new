@@ -17,20 +17,10 @@ class AuthController extends Controller
     public function register(Request $request)
     {
 
-        // $request->validate([
-        //     'first_name' => 'required|string|min:3',
-        //     'second_name' => 'required',
-        //     'email' => 'required|email|max:255',
-        //     'phone' => 'required|numeric|min:10',
-        //     'gender' => 'required',
-        //     'password' => 'required',
-        // ]);
         if (!empty($request->image)) {
             $image = FileUploader::uploadFile($request->file('image'), 'images/usersimage');
         }
 
-       
-        // return $image;
         $user = User::create([
             'first_name' => $request->first_name,
             'second_name' => $request->second_name,
@@ -78,7 +68,7 @@ class AuthController extends Controller
     //     if(!empty($user)){
     //         if($user->name == null){
     //             $type = "new";
-                
+
     //         }
     //         $token = $user->createToken("user")->plainTextToken;
     //         $user->update([
@@ -109,7 +99,7 @@ class AuthController extends Controller
     //         ],200);
     //     }
 
-        
+
 
     // }
 
@@ -133,10 +123,9 @@ class AuthController extends Controller
     //     ];
     //     return response($response, 200);
     // }
-    
-      public function generateOTP(Request $request)
+
+    public function generateOTP(Request $request)
     {
-    
         $request->validate([
             "phone" => "required"
         ]);
@@ -162,21 +151,18 @@ class AuthController extends Controller
 
 
         $res =   OTPGenerator::sendMessage($otp, $request->phone);
-       
-            return response([
-                "message" => "OTP send to your Mobile Number",
-                "status" => true
-            ], 200);
-       
 
-
+        return response([
+            "message" => "OTP send to your Mobile Number",
+            "status" => true
+        ], 200);
     }
-    
-    
-     public function OTPLogin(Request $request)
+
+
+    public function OTPLogin(Request $request)
     {
-       
-       
+
+        \Log::info($request->all());
         $request->validate([
             "phone" => "required",
             "otp" => "required"
@@ -189,8 +175,8 @@ class AuthController extends Controller
 
 
         $otp = OTP::where("phone", $request->phone)->latest()->first();
-        
-       
+
+
 
         if (!empty($user)) {
 
@@ -257,10 +243,10 @@ class AuthController extends Controller
             }
         }
     }
-    
-    
-      public function googleLogin(Request $request)
-     {
+
+
+    public function googleLogin(Request $request)
+    {
         // return $request->all();
         $t = $request->validate([
             'token' => 'required|string',
@@ -298,22 +284,20 @@ class AuthController extends Controller
         //     ]);
         //     $type = 'new';
         // }
-        $type='old';
-        if(!empty($user)){
+        $type = 'old';
+        if (!empty($user)) {
             $user->update([
                 'device_id' => $request->device_id,
-                    'firebase_uid' => $uid,
+                'firebase_uid' => $uid,
             ]);
-
-        }
-        else{
+        } else {
             $user =  User::create([
-                        'email' => $email,
-                        'device_id' => $request->device_id,
-                        'firebase_uid' => $uid,
-                        "type" => "user"
-                    ]);
-                    $type = 'new';
+                'email' => $email,
+                'device_id' => $request->device_id,
+                'firebase_uid' => $uid,
+                "type" => "user"
+            ]);
+            $type = 'new';
         }
         return response([
             'type' => $type,
@@ -322,12 +306,13 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logOut(){
+    public function logOut()
+    {
         auth("sanctum")->user()->id->tokens()->delete();
         return response([
             "message" => "Logout Successfully",
             "status" => true
-        ],200);
+        ], 200);
     }
 
     // public function login(Request $request)
