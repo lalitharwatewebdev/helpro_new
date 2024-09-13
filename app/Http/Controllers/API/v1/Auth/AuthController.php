@@ -162,7 +162,7 @@ class AuthController extends Controller
     public function OTPLogin(Request $request)
     {
 
-        \Log::info($request->all());
+    //    return $request->all();
         $request->validate([
             "phone" => "required",
             "otp" => "required"
@@ -184,9 +184,9 @@ class AuthController extends Controller
                 if ($user->name == null) {
                     $type = 'new';
 
-                    // $user->update([
-                    //     "device_id" => $request->device_id
-                    // ]);
+                    $user->update([
+                        "device_id" => $request->device_id
+                    ]);
                     $token = $user->createToken("otp_login")->plainTextToken;
 
                     return response([
@@ -199,6 +199,10 @@ class AuthController extends Controller
                 } else {
                     $type = 'old';
                     $token = $user->createToken("otp_login")->plainTextToken;
+
+                    $user->update([
+                        "device_id" => $request->device_id
+                    ]);
 
                     return response([
                         "message" => "User Authenticated",

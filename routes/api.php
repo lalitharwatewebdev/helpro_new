@@ -55,14 +55,26 @@ Route::prefix('v1')->group(function () {
         Route::get("/", "get");
     });
 
+    Route::controller(UserController::class)->prefix("user")->group(function () {
+        Route::post("sign-up", "store");
+        Route::get("/", "profile");
+        Route::post("logout", "logOut");
+    });
+
 
     Route::controller(BannerController::class)->prefix("banner")->group(function () {
             Route::get("/", 'get');
         });
+
+
+        Route::controller(UserController::class)->prefix("user")->group(function () {
+            Route::get("/", "profile");
+        });
+
     Route::group(['middleware' => "auth:sanctum"], function () {
         Route::controller(UserController::class)->prefix("user")->group(function () {
             Route::post("sign-up", "store");
-            Route::get("/", "profile");
+            // Route::get("/", "profile");
             Route::post("logout", "logOut");
         });
 

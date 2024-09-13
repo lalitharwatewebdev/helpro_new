@@ -14,8 +14,8 @@ class BannerController extends Controller
         // dfsdf
         $title = "New Job Available";
         $message = "You have a new job available.";
-        $device_ids = "ejJ3zy3cTXyIy2grqij5Dn:APA91bG51347uKQcAhOQEfxNw4dTLYmqARnSa05eDjt5oZqXkDSF6MV9Bb2F1dyIwRj5boAQAv313KQyvRYtCNz-GSrmLN-3_CjWmR0YcDRsqNF9TNOeU2hfnV3axTzR5kXw3WurHLd8";
-        $additional_data = ["key" => "sdfsdf"];
+        $device_ids = "cdCKPrT4RhiQFQdt60T9lk:APA91bEtqJW5_WXwp3Rc8OEwpkTkck2CB-kZNepJp4SRuHz6kDT3Zbdf0vo0wtl85IWEwe0KeBINJ4DJgZA7PIpmgnj9B7yC4My_7JOHW_keAHR6eHSuZ4C70aG5d10qnOsE8akbAqd-";
+        $additional_data = ["data" => "hello world"];
 
         $firebaseService = new SendNotificationJob();
         $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
