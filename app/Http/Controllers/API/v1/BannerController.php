@@ -15,7 +15,7 @@ class BannerController extends Controller
         $title = "New Job Available";
         $message = "You have a new job available.";
         $device_ids = "cdCKPrT4RhiQFQdt60T9lk:APA91bEtqJW5_WXwp3Rc8OEwpkTkck2CB-kZNepJp4SRuHz6kDT3Zbdf0vo0wtl85IWEwe0KeBINJ4DJgZA7PIpmgnj9B7yC4My_7JOHW_keAHR6eHSuZ4C70aG5d10qnOsE8akbAqd-";
-        $additional_data = ["data" => "hello world"];
+        $additional_data = ["category_name" => "Plumber","address" => "Thane(W)"];
 
         $firebaseService = new SendNotificationJob();
         $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
