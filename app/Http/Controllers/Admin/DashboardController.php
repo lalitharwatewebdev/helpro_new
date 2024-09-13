@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Slider;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendNotificationJob;
 use App\Models\BusinessSetting;
 use App\Models\PromoCode;
 use App\Models\Subscription;
@@ -18,6 +19,18 @@ class DashboardController extends Controller
 
     public function home()
     {
+
+        // $title = "New Job Available";
+        // $message = "You have a new job available.";
+        // $device_ids = "cWTfpKz-R8C9uim9xNHzKF:APA91bG9XyX4utJ5yAejC6AqORuB0ovrpnfRM_jcD4-Xbl03p7m0yGXdjfATMnFPc2PpodUO-K__Bre45UUib51V9dMFQfBlZsHQJPqguQMx1oSbm5LC8OWAMdN6qnvuMziOzCMtPKde";
+        // $additional_data = ["category_name" => "Plumber","address" => "Thane(W)"];
+
+        // $firebaseService = new SendNotificationJob();
+        // $firebaseService->sendNotification($device_ids, $title, $message);
+
+        // dispatch(new SendNotificationJob(
+            
+        // ));
 
     //    user graph
         $user_graph = DB::table("users")

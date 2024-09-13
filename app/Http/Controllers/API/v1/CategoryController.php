@@ -27,10 +27,13 @@ class CategoryController extends Controller
         $category_id = $request->category_id;
         $lat_long = $request->lat_long;
         $radius = 100;
-        
-        
-        
-        
+
+
+        $category_data = Category::find($request->category_id);
+
+
+
+
 
         // Validate inputs
         if (!$category_id || !$lat_long || !$radius) {
@@ -63,12 +66,12 @@ class CategoryController extends Controller
 
         // Get areas in bounding box
         $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
-        ->where('category_id', $category_id)
-        ->whereBetween('latitude', [$latMin, $latMax])
-        ->whereBetween('longitude', [$lonMin, $lonMax])
-        ->having('distance', '<=', $radius)
-        ->with("category:id,title,image")
-        ->get();
+            ->where('category_id', $category_id)
+            ->whereBetween('latitude', [$latMin, $latMax])
+            ->whereBetween('longitude', [$lonMin, $lonMax])
+            ->having('distance', '<=', $radius)
+            ->with("category:id,title,image")
+            ->get();
 
         $labours = User::where('type', 'labour')
             ->whereHas('category', function ($query) use ($category_id) {
@@ -89,13 +92,15 @@ class CategoryController extends Controller
                 $labour->type = 'labour';
                 return $labour;
             });
-            $title = "New Job Available";
-            $message = "You have a new job available.";
-            $device_ids = "ejJ3zy3cTXyIy2grqij5Dn:APA91bG51347uKQcAhOQEfxNw4dTLYmqARnSa05eDjt5oZqXkDSF6MV9Bb2F1dyIwRj5boAQAv313KQyvRYtCNz-GSrmLN-3_CjWmR0YcDRsqNF9TNOeU2hfnV3axTzR5kXw3WurHLd8";
-            $additional_data = ["key" => "sdfsdf"];
 
-$firebaseService = new SendNotificationJob();
-$firebaseService->sendNotification($device_ids,$title,$message,$additional_data);
+
+         $title = "New Job Available";
+        $message = "You have a new job available.";
+        $device_ids = "cWTfpKz-R8C9uim9xNHzKF:APA91bG9XyX4utJ5yAejC6AqORuB0ovrpnfRM_jcD4-Xbl03p7m0yGXdjfATMnFPc2PpodUO-K__Bre45UUib51V9dMFQfBlZsHQJPqguQMx1oSbm5LC8OWAMdN6qnvuMziOzCMtPKde";
+        $additional_data = ["category_name" => $category_data->title,"address" => auth()->user()->address];
+
+        $firebaseService = new SendNotificationJob();
+        $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
 
 
         $responseData = [

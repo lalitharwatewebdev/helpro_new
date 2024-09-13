@@ -170,7 +170,7 @@ class AuthController extends Controller
 
         $type = "old";
 
-        $user = User::where("phone", $request->phone)->first();
+        $user = User::where("phone", $request->phone)->where("type","user")->first();
 
 
 

@@ -118,10 +118,10 @@ class AuthController extends Controller
             "phone" => "required",
             "otp" => "required"
         ]);
+        \Log::info($request->device_id);
+        $type = "old";  
 
-        $type = "old";
-
-        $user = User::where("phone", $request->phone)->first();
+        $user = User::where("phone", $request->phone)->where("type","labour")->first();
 
 
 
@@ -135,9 +135,9 @@ class AuthController extends Controller
                 if ($user->name == null) {
                     $type = 'new';
 
-                    // $user->update([
-                    //     "device_id" => $request->device_id
-                    // ]);
+                    $user->update([
+                        "device_id" => $request->device_id
+                    ]);
                     $token = $user->createToken("otp_login")->plainTextToken;
 
                     return response([
