@@ -25,7 +25,7 @@ class LabourController extends Controller
 
 
     // public function sendNotification()
-    // {
+    // {fsdf
     //     $firebaseService = new SendNotificationJob();
     //     $labour_full_name = auth()->user()->name;
     //     $device_id = "cLlFb-JGQ6CJxedN39t9hU:APA91bG-f9rO-N5lwaNleoBrrr0hngTCDWV1Vb1I75v-9NlErczmaYysrdgTKzs3j0BEGWCUiR7i2J9W3W6eF514Tjau1a1WOeQqDfHjRccGI4fZCITqP2Jd61TA69aHJKpYGNiKy0aF";
