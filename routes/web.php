@@ -257,6 +257,20 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::post('send-report', 'send')->name('send-report');
     });
 
+    Route::name('users.')
+    ->prefix('users')
+    ->controller(UserController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get("details", "details")->name("details");
+        Route::get('blocked', 'index')->name('blocked');
+        Route::get('deleted', 'index')->name('deleted');
+        Route::post('store', 'store')->name('store');
+        Route::get('{id}/edit', "edit")->name('edit');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::post('update', 'update')->name('update');
+        Route::put('status', 'status')->name('status');
+    });
+
     // Route::name('business-settings.')
     //     ->prefix('business-settings')
     //     ->controller(BusinessSettingController::class)->group(function () {
@@ -323,23 +337,23 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     //         Route::put('status', 'status')->name('status');
     //     });
 
-    // Route::name('labours.')
-    //     ->prefix('labours')
-    //     ->controller(LabourController::class)->group(function () {
-    //         Route::get('pending', 'index')->name('pending');
-    //         Route::get("accepted", "index")->name("accepted");
-    //         Route::get("rejected", "index")->name("rejected");
-    //         Route::get('blocked', 'index')->name('blocked');
-    //         Route::get("add", "create")->name("add");
-    //         Route::get('destroy', 'destroy')->name('destroy');
-    //         Route::post('store', 'store')->name('store');
-    //         Route::get('{id}/edit', "edit")->name('edit');
-    //         Route::delete('/{id}', 'destroy')->name('destroy');
-    //         Route::post('update', 'update')->name('update');
-    //         Route::put('status', 'status')->name('status');
-    //         Route::get("get-city", "getCity")->name("city");
-    //         Route::get('details', "details")->name("details");
-    //     });
+    Route::name('labours.')
+        ->prefix('labours')
+        ->controller(LabourController::class)->group(function () {
+            Route::get('pending', 'index')->name('pending');
+            Route::get("accepted", "index")->name("accepted");
+            Route::get("rejected", "index")->name("rejected");
+            Route::get('blocked', 'index')->name('blocked');
+            Route::get("add", "create")->name("add");
+            Route::get('destroy', 'destroy')->name('destroy');
+            Route::post('store', 'store')->name('store');
+            Route::get('{id}/edit', "edit")->name('edit');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::post('update', 'update')->name('update');
+            Route::put('status', 'status')->name('status');
+            Route::get("get-city", "getCity")->name("city");
+            Route::get('details', "details")->name("details");
+        });
 
 
     //     Route::name('transactions.')

@@ -4,19 +4,23 @@
       "url": "admin/",
       "name": "Dashboard",
       "icon": "<i data-feather='home'></i>",
-      "slug": "admin.home.index"
+      "slug": "admin.home.index",
+      "isAdmin" :true
     },
    
     {
       "url": "admin/category",
       "name": "Category",
       "icon": "<span class='material-symbols-outlined'>category</span>",
-      "slug": "admin.category.index"
+      "slug": "admin.category.index",
+      "isAdmin" :false
+     
     },
   
     {
       "name": "Slider Management",
       "icon": "<i data-feather='user'></i>",
+      "isAdmin" :false,
       "slug": "",
       "submenu": [
         {
@@ -37,11 +41,13 @@
       "url": "admin/users",
       "name": "User Management",
       "icon": "<i data-feather='home'></i>",
+      "isAdmin" :true,
       "slug": "admin.users.index"
     },
     {
       "name": "Labour Management",
       "icon": "<i data-feather='user'></i>",
+      "isAdmin" :true,
       "slug": "",
       "submenu": [
         {
@@ -69,7 +75,8 @@
       "url": "admin/areas",
       "name": "Area Service Management",
       "icon": "<i data-feather='user'></i>",
-      "slug": "admin.areas.index"
+      "slug": "admin.areas.index",
+      "isAdmin" :false
     },
    
 
@@ -77,17 +84,20 @@
       "url": "admin/tickets",
       "name": "Support",
       "icon": "<i data-feather='home'></i>",
-      "slug": "admin.tickets.index"
+      "slug": "admin.tickets.index",
+      "isAdmin" :false
     },
     {
       "url": "admin/transactions",
       "name": "Transaction Management",
       "icon": "<i data-feather='user'></i>",
-      "slug": "admin.transactions.index"
+      "slug": "admin.transactions.index",
+      "isAdmin" :false
     },
     {
     "name": "Business Settings",
       "icon": "<i data-feather='user'></i>",
+      "isAdmin" :false,
       "slug": "",
       "submenu": [ 
 

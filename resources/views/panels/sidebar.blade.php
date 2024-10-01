@@ -43,7 +43,7 @@
                                 $custom_classes = $menu->classlist;
                             }
                         @endphp
-                          @if (auth("admin")->user()->role == "admin" && $menu->name =="")
+                        @if (auth("admin")->user()->role == "admin" && $menu->isAdmin==true)
                           
                         <li
                             class="nav-item {{ Route::currentRouteName() === $menu->slug ? 'active' : '' }} {{ $custom_classes }}">

@@ -39,21 +39,21 @@ class LabourTable extends DataTableComponent
             ->setDefaultSort('id', 'desc')
             ->setEmptyMessage('No Result Found')
             ->setTableAttributes([
-                'id' => 'user-table',
+                'id' => 'source-table',
             ])
             ->setBulkActions([
                 'exportSelected' => 'Export',
             ])
             ->setConfigurableAreas([
                 'toolbar-right-end' => 'content.rapasoft.add-button',
-                'toolbar-left-end' => [
-                    'content.rapasoft.active-inactive',
-                    [
-                        'route' => 'admin.users.index',
-                    ]
-                ]
+                // 'toolbar-left-end' => [
+                //     'content.rapasoft.active-inactive', [
+                //         'route' => 'admin.users.index',
+                //     ],
+                // ],
             ]);
     }
+
 
     public function columns(): array
     {
@@ -200,6 +200,6 @@ class LabourTable extends DataTableComponent
     public function exportSelected()
     {
         $modelData = new User;
-        return Excel::download(new CustomExport($this->getSelected(), $modelData), 'users.xlsx');
+        return Excel::download(new CustomExport($this->getSelected(), $modelData), 'labours.xlsx');
     }
 }
