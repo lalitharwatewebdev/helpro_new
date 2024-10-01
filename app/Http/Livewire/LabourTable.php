@@ -39,7 +39,7 @@ class LabourTable extends DataTableComponent
             ->setDefaultSort('id', 'desc')
             ->setEmptyMessage('No Result Found')
             ->setTableAttributes([
-                'id' => 'source-table',
+            'id' => 'source-table',
             ])
             ->setBulkActions([
                 'exportSelected' => 'Export',

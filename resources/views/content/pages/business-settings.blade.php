@@ -136,12 +136,17 @@
             </div>
             
             
-             <div class="col-md-6 mt-3">
+             <div class="col-md-4 mt-3">
                 <x-input name="percentage_for_less_than" value="{{ $data['percentage_for_less_than'] ?? '' }}" type="number" label="Percentage for Less Than 12 Hours" />
             </div>
-             <div class="col-md-6 mt-3">
+             <div class="col-md-4 mt-3">
            
                 <x-input name="percentage_for_less_than" value="{{ $data['percentage_for_less_than'] ?? '' }}" type="number" label="Percentage for More than 12 Hours" />
+            </div>
+
+            <div class="col-md-4 mt-3">
+           
+                <x-input name="radius" value="{{ $data['radius'] ?? '' }}" type="number" label="Radius" />
             </div>
             <div class="col-md-12 mt-3">
                 <label for="about_us">About Us</label>
