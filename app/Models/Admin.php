@@ -15,6 +15,11 @@ class Admin extends Authenticatable
         'password', 'remember_token',
     ];
 
+    // method to check if it is superadmin
+    public function isSuperAdmin(){
+        return $this->role == 'superadmin';
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');

@@ -52,7 +52,7 @@ return [
 
         // 'superadmin' => [
         //     "driver" => 'session',
-        //     'provider' => 
+        //     'provider' => ""
         // ]
     ],
 
@@ -82,6 +82,11 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
         ],
+
+        // "superadmin" => [
+        //     "driver" => "eloquent",
+        //     "model" => App\Models\Admin::class
+        // ]
     ],
 
     /*

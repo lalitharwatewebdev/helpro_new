@@ -17,9 +17,9 @@ class IsAdminMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::guard('admin')->check()) {
-            return $next($request); // pass the admin
-        }
+    if (Auth::guard('admin')->check()) {
+        return $next($request); // pass the admin
+    }
         auth('admin')->logout();
         return redirect()->route('login'); // not admin. redirect whereever you like
     }

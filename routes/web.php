@@ -33,6 +33,16 @@ Route::prefix('admin')->group(function () {
     Route::get('/logout', [LogoutController::class, 'logout'])->name('logout-admin');
 });
 
+
+Route::prefix("admin")->name("admin.")->middleware(['superadmin'])->group(function(){
+    Route::name('business-settings.')
+    ->prefix('business-settings')
+    ->controller(BusinessSettingController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+    });
+});
+
 Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function () {
     Route::name('home.')->controller(DashboardController::class)->group(function () {
         Route::get('/', 'home')->name('index');
@@ -43,12 +53,12 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::post('send-report', 'send')->name('send-report');
     });
 
-    Route::name('business-settings.')
-        ->prefix('business-settings')
-        ->controller(BusinessSettingController::class)->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('store', 'store')->name('store');
-        });
+    // Route::name('business-settings.')
+    //     ->prefix('business-settings')
+    //     ->controller(BusinessSettingController::class)->group(function () {
+    //         Route::get('/', 'index')->name('index');
+    //         Route::post('store', 'store')->name('store');
+    //     });
 
         Route::name('labour-business-settings.')
         ->prefix('labour-business-settings')
