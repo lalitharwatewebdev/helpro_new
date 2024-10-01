@@ -1,5 +1,4 @@
 @extends('layouts/contentLayoutMaster')
-
 @section('title', 'Business Settings')
 @section('page-style')
     <style>

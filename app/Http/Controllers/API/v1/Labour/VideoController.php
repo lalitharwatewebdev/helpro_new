@@ -11,7 +11,6 @@ class VideoController extends Controller
     public function get(){
         $video = Video::where("type","labour")->get();
 
-
         return response([
             "data" => $video
         ],200);
