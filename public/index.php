@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\sendAcceptMessage;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 
@@ -51,5 +52,6 @@ $kernel = $app->make(Kernel::class);
 $response = tap($kernel->handle(
     $request = Request::capture()
 ))->send();
+
 
 $kernel->terminate($request, $response);

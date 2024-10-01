@@ -19,7 +19,7 @@
             
             <x-divider text="Android Settings"/>
             <div class="col-md-4">
-                <x-input value="{{ $data['android_version'] ?? '' }}" name="android_version" label="Android Version" />
+                <x-input value="{{ $data['Android_Version'] ?? '' }}" name="Android_Version" label="Android Version" />
             </div>
             
              <div class="col-md-4 my-auto">
@@ -37,8 +37,8 @@
                     <input value="0" type="hidden" name="android_maintenance_update">
                     <input value="1" name="android_maintenance_update" type="checkbox"
                         @if ($data['android_maintenance_update'] ?? '' == 1) checked @endif class="custom-control-input"
-                        id="switch-force-update-android">
-                    <label class="custom-control-label" for="switch-force-update-android">Maintenance Update</label>
+                        id="switch-android-maintenance-update">
+                    <label class="custom-control-label" for="switch-android-maintenance-update">Maintenance Update</label>
                 </div>
             </div>
             
@@ -49,7 +49,7 @@
             <x-divider text="IOS Settings"/>
             
             <div class="col-md-4">
-                <x-input value="{{ $data['ios_version'] ?? '' }}" name="ios_version" label="IOS Version" />
+                <x-input value="{{ $data['IOS_Version'] ?? '' }}" name="IOS_Version" label="IOS Version" />
             </div>
             
              <div class="col-md-4 my-auto">
@@ -57,8 +57,8 @@
                     <input value="0" type="hidden" name="ios_force_update">
                     <input value="1" name="ios_force_update" type="checkbox"
                         @if ($data['ios_force_update'] ?? '' == 1) checked @endif class="custom-control-input"
-                        id="switch-force-update-android">
-                    <label class="custom-control-label" for="switch-force-update-android">Force Update</label>
+                        id="switch-ios-force-updated">
+                    <label class="custom-control-label" for="switch-ios-force-updated">Force Update</label>
                 </div>
             </div>
             
@@ -67,8 +67,8 @@
                     <input value="0" type="hidden" name="ios_maintenance_update">
                     <input value="1" name="ios_maintenance_update" type="checkbox"
                         @if ($data['ios_maintenance_update'] ?? '' == 1) checked @endif class="custom-control-input"
-                        id="switch-force-update-android">
-                    <label class="custom-control-label" for="switch-force-update-android">Maintenance Update</label>
+                        id="switch-ios-maintenance-update">
+                    <label class="custom-control-label" for="switch-ios-maintenance-update">Maintenance Update</label>
                 </div>
             </div>
             
@@ -152,9 +152,12 @@
                 <label for="contact_us">Contact Us</label>
                 <x-editor name="contact_us" />
             </div>
-            <div class="col-md-4 mt-3">
-                <x-input value="{{ $data['privacy_policy'] ?? '' }}" name="privacy_policy" />
+            
+            <div class="col-md-12 mt-5">
+
+                <x-editor name="privacy_policy_user" label="Privacy Policy"/>
             </div>
+            
             <div class="col-md-4 mt-3">
                 <x-input value="{{ $data['terms_and_conditions'] ?? '' }}" name="terms_and_conditions" />
             </div>
@@ -180,11 +183,13 @@
                 @if ($data['contact_us'] ?? '' != '')
                     `{!! $data['contact_us'] ?? '' !!}`
                 @endif
-           
-            fullEditor_terms_and_condition.root.innerHTML =
-                @if ($data['terms_and_condition'] ?? '' != '')
-                    `{!! $data['terms_and_condition'] ?? '' !!}`
+                
+             fullEditor_privacy_policy.root.innerHTML =
+                @if ($data['privacy_policy'] ?? '' != '')
+                    `{!! $data['privacy_policy'] ?? '' !!}`
                 @endif
-        })
+           
+           
+        });
     </script>
 @endsection

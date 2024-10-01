@@ -25,7 +25,7 @@
                 <div class="card-body">
                     <a href="javascript:void(0);" class="brand-logo align-items-center flex-column">
 
-                        <img style="max-width: 5em" src="{{ asset("images/logo/MDServices.png") }}" alt="">
+                        <img style="max-width: 5em" src="{{ asset("images/logo/logo-new.png") }}" alt="">
 
                         <h2 class="brand-text text-primary ">{{ Str::ucfirst(env('APP_NAME')) }}</h2>
                     </a>

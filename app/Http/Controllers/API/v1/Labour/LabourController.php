@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\API\v1\Labour;
-use App\Notifications\firebaseNotification;
+
+
 use App\Http\Controllers\Controller;
 use App\Models\Areas;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Booking;
 use App\Models\BookingRequest;
-use App\Models\Category;
 use App\Models\Wallet;
 use App\Models\Checkout;
 use App\Models\RejectedBooking;
@@ -16,16 +16,34 @@ use App\Models\AcceptedBooking;
 use App\Models\BusinessSetting;
 use App\Models\Transactions;
 use App\Jobs\SendNotificationJob;
-
+use App\Models\LabourAcceptedBooking;
+use App\Models\LabourRejectedBooking;
 
 class LabourController extends Controller
 {
 
 
+
+    // public function sendNotification()
+    // {
+    //     $firebaseService = new SendNotificationJob();
+    //     $labour_full_name = auth()->user()->name;
+    //     $device_id = "cLlFb-JGQ6CJxedN39t9hU:APA91bG-f9rO-N5lwaNleoBrrr0hngTCDWV1Vb1I75v-9NlErczmaYysrdgTKzs3j0BEGWCUiR7i2J9W3W6eF514Tjau1a1WOeQqDfHjRccGI4fZCITqP2Jd61TA69aHJKpYGNiKy0aF";
+    //     $message = "Booking Accepted By " . $labour_full_name;
+    //     $title = "Booking Accepted";
+    //     $firebaseService->sendNotification($device_id, $title, $message);
+
+    //     return response([
+    //         "message" => "Notification send to user successfully",
+
+    //     ], 200);
+    // }
+
+
     public function profile(Request $request)
     {
 
-        $user_id  = auth()->user()->id;
+        $user_id = auth()->user()->id;
         $user_data = User::with("states:id,name", "cities:id,name")->where("type", "labour")->find($user_id);
         $wallet_amount = Wallet::where("user_id", auth()->user()->id)->first();
 
@@ -60,8 +78,8 @@ class LabourController extends Controller
         $longitude = 72.955762;
 
         $labour_id = auth()->user();
-        $categories =  $labour_id->category()->first();
-        $category_id =  $categories->pivot->category_id;
+        $categories = $labour_id->category()->first();
+        $category_id = 13;
         $radius = 5;
         $booking_amount_data = AcceptedBooking::with("booking.checkout")->where("labour_id", auth()->user()->id)->get();
 
@@ -97,7 +115,7 @@ class LabourController extends Controller
         $lonMax = rad2deg($lonFrom + $lonDelta);
 
         // Get areas in bounding box
-        $area =  Areas::whereBetween('latitude', [$latMin, $latMax])
+        $area = Areas::whereBetween('latitude', [$latMin, $latMax])
             ->whereBetween('longitude', [$lonMin, $lonMax])
             ->where("category_id", $category_id)
             ->get()
@@ -120,7 +138,7 @@ class LabourController extends Controller
         // return $checkout;
         foreach ($checkouts as $checkout) {
 
-            $get_bookings =  Booking::where("checkout_id", $checkout->id)->whereColumn("quantity_required", "!=", "current_quantity")->first();
+            $get_bookings = Booking::where("checkout_id", $checkout->id)->whereColumn("quantity_required", "!=", "current_quantity")->first();
 
             if ($get_bookings) {
 
@@ -148,7 +166,7 @@ class LabourController extends Controller
 
 
         // getting total amount of user booking
-        $bookings =  BookingRequest::with("checkout", "checkout.user:id,name", "checkout.address.states:id,name", "checkout.address.cities:id,name", "checkout.area")->where("user_id", auth()->user()->id)
+        $bookings = BookingRequest::with("checkout", "checkout.user:id,name", "checkout.address.states:id,name", "checkout.address.cities:id,name", "checkout.area")->where("user_id", auth()->user()->id)
             ->where("category_id", $category_id)->get();
 
 
@@ -179,7 +197,7 @@ class LabourController extends Controller
             "bookings" => $bookings,
             "total_amount" => $total_amount,
             "total_wallet_amount" => $total_wallet_amount->amount ?? 0,
-            "total_booking_accepted" =>   $total_booking_accepted,
+            "total_booking_accepted" => $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,
             "status" => true
         ], 200);
@@ -239,7 +257,7 @@ class LabourController extends Controller
 
     public function acceptedBooking()
     {
-        $data = AcceptedBooking::where("labour_id", auth()->user()->id)->get();
+        $data = AcceptedBooking::with(["booking.user", "booking.checkout.address"])->where("labour_id", auth()->user()->id)->get();
         return response([
             "data" => $data,
             "status" => true
@@ -276,12 +294,8 @@ class LabourController extends Controller
     {
         $action = $request->action;
         $booking_id = $request->booking_id;
-
-
-
         $business_settings = BusinessSetting::pluck("value", "key")->toArray();
-
-        $services_charges =  $business_settings['service_charges'];
+        $services_charges = $business_settings['service_charges'];
 
         // if user rejected the booking
         if (strtolower($action) == "rejected") {
@@ -357,7 +371,7 @@ class LabourController extends Controller
             } else {
                 Wallet::create([
                     "user_id" => auth()->user()->id,
-                    "amount" =>   intval($final_price)
+                    "amount" => intval($final_price)
                 ]);
             }
 
@@ -369,22 +383,68 @@ class LabourController extends Controller
 
             // and check if quantity required and current are same
             if ($check_booking->quantity_required == $check_booking->current_quantity) {
-                BookingRequest::where("booking_id", $booking_id)->delete();
+                // BookingRequest::where("booking_id", $booking_id)->delete();
+                BookingRequest::where("user_id", auth()->user()->id)->where("booking_id", $booking_id)->delete();
             }
 
             // if it is same we will delete it as booking is completed and we dont want any more users in it
-            BookingRequest::where("user_id", auth()->user()->id)->where("booking_id", $booking_id)->delete();
-            $user_device_id = $booking->user->device_id;
-            $message = auth()->user()->name . " accepted your booking.";
-           
-            
-            // $booking->user->notify(new firebaseNotification());
-            SendNotificationJob::dispatch("Booking Accepted",$message,$user_device_id);
+
+            $firebaseService = new SendNotificationJob();
+            $labour_full_name = auth()->user()->name;
+            $device_id = ["cLlFb-JGQ6CJxedN39t9hU:APA91bG-f9rO-N5lwaNleoBrrr0hngTCDWV1Vb1I75v-9NlErczmaYysrdgTKzs3j0BEGWCUiR7i2J9W3W6eF514Tjau1a1WOeQqDfHjRccGI4fZCITqP2Jd61TA69aHJKpYGNiKy0aF"];
+            $message = "Booking Accepted By " . $labour_full_name;
+            $title = "Booking Accepted";
+            $firebaseService->sendNotification($device_id, $title, $message);
 
             return response([
                 "message" => "Booking Accepted",
                 "status" => true
             ], 200);
         }
+    }
+
+    public function getBooking(Request $request){
+        $booking_status = $request->booking_status;
+
+        if($booking_status == "accepted"){
+            \Log::info("Accepted Labour Booking");
+            $data = LabourAcceptedBooking::with("booking.user")->where("labour_id",auth()->user()->id)->latest()->get();
+
+            return response([
+                "data" => $data,
+                "status" => true
+            ],200);
+        }
+        else{
+            \Log::info("Rejected Labour Booking");
+            $data = LabourRejectedBooking::with("booking.user:")->where("labour_id",auth()->user()->id)->latest()->get();
+
+            return response([
+                "data" => $data,
+                "status" => true
+            ],200);
+        }
+    }
+
+    public function labourHistory(){
+        $acceptedBooking = LabourAcceptedBooking::where("labour_id",auth()->user()->id)->get();
+        $rejectedBooking = LabourRejectedBooking::where("labour_id",auth()->user()->id)->get();
+
+        $combined_bookings  = $acceptedBooking->merge($rejectedBooking);
+        $combined_bookings = $combined_bookings->sortByDesc("created_at");
+
+        return response([
+            "data" => $combined_bookings,
+            "status" => true
+        ],200);
+    }
+
+    public function currentJob(){
+        $data = LabourAcceptedBooking::with("booking")->where("labour_id",auth()->user()->id)->first();
+
+        return response([
+            "data" => $data,
+            "status" => true
+        ],200);
     }
 }

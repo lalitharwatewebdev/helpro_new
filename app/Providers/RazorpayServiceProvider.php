@@ -20,6 +20,7 @@ class RazorpayServiceProvider
 
     public function createOrder($amount, $currency = "INR", $checkout_id)
     {
+        \Log::info($amount);
         $receipt = "receipt_id" . time();
 
 

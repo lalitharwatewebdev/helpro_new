@@ -69,19 +69,19 @@ class LabourController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            //     "name" => "required",
-            //     "email" => "required|email",
-            //     "phone" => "required|max:10",
-            //     "aadhaar_number" => "required|max:12",
-            //     "aadhaar_card_front" => "required|mimes:png,jpeg,webp,jpg",
-            //     "aadhaar_card_back" => "required|mimes:png,jpeg,webp,jpg",
-            //     "pan_number" => "required",
-            //     "bank_name" => "required",
-            //     "IFSC_code" => "required",
-            //     "bank_address" => "required",
-            'profile_pic' => 'required|mimes:png,jpg,jpeg,webp,svg'
-        ]);
+        // $request->validate([
+        //     //     "name" => "required",
+        //     //     "email" => "required|email",
+        //     //     "phone" => "required|max:10",
+        //     //     "aadhaar_number" => "required|max:12",
+        //     //     "aadhaar_card_front" => "required|mimes:png,jpeg,webp,jpg",
+        //     //     "aadhaar_card_back" => "required|mimes:png,jpeg,webp,jpg",
+        //     //     "pan_number" => "required",
+        //     //     "bank_name" => "required",
+        //     //     "IFSC_code" => "required",
+        //     //     "bank_address" => "required",
+        //     // 'profile_pic' => 'required|mimes:png,jpg,jpeg,webp,svg'
+        // ]);
         $data = new User();
 
 
@@ -112,10 +112,10 @@ class LabourController extends Controller
         $data->aadhaar_number = $request->aadhaar_number;
         $data->branch_address = $request->bank_address;
         $data->gender = $request->gender;
-        $data->labour_status = "accepted";
+        $data->labour_status = "pending";
 
 
-        $data->rate_per_day = $request->rate_per_day;
+       
         $data->type = "labour";
 
 
@@ -123,20 +123,20 @@ class LabourController extends Controller
         $data->save();
 
         if ($data) {
-            if ($request->labour_images) {
-                foreach ($request->labour_images as $images) {
-                    $labour_image = new LabourImage();
-                    $labour_image->user_id = $data->id;
-                    $labour_image->image = FileUploader::uploadFile($images, 'images/labour_images');
+            // if ($request->labour_images) {
+            //     foreach ($request->labour_images as $images) {
+            //         $labour_image = new LabourImage();
+            //         $labour_image->user_id = $data->id;
+            //         $labour_image->image = FileUploader::uploadFile($images, 'images/labour_images');
 
-                    $labour_image->save();
+            //         $labour_image->save();
 
-                    $user_data = User::find($data->id);
+            //         $user_data = User::find($data->id);
 
-                    $user_data->category()->attach($request->category);
-                }
+            //         $user_data->category()->attach($request->category);
+            //     }
 
-            }
+            // }
 
 
 
@@ -183,7 +183,10 @@ class LabourController extends Controller
             "labour_status" => $request->type
         ]);
 
-        SendNotificationJob::dispatch("Congraluations","Your Labour Account was Approved",$user->device_id);
+       
+
+        // $firebaseService = new SendNotificationJob();
+        // $firebaseService->sendNotification($user->device_id->toArray, "Accepted", "You're accepted");
 
 
         return response([

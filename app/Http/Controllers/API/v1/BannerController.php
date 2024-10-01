@@ -11,15 +11,6 @@ class BannerController extends Controller
 {
     public function get()
     {
-    // dfsdf
-        // $title = "New Job Available";
-        // $message = "You have a new job available.";
-        // $device_ids = "cWTfpKz-R8C9uim9xNHzKF:APA91bG9XyX4utJ5yAejC6AqORuB0ovrpnfRM_jcD4-Xbl03p7m0yGXdjfATMnFPc2PpodUO-K__Bre45UUib51V9dMFQfBlZsHQJPqguQMx1oSbm5LC8OWAMdN6qnvuMziOzCMtPKde";
-        // $additional_data = ["category_name" => "Plumber","address" => "Thane(W)"];
-
-        // $firebaseService = new SendNotificationJob();
-        // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
-
         $data = Slider::active()->where("app_type", "user")->get();
 
         return response([

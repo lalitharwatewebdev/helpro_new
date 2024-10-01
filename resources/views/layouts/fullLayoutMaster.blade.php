@@ -19,7 +19,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title') - {{ Str::ucfirst(env('APP_NAME')) }}</title>
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/logo/logo.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/logo/logo-new.png') }}">
     <link rel="stylesheet" href="{{ asset(mix('css/custom/loader.css')) }}" />
     <script src="{{ asset(mix('js/core/scripts.js')) }}"></script>
     {{-- Include core + vendor Styles --}}

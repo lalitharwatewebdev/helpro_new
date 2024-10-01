@@ -25,6 +25,14 @@ use App\Http\Controllers\API\v1\Labour\SliderController;
 use App\Http\Controllers\API\v1\Labour\WalletController as LabourWalletController;
 use App\Http\Controllers\API\v1\Labour\LabourController as LabourUserController;
 use App\Http\Controllers\API\v1\LabourRedeemController;
+use App\Http\Controllers\API\v1\TicketController;
+use App\Http\Controllers\API\v1\Labour\TicketController as LabourTicketController;
+use App\Http\Controllers\API\v1\LabourAcceptBookingController;
+use App\Http\Controllers\API\v1\LabourBookingController;
+use App\Http\Controllers\API\v1\LabourRazorPayController;
+use App\Http\Controllers\API\v1\TicketChatController;
+use App\Http\Controllers\API\v1\VideoController;
+use App\Models\LabourAcceptedBooking;
 
 Route::prefix('v1')->group(function () {
 
@@ -32,9 +40,9 @@ Route::prefix('v1')->group(function () {
 
     Route::controller(AuthController::class)->prefix("user")->group(function () {
         // Route::post("login", "OtpLogin");
-        Route::post("otp-login","OTPLogin");
-        Route::post("get-otp","generateOTP");
-        Route::post("google-login","googleLogin");
+        Route::post("otp-login", "OTPLogin");
+        Route::post("get-otp", "generateOTP");
+        Route::post("google-login", "googleLogin");
     });
 
 
@@ -63,18 +71,18 @@ Route::prefix('v1')->group(function () {
 
 
     Route::controller(BannerController::class)->prefix("banner")->group(function () {
-            Route::get("/", 'get');
-        });
+        Route::get("/", 'get');
+    });
 
 
-        Route::controller(UserController::class)->prefix("user")->group(function () {
-            Route::get("/", "profile");
-        });
+    // Route::controller(UserController::class)->prefix("user")->group(function () {
+    //     Route::get("/", "profile");
+    // });
 
     Route::group(['middleware' => "auth:sanctum"], function () {
         Route::controller(UserController::class)->prefix("user")->group(function () {
             Route::post("sign-up", "store");
-            // Route::get("/", "profile");
+            Route::get("/", "profile");
             Route::post("logout", "logOut");
         });
 
@@ -122,15 +130,49 @@ Route::prefix('v1')->group(function () {
             });
         });
 
+        Route::prefix("tickets")->group(function () {
+            Route::controller(TicketController::class)->group(function () {
+                Route::post("create", "create");
+                Route::get("/", "get");
+            });
+        });
+
+        Route::controller(TicketChatController::class)->prefix("ticket-chat")->group(function () {
+            Route::post("create", "create");
+            Route::get("/", "get");
+        });
+
         Route::controller(ReferralController::class)->prefix("referrals")->group(function () {
             Route::post("add-referral", "addReferral");
         });
 
-        Route::controller(WalletController::class)->prefix("wallets")->group(function(){
-            Route::post("add-amount","createAmount");
-            Route::post("fetch-amount","fetchAmount");
-            Route::get("wallet-transactions","walletTransaction");
+        Route::controller(WalletController::class)->prefix("wallets")->group(function () {
+            Route::post("add-amount", "createAmount");
+            Route::post("fetch-amount", "fetchAmount");
+            Route::get("wallet-transactions", "walletTransaction");
         });
+
+        Route::controller(VideoController::class)->prefix("videos")->group(function () {
+            Route::get("/", "get");
+        });
+
+
+        // labour booking routes
+        Route::controller(LabourBookingController::class)->prefix("labour-booking")->group(function(){
+            Route::post("/","bookNew");
+        });
+
+        // labour accepting booking route
+        Route::controller(LabourAcceptBookingController::class)->prefix("labour-accepting-booking")->group(function(){
+            Route::post("/","labourAcceptBooking");
+        });
+
+        //labour payment razorpay api
+        Route::controller(LabourRazorPayController::class)->prefix("labour-payment")->group(function(){
+            Route::post("/","store");
+            Route::post("fetch-order","fetchOrder");
+        });
+
     });
 
 
@@ -139,17 +181,35 @@ Route::prefix('v1')->group(function () {
     Route::prefix("labour")->group(function () {
         Route::controller(LabourAuthController::class)->group(function () {
             // Route::post("login", "OtpLogin");
-        Route::post("get-otp", "generateOTP");
-        Route::post("otp-login", 'OTPLogin');
-        Route::post("google-login","googleLogin");
+            Route::post("get-otp", "generateOTP");
+            Route::post("otp-login", 'OTPLogin');
+            Route::post("google-login", "googleLogin");
+           
         });
 
 
 
-        // Route::group(['middleware' => "auth:sanctum"], function () {
+
+
+
+        Route::group(['middleware' => "auth:sanctum"], function () {
             Route::controller(LabourAuthController::class)->group(function () {
                 Route::post("sign-up", "signUp");
                 Route::post("logout", "logOut");
+                Route::post("update-category","updateCategory");
+                Route::get("labour-profile","Profile");
+            });
+
+
+            Route::controller(LabourTicketController::class)->prefix("tickets")->group(function () {
+                Route::post("create", "create");
+            });
+
+
+
+
+            Route::controller(VideoController::class)->prefix("videos")->group(function () {
+                Route::get("/", "get");
             });
 
             // Route::controller(SliderController::class)->grou
@@ -168,17 +228,22 @@ Route::prefix('v1')->group(function () {
                 Route::post("accept-user-booking", "AcceptedUserBooking");
                 Route::post("reject-user-booking", "rejectUserBooking");
                 Route::post("accept-reject-booking", 'acceptRejectBooking');
+                Route::get("send-notification", "sendNotification");
+                Route::post("get-booking","getBooking");
+                Route::post("labour-history","labourHistory");
+                Route::post("current-job","currentJob");
             });
 
-            Route::controller(LabourWalletController::class)->prefix("wallets")->group(function(){
-                Route::post("redeem-wallet-amount","redeemAmount");
-                Route::get("transactions","transactions");
+
+            Route::controller(LabourWalletController::class)->prefix("wallets")->group(function () {
+                Route::post("redeem-wallet-amount", "redeemAmount");
+                Route::get("transactions", "transactions");
             });
 
-            Route::controller(LabourRedeemController::class)->prefix("redeem")->group(function(){
-                Route::post("redeem-amount","redeemAmount");
-                Route::get("redeem-history","getHistory");
+            Route::controller(LabourRedeemController::class)->prefix("redeem")->group(function () {
+                Route::post("redeem-amount", "redeemAmount");
+                Route::get("redeem-history", "getHistory");
             });
         });
     });
-// });
+});

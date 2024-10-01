@@ -9,6 +9,7 @@ use App\Models\BookingRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Jobs\SendNotificationJob;
+use App\Models\Address;
 
 class CategoryController extends Controller
 {
@@ -24,16 +25,21 @@ class CategoryController extends Controller
 
     public function getArea(Request $request)
     {
+       
+        \Log::info($request->all());
+        
+        $user = User::find(auth()->user()->id);
+        
+        $user->update([
+                "lat_long" => $request->lat_long
+            ]);
+        
         $category_id = $request->category_id;
         $lat_long = $request->lat_long;
-        $radius = 100;
+        $radius = 5000000;
 
 
         $category_data = Category::find($request->category_id);
-
-
-
-
 
         // Validate inputs
         if (!$category_id || !$lat_long || !$radius) {
@@ -65,15 +71,16 @@ class CategoryController extends Controller
         $lonMax = rad2deg($lonFrom + $lonDelta);
 
         // Get areas in bounding box
-        $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+         $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
             ->where('category_id', $category_id)
-            ->whereBetween('latitude', [$latMin, $latMax])
-            ->whereBetween('longitude', [$lonMin, $lonMax])
-            ->having('distance', '<=', $radius)
-            ->with("category:id,title,image")
+            // ->whereBetween('latitude', [$latMin, $latMax])
+            // ->whereBetween('longitude', [$lonMin, $lonMax])
+            ->with("category:id,title,image")->take(1)
             ->get();
-
-        $labours = User::where('type', 'labour')
+        
+        
+         $labours_device_id = User::where('type', 'labour')
+         ->where("is_online","yes")
             ->whereHas('category', function ($query) use ($category_id) {
                 $query->where('category_id', $category_id);
             })
@@ -91,28 +98,56 @@ class CategoryController extends Controller
             ->map(function ($labour) {
                 $labour->type = 'labour';
                 return $labour;
-            });
+            })->pluck("device_id")->toArray();
 
 
-         $title = "New Job Available";
-        $message = "You have a new job available.";
-        $device_ids = "cWTfpKz-R8C9uim9xNHzKF:APA91bG9XyX4utJ5yAejC6AqORuB0ovrpnfRM_jcD4-Xbl03p7m0yGXdjfATMnFPc2PpodUO-K__Bre45UUib51V9dMFQfBlZsHQJPqguQMx1oSbm5LC8OWAMdN6qnvuMziOzCMtPKde";
-        $additional_data = ["category_name" => $category_data->title,"address" => auth()->user()->address];
+            $labours = User::where('type', 'labour')
+            ->where("is_online","yes")
+            ->whereHas('category', function ($query) use ($category_id) {
+                $query->where('category_id', $category_id);
+            })
+            ->get()
+            ->filter(function ($labour) use ($latitude, $longitude, $radius) {
+                [$labourLatitude, $labourLongitude] = explode(',', $labour->lat_long);
+                $distance = $this->haversineGreatCircleDistance(
+                    $latitude,
+                    $longitude,
+                    $labourLatitude,
+                    $labourLongitude
+                );
+                return $distance <= $radius;
+            })
+            ->map(function ($labour) {
+                $labour->type = 'labour';
+                return $labour;
+            })->toArray();
+            
+       
+        
+        // $labours = User::where("type","labour")->get();
+        // \Log::info("labour device id ==> ",$labours_device_id);
+        // if(!empty($labours)){
+            
+        // $user_address = Address::where("user_id",auth()->user()->id)->where("is_primary","yes")->first();
+        // $title = "New Job Available";
+        // $message = "You have a new job available.";
+        // $device_ids = $labours_device_id;
+        // $additional_data = ["category_name" => $category_data->title,"address" => $user_address->address,"booking_id"=>32];
 
-        $firebaseService = new SendNotificationJob();
-        $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        // $firebaseService = new SendNotificationJob();
+        // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        // }
+
 
 
         $responseData = [
             'areas' => $areas,
-            'labour' => $labours
+            'labour' => $labours,
         ];
-
 
         return response([
             "data" => $responseData,
             "status" => true,
-            "comment" => "sdsdf"
         ], 200);
     }
 

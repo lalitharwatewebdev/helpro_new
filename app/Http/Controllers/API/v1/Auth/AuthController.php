@@ -17,6 +17,8 @@ class AuthController extends Controller
     public function register(Request $request)
     {
 
+        \Log::info($request->all());
+
         if (!empty($request->image)) {
             $image = FileUploader::uploadFile($request->file('image'), 'images/usersimage');
         }
@@ -162,7 +164,9 @@ class AuthController extends Controller
     public function OTPLogin(Request $request)
     {
 
-    //    return $request->all();
+       \Log::info("User Login Details:: ",$request->all());
+
+      
         $request->validate([
             "phone" => "required",
             "otp" => "required"
@@ -171,9 +175,6 @@ class AuthController extends Controller
         $type = "old";
 
         $user = User::where("phone", $request->phone)->where("type","user")->first();
-
-
-
         $otp = OTP::where("phone", $request->phone)->latest()->first();
 
 
@@ -218,39 +219,25 @@ class AuthController extends Controller
                     "status" => false
                 ], 400);
             }
-        } else {
+        } 
+        else{
+            User::create([
+                "device_id" => $request->device_id,
+                "phone" => $request->phone,
+            ]);
 
-            if ($otp->generated_otp == $request->otp) {
-
-                $user = User::create([
-                    "phone" => $request->phone,
-                    "device_id" => $request->device_id,
-                    "type" => "user"
-                ]);
-                $token = $user->createToken("otp_login")->plainTextToken;
-
-                $type = "new";
-
-                return response([
-                    "type" => $type,
-                    "token" => $token,
-                    "message" => "User Created Successfully",
-                    "status" => true,
-                ], 200);
-            } else {
-                $type = "new";
-                return response([
-                    "type" => $type,
-                    "message" => "Invalid OTP",
-                    "status" => false
-                ], 400);
-            }
+            return response([
+                "message" => "User Account Created",
+                "status" => true
+            ],200);
         }
     }
 
 
     public function googleLogin(Request $request)
     {
+        
+     
         // return $request->all();
         $t = $request->validate([
             'token' => 'required|string',
@@ -268,7 +255,7 @@ class AuthController extends Controller
         $uid = $verifiedIdToken->claims()->get('sub');
         $firebase_user = $auth->getUser($uid);
         $email = $firebase_user->email;
-        $user = User::where('firebase_uid', $firebase_user->uid)->orWhere('email', $email)->first();
+        $user = User::where('email', $email)->first();
 
         $type = 'old';
         // if (!empty($user)) {
@@ -292,13 +279,13 @@ class AuthController extends Controller
         if (!empty($user)) {
             $user->update([
                 'device_id' => $request->device_id,
-                'firebase_uid' => $uid,
+              
             ]);
         } else {
             $user =  User::create([
                 'email' => $email,
                 'device_id' => $request->device_id,
-                'firebase_uid' => $uid,
+              
                 "type" => "user"
             ]);
             $type = 'new';

@@ -8,7 +8,7 @@
             <li class="nav-item mr-auto">
                 <a class="navbar-brand" href="{{ url('admin/') }}">
                     <span class="brand-logo">
-                        <img src="{{ asset('images/logo/MDServices.png') }}" alt="">
+                        <img src="{{ asset('images/logo/logo-new.png') }}" alt="">
                     </span>
                     <h4 class="brand-text">{{ Str::ucfirst(env('APP_NAME')) }}</h4>
                 </a>

@@ -45,6 +45,7 @@ class UserController extends Controller
         $data->city = $request->city;
         $data->address = $request->address;
         $data->lat_long = $request->lat_long;
+        
         $data->referral_code = $this->referralGenerator($request->username);
         if($request->hasFile("profile_img")){
             $data->profile_pic = FileUploader::uploadFile($request->file("profile_img"),"images/profile_pic");
@@ -123,13 +124,17 @@ class UserController extends Controller
 
     public function profile(){
        
-        $wallet_amount = Wallet::where("user_id",auth()->user()->id)->first();
+        $user_wallet = Wallet::where("user_id",auth()->user()->id)->first();
+
+        if(!$user_wallet){
+            Wallet::create([
+                "user_id" => auth()->user()->id,   
+            ]);
+        }
         
         $user_id = auth()->user()->id;
         $data = User::with("states","cities")->where("id",$user_id)->first();
-        if($data){
-            $data->wallet_amount = $wallet_amount->amount ?? 0;
-        }
+       
         return response([
             "data" => $data,
             "status" => true

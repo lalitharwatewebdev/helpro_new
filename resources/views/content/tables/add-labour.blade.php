@@ -44,7 +44,7 @@
                             </div>
                             <div class="col-lg-4  col-md-6">
                                 <x-input-file name="profile_pic" />
-                                <x-input name="lat_long" class="lat_long" required type="hidden" />
+                                <!--<x-input name="lat_long" class="lat_long"  />-->
                             </div>
                             <div class="col-lg-4 col-md-6">
                                 <label for="">Select State</label>
@@ -74,9 +74,9 @@
                                 </select>
                             </div>
 
-                            <div class="col-lg-4  col-md-6">
-                                <x-input name="rate_per_day" type="number" />
-                            </div>
+                            <!--<div class="col-lg-4  col-md-6">-->
+                            <!--    <x-input name="rate_per_day" type="number" />-->
+                            <!--</div>-->
 
                             <div class="col-lg-12 col-md-12">
                                 <x-input name="address" type="textarea" />
@@ -85,7 +85,7 @@
 
                         </div>
                         <x-divider text="Co-ordinate" />
-                        <div id="map"></div>
+                        <div id="map"></div>-
                         <x-divider text="Work Details" />
                         <div id="output"></div>
                         <div class="row">
@@ -108,20 +108,20 @@
 
 
 
-                            <div class="col-lg-12 col-md-6">
-                                <x-image-uploader name="labour_images" id="labour_images" />
-                            </div>
+                            <!--<div class="col-lg-12 col-md-6">-->
+                            <!--    <x-image-uploader name="labour_images" id="labour_images" />-->
+                            <!--</div>-->
 
-                            <div class="col-lg-4 col-md-6">
-                                <label for="">Preferred Shifts</label>
-                                <select class="select2  form-control" name="shifts">
-                                    <option value="" disabled selected>Select Shift</option>
-                                    <option value="morning">Morning</option>
-                                    <option value="afternoon">Afternoon</option>
-                                    <option value="evening ">Evening</option>
-                                    <option value="night">Night</option>
-                                </select>
-                            </div>
+                            <!--<div class="col-lg-4 col-md-6">-->
+                            <!--    <label for="">Preferred Shifts</label>-->
+                            <!--    <select class="select2  form-control" name="shifts">-->
+                            <!--        <option value="" disabled selected>Select Shift</option>-->
+                            <!--        <option value="morning">Morning</option>-->
+                            <!--        <option value="afternoon">Afternoon</option>-->
+                            <!--        <option value="evening ">Evening</option>-->
+                            <!--        <option value="night">Night</option>-->
+                            <!--    </select>-->
+                            <!--</div>-->
 
 
 

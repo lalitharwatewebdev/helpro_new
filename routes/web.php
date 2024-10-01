@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\SubscriptionController;
+use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
@@ -234,6 +235,14 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
             Route::delete('/{id}', 'destroy')->name('destroy');
             Route::post('update', 'update')->name('update');
             Route::put('status', 'status')->name('status');
+        });
+
+        Route::name('tickets.')
+        ->prefix('tickets')
+        ->controller(TicketController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get("get-ticket-id","getTicketChat")->name("get-ticket-by-id");
+            Route::post("store","store")->name("store");
         });
 
         

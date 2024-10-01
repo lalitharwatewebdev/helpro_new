@@ -6,18 +6,14 @@
       "icon": "<i data-feather='home'></i>",
       "slug": "admin.home.index"
     },
+   
     {
       "url": "admin/category",
       "name": "Category",
       "icon": "<span class='material-symbols-outlined'>category</span>",
       "slug": "admin.category.index"
     },
-    {
-      "url": "admin/redeem",
-      "name": "Redeem Management",
-      "icon": "<span class='material-symbols-outlined'>category</span>",
-      "slug": "admin.redeem.index"
-    },
+  
     {
       "name": "Slider Management",
       "icon": "<i data-feather='user'></i>",
@@ -68,29 +64,20 @@
         }
       ]
     },
-    {
-      "url": "admin/promo-code",
-      "name": "Promo Code Management",
-      "icon": "<i data-feather='user'></i>",
-      "slug": "admin.promo-code.index"
-    },
+   
     {
       "url": "admin/areas",
       "name": "Area Service Management",
       "icon": "<i data-feather='user'></i>",
       "slug": "admin.areas.index"
     },
+   
+
     {
-      "url": "admin/carts",
-      "name": "Cart Management",
-      "icon": "<i data-feather='user'></i>",
-      "slug": "admin.carts.index"
-    },
-    {
-      "url": "admin/subscriptions",
-      "name": "Subscription Management",
-      "icon": "<i data-feather='user'></i>",
-      "slug": "admin.subscriptions.index"
+      "url": "admin/tickets",
+      "name": "Support",
+      "icon": "<i data-feather='home'></i>",
+      "slug": "admin.tickets.index"
     },
     {
       "url": "admin/transactions",

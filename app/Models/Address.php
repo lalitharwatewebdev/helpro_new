@@ -30,5 +30,10 @@ class Address extends Model
         return $this->belongsTo(User::class);
     }
 
+    // labour booking relationship
+    public function labourBooking(){
+        return $this->hasMany(LabourBooking::class);
+    }
+
     
 }

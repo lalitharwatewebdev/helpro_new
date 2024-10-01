@@ -20,7 +20,7 @@ class SendNotificationJob
     {
         $this->firebase = app(Factory::class);
     }
-    public function sendNotification(string $token, string $title, string $body, array $data = [], string $image = null)
+    public function sendNotification(array $token = [], string $title, string $body, array $data = [], string $image = null)
     {
 
         $firebase = $this->firebase->withServiceAccount(base_path('/firebase.json'));
@@ -35,13 +35,17 @@ class SendNotificationJob
             $notificationPayload['image'] = $image;
         }
         $notification = Notification::fromArray($notificationPayload);
-
-        $message = CloudMessage::withTarget('token', $token)
+        
+    
+        foreach($token as $t){
+                $message = CloudMessage::withTarget("token",$t)
             ->withNotification($notification)
             ->withHighestPossiblePriority('high');
         if ($data) {
             $message = $message->withData($data);
         }
-        return $messaging->send($message);
+         $messaging->send($message);    
+        }
+        
     }
 }

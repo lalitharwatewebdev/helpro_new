@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId("labour_id")->nullable()->contrained("users")->nullOnDelete();
             $table->foreignId("booking_id")->nullable()->constrained()->nullOnDelete();
+            $table->decimal("amount")->nullable();
+            $table->integer("otp")->nullable();
             $table->timestamps();
             $table->enum('status', ['active', 'blocked'])->default('active');
         });

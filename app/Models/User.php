@@ -72,7 +72,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function category()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class,"category_user","user_id");
     }
 
     public function labourAttach()
@@ -84,6 +84,23 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Address::class, "user_id");
     }
+
+    public function tickets(){
+        return $this->hasMany(Ticket::class);
+    }
+
+
+    // labour booking relationship
+    public function labourBooking(){
+        return $this->hasMany(LabourBooking::class);
+    }
+
+    // labour accepted Booking
+    public function labourAcceptedBooking(){
+        return $this->hasMany(LabourAcceptedBooking::class);
+    }
+
+
 
 
 }
