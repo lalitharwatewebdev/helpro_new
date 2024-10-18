@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('labour_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("booking_id")->constrained("labour_razor_pay")->cascadeOnDelete();
+            $table->foreignId("booking_id")->constrained("labour_bookings")->cascadeOnDelete();
             $table->timestamps();
             $table->enum('status', ['active', 'blocked'])->default('active');
         });

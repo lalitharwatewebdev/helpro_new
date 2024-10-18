@@ -39,7 +39,6 @@ Route::prefix('v1')->group(function () {
 
 
     Route::controller(AuthController::class)->prefix("user")->group(function () {
-        // Route::post("login", "OtpLogin");
         Route::post("otp-login", "OTPLogin");
         Route::post("get-otp", "generateOTP");
         Route::post("google-login", "googleLogin");

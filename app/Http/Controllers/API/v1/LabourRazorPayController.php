@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\BusinessSetting;
 use App\Models\LabourBooking;
 use App\Models\LabourPayment;
 use App\Models\LabourRazorPay;
@@ -48,20 +49,27 @@ class LabourRazorPayController extends Controller
     }
 
     public function fetchOrder(Request $request){
+        $booking_id = $request->booking_code;
+
         $fetchOrder = $this->labourRazorPay->fetchOrder($request->order_id);
         
         if(isset($fetchOrder['status'])){
                 // return $fetchOrder;
 
                 // get booking by order_id
-                $booking = LabourRazorPay::where("order_id",$fetchOrder['order_id'])->pluck("order_data")->first();
-                $booking = json_decode($booking);
+                // $booking = LabourRazorPay::where("order_id",$fetchOrder['order_id'])->pluck("order_data")->first();
+                // $booking = json_decode($booking);
+
+                $booking = LabourBooking::where("booking_code",$booking_id)->first();
+
+                $service_charges = BusinessSetting::pluck("services_charges")->first();
 
                 if($booking){
 
                     $labourPayment = new LabourPayment();
     
                     $labourPayment->booking_id = $booking->id;
+                    $labourPayment->service_charges = $service_charges;
                     $labourPayment->save();
     
                     return response([

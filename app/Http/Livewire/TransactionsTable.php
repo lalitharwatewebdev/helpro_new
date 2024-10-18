@@ -7,6 +7,7 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Excel;
+use App\Models\LabourPayment;
 use App\Models\Booking;
 use App\Exports\CustomExport;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
@@ -131,19 +132,19 @@ class TransactionsTable extends DataTableComponent
 
 
 
-        //     Column::make('Actions')
-        //     ->label(function ($row, Column $column) {
-        //         $delete_route = route('admin.transactions.destroy', $row->id);
-        //         $edit_route = route('admin.transactions.edit', $row->id);
-        //         $edit_callback = 'setValue';
-        //         $modal = '#edit-transactions-modal';
-        //         return view('content.table-component.action', compact('edit_route', 'delete_route', 'edit_callback', 'modal'));
-        //     }),
-        // Column::make('status')
-        //     ->format(function ($value, $data, Column $column) {
-        //         $route = route('admin.transactions.status');
-        //         return view('content.table-component.switch', compact('data', 'route'));
-        //     }),
+            Column::make('Actions')
+            ->label(function ($row, Column $column) {
+                $delete_route = route('admin.transactions.destroy', $row->id);
+                $edit_route = route('admin.transactions.edit', $row->id);
+                $edit_callback = 'setValue';
+                $modal = '#edit-transactions-modal';
+                return view('content.table-component.action', compact('edit_route', 'delete_route', 'edit_callback', 'modal'));
+            }),
+        Column::make('status')
+            ->format(function ($value, $data, Column $column) {
+                $route = route('admin.transactions.status');
+                return view('content.table-component.switch', compact('data', 'route'));
+            }),
                  
                 
                 // Column::make('image')
@@ -156,22 +157,22 @@ class TransactionsTable extends DataTableComponent
                 // })
                 // ->html(),
 
-                // Column::make('Created at', 'created_at')
-                // ->format(function ($value) {
-                //     return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
+                Column::make('Created at', 'created_at')
+                ->format(function ($value) {
+                    return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
 
-                // })
-                // ->html()
-                // ->collapseOnTablet()
-                // ->sortable(),
-            // Column::make('Updated at', 'updated_at')
-            //     ->format(function ($value) {
-            //        return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
+                })
+                ->html()
+                ->collapseOnTablet()
+                ->sortable(),
+            Column::make('Updated at', 'updated_at')
+                ->format(function ($value) {
+                   return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
 
-            //     })
-            //     ->html()
-            //     ->collapseOnTablet()
-            //     ->sortable(),
+                })
+                ->html()
+                ->collapseOnTablet()
+                ->sortable(),
         ];
     }   
 
@@ -202,7 +203,7 @@ class TransactionsTable extends DataTableComponent
     public function builder(): Builder
     {
         $modal = Booking::query();
-        $modal->with("labour","user","checkout");
+        // $modal->with();
         return $modal;
     }
 

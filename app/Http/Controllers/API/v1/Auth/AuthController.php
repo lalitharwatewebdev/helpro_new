@@ -14,8 +14,7 @@ use App\Helpers\OTPGenerator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
-    {
+    public function register(Request $request)    {
 
         \Log::info($request->all());
 
@@ -176,7 +175,7 @@ class AuthController extends Controller
 
         $user = User::where("phone", $request->phone)->where("type","user")->first();
         $otp = OTP::where("phone", $request->phone)->latest()->first();
-
+        // return $otp;
 
 
         if (!empty($user)) {
@@ -221,12 +220,17 @@ class AuthController extends Controller
             }
         } 
         else{
-            User::create([
+            $type = "new";
+            $user = User::create([
                 "device_id" => $request->device_id,
                 "phone" => $request->phone,
             ]);
 
+            $token = $user->createToken("user")->plainTextToken;
+
             return response([
+                "type" => $type,
+                "token" => $token,
                 "message" => "User Account Created",
                 "status" => true
             ],200);

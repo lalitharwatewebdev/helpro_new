@@ -24,6 +24,8 @@ class UserController extends Controller
         $user_referral = '';
         $data = User::where("id",auth()->user()->id)->first();
 
+       
+
         $buinsess_settings = BusinessSetting::pluck("value","key");
         $referral_amount = $buinsess_settings['referral_amount'];
         $referral_via_amount = $buinsess_settings['referral_via_amount'];

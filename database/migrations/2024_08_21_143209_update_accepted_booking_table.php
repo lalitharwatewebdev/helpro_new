@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up()    
     {
         Schema::table('accepted_bookings', function (Blueprint $table) {
             $table->string("labour_booking_status")->default("accepted");

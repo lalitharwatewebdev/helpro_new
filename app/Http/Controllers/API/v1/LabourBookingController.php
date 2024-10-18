@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Address;
 use App\Models\Areas;
 use App\Models\Category;
+use App\Models\BusinessSetting;
 
 
 // notification
@@ -33,7 +34,7 @@ class LabourBookingController extends Controller
             "end_time" => "required",
             "start_date" => "required",
             "end_date" => "required",
-            "address_id" => 'required|exists:addresses,id'
+            "address_id" => 'required|exists:addresses,id',
         ]);
         // first we take users updated lat_long
         $user = User::find(auth()->user()->id);
@@ -42,7 +43,7 @@ class LabourBookingController extends Controller
         // get labour as per the user required category
         $category_id = $request->category_id;
         $lat_long = $request->lat_long;
-        $radius = 50000;
+        $radius = BusinessSetting::where("key","radius")->first();
 
 
         $category_data = Category::find($request->category_id);
@@ -79,8 +80,8 @@ class LabourBookingController extends Controller
         // get area first nearest to user's co-ordinate
         $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
             ->where('category_id', $category_id)
-            // ->whereBetween('latitude', [$latMin, $latMax])
-            // ->whereBetween('longitude', [$lonMin, $lonMax])
+            ->whereBetween('latitude', [$latMin, $latMax])
+            ->whereBetween('longitude', [$lonMin, $lonMax])
             ->with("category:id,title,image")->take(1)
             ->get();
 
@@ -109,7 +110,7 @@ class LabourBookingController extends Controller
         }
 
 
-        \Log::info("labour device id ==> ", $labours);
+      
 
 
       

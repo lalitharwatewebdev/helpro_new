@@ -10,7 +10,7 @@ use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
-
+    
 
 
 class LabourTable extends DataTableComponent
@@ -58,8 +58,6 @@ class LabourTable extends DataTableComponent
     public function columns(): array
     {
         return [
-
-
             Column::make('SrNo.', 'id')
                 ->format(function ($value, $row, Column $column) {
                     return (($this->page - 1) * $this->getPerPage()) + ($this->counter++);

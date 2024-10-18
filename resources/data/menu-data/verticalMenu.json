@@ -7,6 +7,13 @@
       "slug": "admin.home.index",
       "isAdmin" :true
     },
+    {
+      "url": "admin/videos",
+      "name": "Videos",
+      "icon": "<i data-feather='home'></i>",
+      "slug": "admin.videos.index",
+      "isAdmin" :true
+    },
    
     {
       "url": "admin/category",

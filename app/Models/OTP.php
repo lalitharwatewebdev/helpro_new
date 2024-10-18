@@ -9,7 +9,7 @@ class OTP extends Model
 {
     use HasFactory;
     protected $guarded = [];
-        protected $table="otps";
+    protected $table="otps";
 
     public function scopeActive($query)
     {

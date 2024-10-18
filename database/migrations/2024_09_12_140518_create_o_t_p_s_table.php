@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('o_t_p_s', function (Blueprint $table) {
+        Schema::create('otps', function (Blueprint $table) {
             $table->id();
+            $table->string("user_id");
+            $table->string("generated_otp");
+            $table->enum('type',['user','labour']);
             $table->timestamps();
             $table->enum('status', ['active', 'blocked'])->default('active');
         });
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('o_t_p_s');
+        Schema::dropIfExists('otps');
     }
 };

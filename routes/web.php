@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Misc\SendReportController;
@@ -39,6 +40,9 @@ Route::prefix("admin")->name("admin.")->middleware(['superadmin'])->group(functi
         Route::get('/', 'home')->name('index');
         Route::get('invoice-download', 'downloadPdf')->name('invoice-download');
     });
+
+
+   
 
     Route::controller(SendReportController::class)->name('miscellaneous.')->prefix('miscellaneous')->group(function () {
         Route::post('send-report', 'send')->name('send-report');
@@ -206,6 +210,9 @@ Route::prefix("admin")->name("admin.")->middleware(['superadmin'])->group(functi
         });
 
 
+      
+
+
         Route::name('areas.')
         ->prefix('areas')
         ->controller(AreaController::class)->group(function () {
@@ -251,6 +258,20 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     Route::name('home.')->controller(DashboardController::class)->group(function () {
         Route::get('/', 'home')->name('index');
         Route::get('invoice-download', 'downloadPdf')->name('invoice-download');
+    });
+
+    Route::name('videos.')
+    ->prefix('videos')
+    ->controller(VideoController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get("details", "details")->name("details");
+        Route::get('blocked', 'index')->name('blocked');
+        Route::get('deleted', 'index')->name('deleted');
+        Route::post('store', 'store')->name('store');
+        Route::get('{id}/edit', "edit")->name('edit');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::post('update', 'update')->name('update');
+        Route::put('status', 'status')->name('status');
     });
 
     Route::controller(SendReportController::class)->name('miscellaneous.')->prefix('miscellaneous')->group(function () {
