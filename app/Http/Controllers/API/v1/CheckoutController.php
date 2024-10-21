@@ -89,6 +89,8 @@ public function formatDateWithSuffix($date) {
         $labour_arr = [];
         $diff = (strtotime($request->end_date) - strtotime($request->start_date));
         $date_result = abs(round($diff) / 86400) + 1;
+        \Log::info("date_result");
+        \Log::info($date_result);
 
         // $amount = (intval($area->price) * intval($request->quantity)) * $date_result + $services_charges;
         $amount = $request->amount;
@@ -105,36 +107,39 @@ public function formatDateWithSuffix($date) {
         $data->labour_quantity = $request->quantity;
         $data->alternate_number = $request->alternate_number;
         $data->note = $request->note;
+        $data->transaction_type = $request->transaction_type;
         $data->save();
 
-        if ($request->use_wallet == "yes") {
-            $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
-
-
-            if ($user_wallet->amount == 0) {
-
-                $order = $this->razorpay->createOrder($amount, "INR", $data->id);
-                $is_razorpay = true;
-            }
-
-            if ($user_wallet->amount < $amount) {
-                $partial_amount = $amount - $user_wallet->amount;
-                $user_wallet->decrement("amount", $user_wallet->amount);
-                $order = $this->razorpay->createOrder($partial_amount, "INR", $data->id);
-                $is_razorpay = true;
+      if($request->transaction_type == 'pre_paid'){
+            if ($request->use_wallet == "yes") {
+                $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
+    
+    
+                if ($user_wallet->amount == 0) {
+    
+                    $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+                    $is_razorpay = true;
+                }
+    
+                if ($user_wallet->amount < $amount) {
+                    $partial_amount = $amount - $user_wallet->amount;
+                    $user_wallet->decrement("amount", $user_wallet->amount);
+                    $order = $this->razorpay->createOrder($partial_amount, "INR", $data->id);
+                    $is_razorpay = true;
+                } else {
+                    $is_razorpay = false;
+                    $user_wallet->decrement("amount", $amount);
+                }
+    
+                Transactions::create([
+                    "user_id" => auth()->user()->id,
+                    "amount" => $amount,
+                    "remark" => "Labours Purchased",
+                    "transaction_type" => "debited"
+                ]);
             } else {
-                $is_razorpay = false;
-                $user_wallet->decrement("amount", $amount);
+                $order = $this->razorpay->createOrder($amount, "INR", $data->id);
             }
-
-            Transactions::create([
-                "user_id" => auth()->user()->id,
-                "amount" => $amount,
-                "remark" => "Labours Purchased",
-                "transaction_type" => "debited"
-            ]);
-        } else {
-            $order = $this->razorpay->createOrder($amount, "INR", $data->id);
         }
        
         $booking = new Booking();
@@ -147,6 +152,7 @@ public function formatDateWithSuffix($date) {
         $booking->checkout_id = $data->id;
         $booking->quantity_required = $request->quantity;
         $booking->otp = mt_rand(111111, 999999);
+        $booking->transaction_type = $request->transaction_type;
         $booking->save();
 
 
@@ -154,11 +160,11 @@ public function formatDateWithSuffix($date) {
 
         $labour_get_data = User::where("type", "labour")->pluck("device_id");
         // \Log::info("labour's device_id ===>", $labour_get_data);
-        $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
+        $user_address = Address::where("user_id", auth()->user()->id)->first();
         $title = "New Job Available";
         $message = "You have a new job available.";
         $device_ids = $labour_get_data->toArray();
-        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name];
+        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => "32", "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name];
 
         $firebaseService = new SendNotificationJob();
         $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);

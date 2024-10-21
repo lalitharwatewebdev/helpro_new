@@ -35,12 +35,6 @@
           "name": "User Slider",
           "icon": "eye",
           "slug": "admin.sliders.user"
-        },
-        {
-          "url": "admin/sliders/labour",
-          "name": "Labour Slider",
-          "icon": "circle",
-          "slug": "admin.sliders.labour"
         }
       ]
     },

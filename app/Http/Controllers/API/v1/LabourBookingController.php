@@ -3,19 +3,18 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-//notification
 use App\Jobs\SendNotificationJob;
 
+//notification
+use App\Models\Address;
+
 // models
+use App\Models\Areas;
+use App\Models\BusinessSetting;
+use App\Models\Category;
 use App\Models\LabourBooking;
 use App\Models\User;
-use App\Models\Address;
-use App\Models\Areas;
-use App\Models\Category;
-use App\Models\BusinessSetting;
-
+use Illuminate\Http\Request;
 
 // notification
 
@@ -23,6 +22,7 @@ class LabourBookingController extends Controller
 {
     public function bookNew(Request $request)
     {
+        \Log::info($request->all());
         \Log::info("Labour booking from user App ::: =>", $request->all());
 
         $request->validate([
@@ -43,8 +43,9 @@ class LabourBookingController extends Controller
         // get labour as per the user required category
         $category_id = $request->category_id;
         $lat_long = $request->lat_long;
-        $radius = BusinessSetting::where("key","radius")->first();
 
+        $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+        $radius = $business_settings['radius'];
 
         $category_data = Category::find($request->category_id);
 
@@ -75,7 +76,6 @@ class LabourBookingController extends Controller
         $latMax = rad2deg($latFrom + $latDelta);
         $lonMin = rad2deg($lonFrom - $lonDelta);
         $lonMax = rad2deg($lonFrom + $lonDelta);
-
 
         // get area first nearest to user's co-ordinate
         $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
@@ -109,11 +109,6 @@ class LabourBookingController extends Controller
                 })->pluck("device_id")->toArray();
         }
 
-
-      
-
-
-      
         try {
             if (!empty($labours)) {
 
@@ -127,19 +122,25 @@ class LabourBookingController extends Controller
                 $labourBooking->end_time = $request->end_time;
                 $labourBooking->start_date = $request->start_date;
                 $labourBooking->end_date = $request->end_date;
+                $labourBooking->labour_amount = $request->labour_amount;
+                $labourBooking->commission_amount = $request->commission_amount;
+                $labourBooking->total_labour_charges = $request->total_labour_charges;
                 $labourBooking->save();
+                \Log::info($labourBooking);
+                \Log::info("LabourBooking");
 
-               
                 // ("Labour Booking Done :: ", $labourBooki\Log::infong);
                 if ($labourBooking) {
+                    \Log::info("userDatataa");
+                    \Log::info(auth()->user()->id);
 
                     $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
 
                     if (!$user_address) {
                         return response([
                             "message" => "Address is required",
-                            "status" => true
-                        ],400);
+                            "status" => true,
+                        ], 400);
                     }
 
                     $title = "New Job Available";
@@ -156,8 +157,12 @@ class LabourBookingController extends Controller
                         "start_date" => $start_date,
                         "end_date" => $end_date,
                         "start_time" => $start_time,
-                        "end_time" => $end_time
+                        "end_time" => $end_time,
+                        "price" => $request->labour_amount / $request->labour_quantity,
+
                     ];
+                    
+                    
 
                     $firebaseService = new SendNotificationJob();
                     $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
@@ -167,15 +172,15 @@ class LabourBookingController extends Controller
 
             return response([
                 "message" => "Booked Successfully",
-                "status" => true
+                "status" => true,
             ], 200);
 
         } catch (\Exception $e) {
             \Log::error("Error in sending notification: " . $e->getMessage());
-           
+
             return response([
                 "message" => "Something went wrong. Try Again Later",
-                "status" => true
+                "status" => true,
             ], 400);
         }
     }
@@ -188,8 +193,8 @@ class LabourBookingController extends Controller
         $dLon = deg2rad($lon2 - $lon1);
 
         $a = sin($dLat / 2) * sin($dLat / 2) +
-            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-            sin($dLon / 2) * sin($dLon / 2);
+        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+        sin($dLon / 2) * sin($dLon / 2);
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 

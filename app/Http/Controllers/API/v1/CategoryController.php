@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Areas;
-use App\Models\BookingRequest;
+use App\Models\BusinessSetting;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Jobs\SendNotificationJob;
-use App\Models\Address;
 
 class CategoryController extends Controller
 {
@@ -19,25 +17,26 @@ class CategoryController extends Controller
 
         return response([
             "data" => $data,
-            "status" => true
+            "status" => true,
         ], 200);
     }
 
     public function getArea(Request $request)
     {
-       
+
         \Log::info($request->all());
-        
+
         $user = User::find(auth()->user()->id);
-        
+
         $user->update([
-                "lat_long" => $request->lat_long
-            ]);
-        
+            "lat_long" => $request->lat_long,
+        ]);
+
+        $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+        // $radius = $business_settings['radius'];
         $category_id = $request->category_id;
         $lat_long = $request->lat_long;
-        $radius = 5000000;
-
+        $radius = $business_settings['radius'];
 
         $category_data = Category::find($request->category_id);
 
@@ -71,16 +70,15 @@ class CategoryController extends Controller
         $lonMax = rad2deg($lonFrom + $lonDelta);
 
         // Get areas in bounding box
-         $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+        $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
             ->where('category_id', $category_id)
-            // ->whereBetween('latitude', [$latMin, $latMax])
-            // ->whereBetween('longitude', [$lonMin, $lonMax])
+        // ->whereBetween('latitude', [$latMin, $latMax])
+        // ->whereBetween('longitude', [$lonMin, $lonMax])
             ->with("category:id,title,image")->take(1)
             ->get();
-        
-        
-         $labours_device_id = User::where('type', 'labour')
-         ->where("is_online","yes")
+
+        $labours_device_id = User::where('type', 'labour')
+            ->where("is_online", "yes")
             ->whereHas('category', function ($query) use ($category_id) {
                 $query->where('category_id', $category_id);
             })
@@ -100,9 +98,8 @@ class CategoryController extends Controller
                 return $labour;
             })->pluck("device_id")->toArray();
 
-
-            $labours = User::where('type', 'labour')
-            ->where("is_online","yes")
+        $labours = User::where('type', 'labour')
+            ->where("is_online", "yes")
             ->whereHas('category', function ($query) use ($category_id) {
                 $query->where('category_id', $category_id);
             })
@@ -121,13 +118,11 @@ class CategoryController extends Controller
                 $labour->type = 'labour';
                 return $labour;
             })->toArray();
-            
-       
-        
+
         // $labours = User::where("type","labour")->get();
         // \Log::info("labour device id ==> ",$labours_device_id);
         // if(!empty($labours)){
-            
+
         // $user_address = Address::where("user_id",auth()->user()->id)->where("is_primary","yes")->first();
         // $title = "New Job Available";
         // $message = "You have a new job available.";
@@ -137,8 +132,6 @@ class CategoryController extends Controller
         // $firebaseService = new SendNotificationJob();
         // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
         // }
-
-
 
         $responseData = [
             'areas' => $areas,
@@ -151,7 +144,6 @@ class CategoryController extends Controller
         ], 200);
     }
 
-
     private function haversineGreatCircleDistance($lat1, $lon1, $lat2, $lon2)
     {
         $earthRadius = 6371; // Radius of the Earth in kilometers
@@ -160,8 +152,8 @@ class CategoryController extends Controller
         $dLon = deg2rad($lon2 - $lon1);
 
         $a = sin($dLat / 2) * sin($dLat / 2) +
-            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-            sin($dLon / 2) * sin($dLon / 2);
+        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+        sin($dLon / 2) * sin($dLon / 2);
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
