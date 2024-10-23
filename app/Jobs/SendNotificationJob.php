@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 use Kreait\Firebase\Factory;
+use Kreait\Firebase\Exception\Messaging\NotFound;
 
 class SendNotificationJob
 {
@@ -20,32 +21,40 @@ class SendNotificationJob
     {
         $this->firebase = app(Factory::class);
     }
-    public function sendNotification(array $token = [], string $title, string $body, array $data = [], string $image = null)
-    {
+ public function sendNotification(array $token = [], string $title, string $body, array $data = [], string $image = null)
+{
+    $firebase = $this->firebase->withServiceAccount(base_path('/firebase.json'));
+    $messaging = $firebase->createMessaging();
 
-        $firebase = $this->firebase->withServiceAccount(base_path('/firebase.json'));
-        $messaging = $firebase->createMessaging();
-
-        $notificationPayload = [
-            'title' => $title,
-            'body' => $body,
-        ];
-        // Add the image to the notification payload if provided
-        if ($image) {
-            $notificationPayload['image'] = $image;
-        }
-        $notification = Notification::fromArray($notificationPayload);
-        
+    $notificationPayload = [
+        'title' => $title,
+        'body' => $body,
+    ];
+    if ($image) {
+        $notificationPayload['image'] = $image;
+    }
+    $notification = Notification::fromArray($notificationPayload);
     
-        foreach($token as $t){
-                $message = CloudMessage::withTarget("token",$t)
+    foreach ($token as $t) {
+        $message = CloudMessage::withTarget("token", $t)
             ->withNotification($notification)
             ->withHighestPossiblePriority('high');
+
         if ($data) {
             $message = $message->withData($data);
         }
-         $messaging->send($message);    
-        }
+
+        try {
+            $messaging->send($message);
+        } catch (NotFound  $e) {
+            // Skip the token if it's not registered or found
+            continue;
         
+    
+        }
     }
+}
+
+
+
 }
