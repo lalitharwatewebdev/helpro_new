@@ -270,6 +270,8 @@ class AuthController extends Controller
 
         // adding category in user data
         $user = User::find(auth()->user()->id);
+        $user->category()->detach();
+
         $user->category()->attach($request->category);
 
         return response([
