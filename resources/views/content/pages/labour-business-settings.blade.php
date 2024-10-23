@@ -52,7 +52,8 @@
 
             <div class="col-md-4 mt-3">
                 {{-- <label for="about_us">Minimum Withdrawal Amount</label> --}}
-                <x-input value="{{ $data['minimum_withdrawal_amount'] ?? '' }}" name="minimum_withdrawal_amount" label="Minimum Withdrawal Amount" />
+                <x-input value="{{ $data['minimum_withdrawal_amount'] ?? '' }}" name="minimum_withdrawal_amount"
+                    label="Minimum Withdrawal Amount" />
             </div>
 
             {{-- <div class="col-md-6 mt-3">
@@ -73,12 +74,17 @@
                 <label for="contact_us">Contact Us</label>
                 <x-editor name="contact_us" />
             </div>
-            <div class="col-md-4 mt-3">
-                <x-input value="{{ $data['privacy_policy'] ?? '' }}" name="privacy_policy" />
+            <div class="col-md-12 mt-3">
+
+                <x-editor name="privacy_policy"  label="Privacy Policy" />
             </div>
-            <div class="col-md-4 mt-3">
-                <x-input value="{{ $data['terms_and_conditions'] ?? '' }}" name="terms_and_conditions" />
+
+            <div class="col-md-12 mt-3">
+                <x-editor name="terms_and_conditions"  label="Terms and Condition" />
+
+
             </div>
+
 
             <div class="col-md-4 mt-3">
                 <x-input value="{{ $data['download_link'] ?? '' }}" name="download_link" label="App Download Link" />
@@ -93,6 +99,14 @@
 @section('page-script')
     <script>
         $(function() {
+            fullEditor_privacy_policy.root.innerHTML =
+                @if ($data['privacy_policy'] ?? '' != '')
+                    `{!! $data['privacy_policy'] ?? '' !!}`
+                @endif
+            fullEditor_terms_and_conditions.root.innerHTML =
+                @if ($data['terms_and_conditions'] ?? '' != '')
+                    `{!! $data['terms_and_conditions'] ?? '' !!}`
+                @endif
             fullEditor_about_us.root.innerHTML =
                 @if ($data['about_us'] ?? '' != '')
                     `{!! $data['about_us'] ?? '' !!}`
@@ -101,11 +115,10 @@
                 @if ($data['contact_us'] ?? '' != '')
                     `{!! $data['contact_us'] ?? '' !!}`
                 @endif
-           
-            fullEditor_terms_and_condition.root.innerHTML =
-                @if ($data['terms_and_condition'] ?? '' != '')
-                    `{!! $data['terms_and_condition'] ?? '' !!}`
-                @endif
+
+
+
+
         })
     </script>
 @endsection
