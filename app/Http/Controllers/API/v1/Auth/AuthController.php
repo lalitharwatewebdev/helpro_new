@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\API\v1\Auth;
 
-use App\Helpers\FileUploader;
-use App\Helpers\OTPGenerator;
-use App\Http\Controllers\Controller;
-use App\Models\OTP;
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Helpers\FileUploader;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
+use App\Models\OTP;
+use App\Helpers\OTPGenerator;
 
 class AuthController extends Controller
 {
@@ -37,7 +39,7 @@ class AuthController extends Controller
      public function generateOTP(Request $request)
     {
         $request->validate([
-            "phone" => "required",
+            "phone" => "required"
         ]);
 
         if ($request->phone == "8111111111" || $request->phone == '711111111') {
@@ -64,7 +66,7 @@ class AuthController extends Controller
 
         return response([
             "message" => "OTP send to your Mobile Number",
-            "status" => true,
+            "status" => true
         ], 200);
     }
 
@@ -89,7 +91,7 @@ class AuthController extends Controller
             if($otp->generated_otp == $request->otp){
                 if($user->name != null){
                     $user->update([
-                        "device_id" => $request->device_id,
+                        "device_id" => $request->device_id
                     ]);
                     $token = $user->createToken("user-otp-login")->plainTextToken;
                     return response([
@@ -137,6 +139,7 @@ class AuthController extends Controller
             ]);
         }
     }
+
 
     public function googleLogin(Request $request)
     {
@@ -215,7 +218,7 @@ class AuthController extends Controller
         auth("sanctum")->user()->id->tokens()->delete();
         return response([
             "message" => "Logout Successfully",
-            "status" => true,
+            "status" => true
         ], 200);
     }
 
