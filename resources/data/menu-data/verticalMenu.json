@@ -5,29 +5,26 @@
       "name": "Dashboard",
       "icon": "<i data-feather='home'></i>",
       "slug": "admin.home.index",
-      "isAdmin" :true
+      "isAdmin": true
     },
     {
       "url": "admin/videos",
       "name": "Videos",
       "icon": "<i data-feather='home'></i>",
       "slug": "admin.videos.index",
-      "isAdmin" :true
+      "isAdmin": true
     },
-   
     {
       "url": "admin/category",
       "name": "Category",
       "icon": "<span class='material-symbols-outlined'>category</span>",
       "slug": "admin.category.index",
-      "isAdmin" :false
-     
+      "isAdmin": false
     },
-  
     {
       "name": "Slider Management",
       "icon": "<i data-feather='user'></i>",
-      "isAdmin" :false,
+      "isAdmin": false,
       "slug": "",
       "submenu": [
         {
@@ -42,13 +39,13 @@
       "url": "admin/users",
       "name": "User Management",
       "icon": "<i data-feather='home'></i>",
-      "isAdmin" :true,
+      "isAdmin": true,
       "slug": "admin.users.index"
     },
     {
       "name": "Labour Management",
       "icon": "<i data-feather='user'></i>",
-      "isAdmin" :true,
+      "isAdmin": true,
       "slug": "",
       "submenu": [
         {
@@ -71,52 +68,72 @@
         }
       ]
     },
-   
+    {
+      "name": "Booking Management",
+      "icon": "<i data-feather='user'></i>",
+      "isAdmin": true,
+      "slug": "",
+      "submenu": [
+        {
+          "url": "admin/userbookings/pending",
+          "name": "Pending Booking",
+          "icon": "eye",
+          "slug": "admin.userbookings.pending"
+        },
+        {
+          "url": "admin/userbookings/accepted",
+          "name": "Accepted Booking",
+          "icon": "circle",
+          "slug": "admin.userbookings.accepted"
+        },
+        {
+          "url": "admin/userbookings/rejected",
+          "name": "Rejected Booking",
+          "icon": "circle",
+          "slug": "admin.userbookings.rejected"
+        }
+      ]
+    },
     {
       "url": "admin/areas",
       "name": "Area Service Management",
       "icon": "<i data-feather='user'></i>",
       "slug": "admin.areas.index",
-      "isAdmin" :false
+      "isAdmin": false
     },
-   
-
     {
       "url": "admin/tickets",
       "name": "Support",
       "icon": "<i data-feather='home'></i>",
       "slug": "admin.tickets.index",
-      "isAdmin" :false
+      "isAdmin": false
     },
     {
       "url": "admin/transactions",
       "name": "Transaction Management",
       "icon": "<i data-feather='user'></i>",
       "slug": "admin.transactions.index",
-      "isAdmin" :false
+      "isAdmin": false
     },
     {
-    "name": "Business Settings",
+      "name": "Business Settings",
       "icon": "<i data-feather='user'></i>",
-      "isAdmin" :false,
+      "isAdmin": false,
       "slug": "",
-      "submenu": [ 
-
+      "submenu": [
         {
           "url": "admin/business-settings",
           "name": "User Business Settings",
           "icon": "<i data-feather='user'></i>",
           "slug": "admin.business-settings.index"
         },
-    
-          {
-            "url": "admin/labour-business-settings",
-            "name": "Labour Business Settings",
-            "icon": "<i data-feather='user'></i>",
-            "slug": "admin.labour-business-settings.index"
-          }
-      
-
-      ] }
+        {
+          "url": "admin/labour-business-settings",
+          "name": "Labour Business Settings",
+          "icon": "<i data-feather='user'></i>",
+          "slug": "admin.labour-business-settings.index"
+        }
+      ]
+    }
   ]
 }
