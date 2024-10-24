@@ -16,9 +16,9 @@ class UserBookingTable extends DataTableComponent
     public $counter = 1;
     public $user_id;
     public $type;
-    public function mount($user_id, $type)
+    public function mount( $type)
     {
-        $this->user_id = $user_id;
+        // $this->user_id = $user_id;
         $this->type = $type;
 
         $this->dispatchBrowserEvent('table-refreshed');
@@ -66,7 +66,7 @@ class UserBookingTable extends DataTableComponent
 
             Column::make("Labour Name", 'labour_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->labour->name;
+                    return $row->labour->name ?? "";
                 })
                 ->html(),
 
@@ -146,7 +146,7 @@ class UserBookingTable extends DataTableComponent
     public function builder(): Builder
     {
         $modal = Booking::query();
-        $modal->with("checkout:", "labour");
+        $modal->with("checkout", "labour");
         $modal->where("booking_status", $this->type);
         return $modal;
     }
