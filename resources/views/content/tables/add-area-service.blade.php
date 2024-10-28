@@ -36,7 +36,7 @@
                             <x-input name="longitude" />
                         </div>
                         <div class="col-lg-4 col-md-6">
-                            <x-input name="radius" />
+                            <x-input name="radius" attrs='onkeyup="getRadius(this)"' />
                         </div>
                         <div class="col-lg-4 col-md-6">
                             <x-input name="price" type="number" />
@@ -76,7 +76,20 @@
 @section('page-script')
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initMap">
     </script>
+    <script>
+        function getRadius(radius) {
 
+
+            const radiusInput = document.getElementById("radius").value;
+
+            const radiuss = parseFloat(radiusInput);
+            console.log(radiuss);
+            if (!isNaN(radiuss)) {
+                circle.setRadius(radiuss); // Update the circle's radius
+            }
+
+        }
+    </script>
     <script>
         var map;
         var circle;
@@ -99,7 +112,19 @@
                 var lng = event.latLng.lng();
 
                 // Define the radius (in meters)
-                var radius = 5000; // Example: 1000 meters
+                console.log("radius");
+
+                console.log($('#radius').val());
+                console.log($('#radius').val() == '');
+                
+                if ($('#radius').val() == 'NaN' || $('#radius').val() == '') {
+                    var radius = 5000; // Example: 1000 meters
+
+                } else {
+                    var radius = parseInt($('#radius').val()) ?? 5000; // Example: 1000 meters
+
+                }
+
 
                 // Remove the previous circle if it exists
                 if (circle) {
