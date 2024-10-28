@@ -21,6 +21,8 @@ class AuthController extends Controller
         $user = User::find(auth()->user()->id);
         $user->name = $request->username;
         $user->email = $request->email;
+        $user->gst_no = $request->gst_no;
+
         
         if($request->profile_pic){
             
