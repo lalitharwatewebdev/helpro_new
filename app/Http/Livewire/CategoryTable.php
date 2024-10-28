@@ -65,7 +65,10 @@ class CategoryTable extends DataTableComponent
                 return $value;
             })
             ->html(),
-                 
+            Column::make("price")
+            ->collapseOnTablet()
+            ->searchable()
+            ->sortable(), 
                 
                 Column::make('image')
                 ->format(function ($row) {

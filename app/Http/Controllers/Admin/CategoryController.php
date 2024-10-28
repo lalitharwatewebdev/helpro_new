@@ -39,15 +39,16 @@ class CategoryController extends Controller
     {
         $request->validate([
             "title" => "required",
-            "image" => "required|mimes:png,jpg,jpeg,webp|max:2000"
+            "image" => "required|mimes:png,jpg,jpeg,webp|max:2000",
         ]);
 
         $data = new Category();
 
         $data->title = $request->title;
-        
-        if($request->hasFile("image")){
-            $data->image = FileUploader::uploadFile($request->file("image"),"images/category_images");
+        $data->price = $request->price;
+
+        if ($request->hasFile("image")) {
+            $data->image = FileUploader::uploadFile($request->file("image"), "images/category_images");
         }
 
         $data->save();
@@ -56,9 +57,8 @@ class CategoryController extends Controller
             'header' => 'Added',
             'message' => 'Added successfully',
             'table' => 'category-table',
-            "reload" => true
+            "reload" => true,
         ]);
-
 
     }
 
@@ -100,12 +100,13 @@ class CategoryController extends Controller
         //     "image" => "required|file|mimes:png,jpg,jpeg,webp|max:2048",
         // ]);
 
-        $data = Category::where("id",$request->id)->first();
+        $data = Category::where("id", $request->id)->first();
 
         $data->title = $request->title;
-      
-        if($request->hasFile("image")){
-            $data->image = FileUploader::uploadFile($request->file("image"),"images/category_images");
+        $data->price = $request->price;
+
+        if ($request->hasFile("image")) {
+            $data->image = FileUploader::uploadFile($request->file("image"), "images/category_images");
         }
 
         $data->save();
@@ -114,7 +115,7 @@ class CategoryController extends Controller
             'header' => 'Success!',
             'message' => 'Category Updated successfully',
             'table' => 'category-table',
-            "reload" => true
+            "reload" => true,
         ]);
     }
 
@@ -135,8 +136,8 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function status(Request $request){
-      
+    public function status(Request $request)
+    {
 
         Category::findOrFail($request->id)->update(['status' => $request->status]);
 
