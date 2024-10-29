@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Ticket;
 use App\Models\TicketChat;
+use App\Models\User;
 
 class TicketController extends Controller
 {
@@ -42,44 +43,54 @@ class TicketController extends Controller
             "reload" => true
         ]);
     }
-    public function edit($id)
-    {
-        $name = Subject::findOrFail($id);
-        return response($name);
-    }
+    // public function edit($id)
+    // {
+    //     $name = Subject::findOrFail($id);
+    //     return response($name);
+    // }
 
     public function update(Request $request)
     {
 
     }
 
-    public function status(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|numeric|exists:subjects,id',
-            'status' => 'required|in:active,blocked',
-        ]);
+    // public function status(Request $request)
+    // {
+    //     $request->validate([
+    //         'id' => 'required|numeric|exists:subjects,id',
+    //         'status' => 'required|in:active,blocked',
+    //     ]);
 
-        Subject::findOrFail($request->id)->update(['status' => $request->status]);
+    //     Subject::findOrFail($request->id)->update(['status' => $request->status]);
 
-        return response([
-            'message' => 'subject status updated successfully',
-            'table' => 'subject-table',
-        ]);
+    //     return response([
+    //         'message' => 'subject status updated successfully',
+    //         'table' => 'subject-table',
+    //     ]);
+    // }
+
+    // public function destroy($id)
+    // {
+    //     Subject::findOrFail($id)->delete();
+    //     return response([
+    //         'header' => 'Deleted!',
+    //         'message' => 'subject deleted successfully',
+    //         'table' => 'subject-table',
+    //     ]);
+    // }
+
+
+    public function getUserProfile($id){
+        $user = User::with("states","cities")->find($id);
+        // dd($user);
+        return view("content.tables.view-profile",compact("user"));
     }
 
-    public function destroy($id)
-    {
-        Subject::findOrFail($id)->delete();
-        return response([
-            'header' => 'Deleted!',
-            'message' => 'subject deleted successfully',
-            'table' => 'subject-table',
-        ]);
-    }
 
-    public function export()
-    {
-        return Excel::download(new GeneralExport(new Subject), 'subject.xlsx');
-    }
+
+
+    // public function export()
+    // {
+    //     return Excel::download(new GeneralExport(new Subject), 'subject.xlsx');
+    // }
 }

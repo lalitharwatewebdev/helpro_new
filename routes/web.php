@@ -254,6 +254,7 @@ Route::prefix("admin")->name("admin.")->middleware(['superadmin'])->group(functi
         Route::get('/', 'index')->name('index');
         Route::get("get-ticket-id", "getTicketChat")->name("get-ticket-by-id");
         Route::post("store", "store")->name("store");
+        Route::get("profile/{id}","getUserProfile")->name("profile");
     });
 });
 
