@@ -161,7 +161,7 @@ class LabourController extends Controller
         $bookings = BookingRequest::with("checkout", "checkout.user:id,name", "checkout.address.states:id,name", "checkout.address.cities:id,name", "checkout.area")->where("user_id", auth()->user()->id)
             ->where("category_id", $category_id)->first();
 
-        $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->first();
+        $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->where('current_status', '!=', '2')->first();
 
         // foreach ($bookings as $booking) {
 
@@ -184,7 +184,7 @@ class LabourController extends Controller
         \Log::info("Wallet ::->" . $total_wallet_amount);
 
         return response([
-            "bookings" => $bookings->booking,
+            "bookings" => $bookings->booking ?? [],
             "total_wallet_amount" => $total_wallet_amount->amount ?? 0,
             "total_booking_accepted" => $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,
@@ -400,7 +400,7 @@ class LabourController extends Controller
 
         if ($booking_status == "accepted") {
 
-            $data = LabourAcceptedBooking::with(['booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->get();
+            $data = LabourAcceptedBooking::with(['booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
 
             \Log::info($data);
 
@@ -409,7 +409,7 @@ class LabourController extends Controller
                 "success" => true,
             ], 200);
         } else {
-            $data = LabourRejectedBooking::with(['booking'])->where("labour_id", auth()->user()->id)->get();
+            $data = LabourRejectedBooking::with(['booking'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
             \Log::info("Rejected Labour Booking" . $data);
 
             return response([

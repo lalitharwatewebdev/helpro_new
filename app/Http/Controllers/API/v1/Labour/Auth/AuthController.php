@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1\Labour\Auth;
 use App\Helpers\FileUploader;
 use App\Helpers\OTPGenerator;
 use App\Http\Controllers\Controller;
+use App\Models\LabourAcceptedBooking;
 use App\Models\OTP;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -315,8 +316,35 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function startWork()
+    public function startWork(Request $request)
     {
+        $request->validate([
+            "booking_id" => "required",
+        ]);
+        $data = LabourAcceptedBooking::where('labour_id', auth()->user()->id)->where('booking_id', $request->booking_id)->first();
+        $data->current_status = 1;
+        $data->start_time = date('Y-m-d H:s', strtotime(now()));
+        $data->save();
 
+        return response([
+            "message" => "Started Work Successfully",
+            "status" => true,
+        ], 200);
+    }
+
+    public function endWork(Request $request)
+    {
+        $request->validate([
+            "booking_id" => "required",
+        ]);
+        $data = LabourAcceptedBooking::where('labour_id', auth()->user()->id)->where('booking_id', $request->booking_id)->first();
+        $data->current_status = 2;
+        $data->end_time = date('Y-m-d H:s', strtotime(now()));
+        $data->save();
+
+        return response([
+            "message" => "Ended Work Successfully",
+            "status" => true,
+        ], 200);
     }
 }
