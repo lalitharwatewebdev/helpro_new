@@ -197,6 +197,8 @@ Route::prefix('v1')->group(function () {
                 Route::post("logout", "logOut");
                 Route::post("update-category","updateCategory");
                 Route::get("labour-profile","Profile");
+                Route::get("start-work","startWork");
+
             });
 
 

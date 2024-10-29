@@ -3,20 +3,21 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Checkout;
-use Illuminate\Http\Request;
-use App\Providers\RazorpayServiceProvider;
+use App\Jobs\SendNotificationJob;
 use App\Models\AcceptedBooking;
+use App\Models\Address;
 use App\Models\Areas;
 use App\Models\Booking;
-use Razorpay\Api\Api;
-use App\Models\Wallet;
-use App\Models\Address;
 use App\Models\BusinessSetting;
+use App\Models\Category;
+use App\Models\Checkout;
+use App\Models\LabourBooking;
 use App\Models\Transactions;
-use App\Jobs\SendNotificationJob;
 use App\Models\User;
+use App\Models\Wallet;
+use App\Providers\RazorpayServiceProvider;
 use DateTime;
+use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
@@ -35,40 +36,41 @@ class CheckoutController extends Controller
 
         return $random;
     }
-    
-   public function formatTimeWithAMPM($time) {
-    $dateTime = new DateTime($time);
-    return $dateTime->format('h:i A');
-}
 
-public function formatDateWithSuffix($date) {
-    $dateTime = new DateTime($date);
-    $day = $dateTime->format('j'); // Day of the month without leading zeros
-    $month = $dateTime->format('M'); // Short month name (Jan, Feb, Mar, etc.)
-    $year = $dateTime->format('Y'); // Full year
-
-    // Determine the appropriate ordinal suffix
-    if ($day % 10 == 1 && $day != 11) {
-        $suffix = 'st';
-    } elseif ($day % 10 == 2 && $day != 12) {
-        $suffix = 'nd';
-    } elseif ($day % 10 == 3 && $day != 13) {
-        $suffix = 'rd';
-    } else {
-        $suffix = 'th';
+    public function formatTimeWithAMPM($time)
+    {
+        $dateTime = new DateTime($time);
+        return $dateTime->format('h:i A');
     }
 
-    // Handle special cases for 11th, 12th, and 13th
-    if (in_array($day, [11, 12, 13])) {
-        $suffix = 'th';
-    }
+    public function formatDateWithSuffix($date)
+    {
+        $dateTime = new DateTime($date);
+        $day = $dateTime->format('j'); // Day of the month without leading zeros
+        $month = $dateTime->format('M'); // Short month name (Jan, Feb, Mar, etc.)
+        $year = $dateTime->format('Y'); // Full year
 
-    return $day . $suffix . ' ' . $month . ' ' . $year;
-}
+        // Determine the appropriate ordinal suffix
+        if ($day % 10 == 1 && $day != 11) {
+            $suffix = 'st';
+        } elseif ($day % 10 == 2 && $day != 12) {
+            $suffix = 'nd';
+        } elseif ($day % 10 == 3 && $day != 13) {
+            $suffix = 'rd';
+        } else {
+            $suffix = 'th';
+        }
+
+        // Handle special cases for 11th, 12th, and 13th
+        if (in_array($day, [11, 12, 13])) {
+            $suffix = 'th';
+        }
+
+        return $day . $suffix . ' ' . $month . ' ' . $year;
+    }
 
     public function store(Request $request)
     {
-
 
         \Log::info($request->all());
         $is_razorpay = true;
@@ -78,13 +80,11 @@ public function formatDateWithSuffix($date) {
             "start_date" => "required",
             "end_date" => "required",
             "start_time" => "required",
-            "end_time" => "required"
+            "end_time" => "required",
         ]);
 
-
-
         $area = Areas::find($request->area_id);
-
+        $category_data = Category::find($request->category_id);
 
         $labour_arr = [];
         $diff = (strtotime($request->end_date) - strtotime($request->start_date));
@@ -110,17 +110,16 @@ public function formatDateWithSuffix($date) {
         $data->transaction_type = $request->transaction_type;
         $data->save();
 
-      if($request->transaction_type == 'pre_paid'){
+        if ($request->transaction_type == 'pre_paid') {
             if ($request->use_wallet == "yes") {
                 $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
-    
-    
+
                 if ($user_wallet->amount == 0) {
-    
+
                     $order = $this->razorpay->createOrder($amount, "INR", $data->id);
                     $is_razorpay = true;
                 }
-    
+
                 if ($user_wallet->amount < $amount) {
                     $partial_amount = $amount - $user_wallet->amount;
                     $user_wallet->decrement("amount", $user_wallet->amount);
@@ -130,18 +129,18 @@ public function formatDateWithSuffix($date) {
                     $is_razorpay = false;
                     $user_wallet->decrement("amount", $amount);
                 }
-    
+
                 Transactions::create([
                     "user_id" => auth()->user()->id,
                     "amount" => $amount,
                     "remark" => "Labours Purchased",
-                    "transaction_type" => "debited"
+                    "transaction_type" => "debited",
                 ]);
             } else {
                 $order = $this->razorpay->createOrder($amount, "INR", $data->id);
             }
         }
-       
+
         $booking = new Booking();
         $booking->user_id = auth()->user()->id;
         $booking->total_amount = $amount;
@@ -155,7 +154,6 @@ public function formatDateWithSuffix($date) {
         $booking->transaction_type = $request->transaction_type;
         $booking->save();
 
-
         $user_name = auth()->user()->firstname . " " . auth()->user()->lastname;
 
         $labour_get_data = User::where("type", "labour")->pluck("device_id");
@@ -164,27 +162,101 @@ public function formatDateWithSuffix($date) {
         $title = "New Job Available";
         $message = "You have a new job available.";
         $device_ids = $labour_get_data->toArray();
-        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => "32", "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name];
+        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => "32", "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name, "category_id" => $request->category_id];
 
         $firebaseService = new SendNotificationJob();
         $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
 
+        try {
+            if (!empty($labours)) {
 
+                $labourBooking = new LabourBooking();
+                $labourBooking->user_id = auth()->user()->id;
+                $labourBooking->category_id = $request->category_id;
+                $labourBooking->labour_quantity = $request->labour_quantity;
+                $labourBooking->address_id = $request->address_id;
+                $labourBooking->labour_booking_code = sha1(now());
+                $labourBooking->start_time = $request->start_time;
+                $labourBooking->end_time = $request->end_time;
+                $labourBooking->start_date = $request->start_date;
+                $labourBooking->end_date = $request->end_date;
+                $labourBooking->labour_amount = $request->labour_amount;
+                $labourBooking->commission_amount = $request->commission_amount;
+                $labourBooking->total_labour_charges = $request->total_labour_charges;
+                $labourBooking->save();
+                \Log::info($labourBooking);
+                \Log::info("LabourBooking");
+
+                // ("Labour Booking Done :: ", $labourBooki\Log::infong);
+                if ($labourBooking) {
+                    \Log::info("userDatataa");
+                    \Log::info(auth()->user()->id);
+
+                    $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
+
+                    if (!$user_address) {
+                        return response([
+                            "message" => "Address is required",
+                            "status" => true,
+                        ], 400);
+                    }
+
+                    $title = "New Job Available";
+                    $message = "You have a new job available.";
+                    $start_time = $request->start_time;
+                    $end_time = $request->end_time;
+                    $start_date = $request->start_date;
+                    $end_date = $request->end_date;
+                    $device_ids = $labours;
+                    $additional_data = [
+                        "category_name" => $category_data->title,
+                        "address" => $user_address->address,
+                        "booking_code" => $labourBooking->labour_booking_code,
+                        "start_date" => $start_date,
+                        "end_date" => $end_date,
+                        "start_time" => $start_time,
+                        "end_time" => $end_time,
+                        "price" => $request->labour_amount / $request->labour_quantity,
+                        "category_id" => $request->category_id,
+
+                    ];
+
+                    $firebaseService = new SendNotificationJob();
+                    $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+                    \Log::info("Notification send");
+                }
+            }
+
+            return response()->json([
+                "message" => "Booking created successfully",
+                "order_id" => $order['id'] ?? null,
+                "checkout_id" => $data->id,
+                "is_razorpay" => $is_razorpay,
+                "status" => true,
+            ], 200);
+
+        } catch (\Exception $e) {
+            \Log::error("Error in sending notification: " . $e->getMessage());
+
+            return response([
+                "message" => "Something went wrong. Try Again Later",
+                "status" => true,
+            ], 400);
+        }
 
         return response()->json([
             "message" => "Booking created successfully",
             "order_id" => $order['id'] ?? null,
             "checkout_id" => $data->id,
             "is_razorpay" => $is_razorpay,
-            "status" => true
+            "status" => true,
         ], 200);
     }
-
 
     public function fetchOrder(Request $request)
     {
         $request->validate([
-            "order_id" => "required"
+            "order_id" => "required",
         ]);
 
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
@@ -195,11 +267,11 @@ public function formatDateWithSuffix($date) {
                 "otp" => mt_rand(111111, 999999),
             ]);
             return response([
-                "message" => "Booking Done Successfully"
+                "message" => "Booking Done Successfully",
             ], 200);
         } else {
             return response([
-                "message" => "Transaction Failure"
+                "message" => "Transaction Failure",
             ], 200);
         }
     }
@@ -213,39 +285,28 @@ public function formatDateWithSuffix($date) {
             ->latest()
             ->get();
 
-
         $processedData = $data->map(function ($booking) {
             if ($booking->current_quantity > 0) {
 
                 $booking->booking_status = "accepted";
             }
 
-
             $labours = AcceptedBooking::with('labour:id,name,email,phone,profile_pic,otp')
                 ->where("booking_id", $booking->id)
                 ->get();
-
-
-
-
-
 
             // $processedCategory = $labours->map(function($labours){
             //     $booking->labours->category = Category::where("id",$labours->id)->first();
             // });
 
-
-
             $booking->labours = $labours;
-
 
             return $booking;
         });
 
-
         return response([
             "data" => $data,
-            "status" => true
+            "status" => true,
         ], 200);
     }
 
@@ -257,8 +318,8 @@ public function formatDateWithSuffix($date) {
         $dLon = deg2rad($lon2 - $lon1);
 
         $a = sin($dLat / 2) * sin($dLat / 2) +
-            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-            sin($dLon / 2) * sin($dLon / 2);
+        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+        sin($dLon / 2) * sin($dLon / 2);
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
