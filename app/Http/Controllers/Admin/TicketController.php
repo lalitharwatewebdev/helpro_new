@@ -13,7 +13,11 @@ class TicketController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::all();
+        // $tickets = Ticket::all();
+        $labourType = "user";
+        $tickets = Ticket::whereHas('user', function ($query) use ($labourType) {
+            $query->where('type', $labourType);
+        })->get();
         return view('content.tables.tickets', compact('tickets'));
     }
 
