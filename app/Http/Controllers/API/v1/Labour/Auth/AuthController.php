@@ -314,4 +314,9 @@ class AuthController extends Controller
             "status" => true,
         ], 200);
     }
+
+    public function startWork()
+    {
+
+    }
 }

@@ -12,6 +12,7 @@ use App\Models\Address;
 use App\Models\Areas;
 use App\Models\BusinessSetting;
 use App\Models\Category;
+use App\Models\LabourBooking;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -111,78 +112,78 @@ class LabourBookingController extends Controller
             "message" => "Booked Successfully",
             "status" => true,
         ], 200);
-        // try {
-        //     if (!empty($labours)) {
+        try {
+            if (!empty($labours)) {
 
-        //         $labourBooking = new LabourBooking();
-        //         $labourBooking->user_id = auth()->user()->id;
-        //         $labourBooking->category_id = $request->category_id;
-        //         $labourBooking->labour_quantity = $request->labour_quantity;
-        //         $labourBooking->address_id = $request->address_id;
-        //         $labourBooking->labour_booking_code = sha1(now());
-        //         $labourBooking->start_time = $request->start_time;
-        //         $labourBooking->end_time = $request->end_time;
-        //         $labourBooking->start_date = $request->start_date;
-        //         $labourBooking->end_date = $request->end_date;
-        //         $labourBooking->labour_amount = $request->labour_amount;
-        //         $labourBooking->commission_amount = $request->commission_amount;
-        //         $labourBooking->total_labour_charges = $request->total_labour_charges;
-        //         $labourBooking->save();
-        //         \Log::info($labourBooking);
-        //         \Log::info("LabourBooking");
+                $labourBooking = new LabourBooking();
+                $labourBooking->user_id = auth()->user()->id;
+                $labourBooking->category_id = $request->category_id;
+                $labourBooking->labour_quantity = $request->labour_quantity;
+                $labourBooking->address_id = $request->address_id;
+                $labourBooking->labour_booking_code = sha1(now());
+                $labourBooking->start_time = $request->start_time;
+                $labourBooking->end_time = $request->end_time;
+                $labourBooking->start_date = $request->start_date;
+                $labourBooking->end_date = $request->end_date;
+                $labourBooking->labour_amount = $request->labour_amount;
+                $labourBooking->commission_amount = $request->commission_amount;
+                $labourBooking->total_labour_charges = $request->total_labour_charges;
+                $labourBooking->save();
+                \Log::info($labourBooking);
+                \Log::info("LabourBooking");
 
-        //         // ("Labour Booking Done :: ", $labourBooki\Log::infong);
-        //         if ($labourBooking) {
-        //             \Log::info("userDatataa");
-        //             \Log::info(auth()->user()->id);
+                // ("Labour Booking Done :: ", $labourBooki\Log::infong);
+                if ($labourBooking) {
+                    \Log::info("userDatataa");
+                    \Log::info(auth()->user()->id);
 
-        //             $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
+                    $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
 
-        //             if (!$user_address) {
-        //                 return response([
-        //                     "message" => "Address is required",
-        //                     "status" => true,
-        //                 ], 400);
-        //             }
+                    if (!$user_address) {
+                        return response([
+                            "message" => "Address is required",
+                            "status" => true,
+                        ], 400);
+                    }
 
-        //             $title = "New Job Available";
-        //             $message = "You have a new job available.";
-        //             $start_time = $request->start_time;
-        //             $end_time = $request->end_time;
-        //             $start_date = $request->start_date;
-        //             $end_date = $request->end_date;
-        //             $device_ids = $labours;
-        //             $additional_data = [
-        //                 "category_name" => $category_data->title,
-        //                 "address" => $user_address->address,
-        //                 "booking_code" => $labourBooking->labour_booking_code,
-        //                 "start_date" => $start_date,
-        //                 "end_date" => $end_date,
-        //                 "start_time" => $start_time,
-        //                 "end_time" => $end_time,
-        //                 "price" => $request->labour_amount / $request->labour_quantity,
+                    $title = "New Job Available";
+                    $message = "You have a new job available.";
+                    $start_time = $request->start_time;
+                    $end_time = $request->end_time;
+                    $start_date = $request->start_date;
+                    $end_date = $request->end_date;
+                    $device_ids = $labours;
+                    $additional_data = [
+                        "category_name" => $category_data->title,
+                        "address" => $user_address->address,
+                        "booking_code" => $labourBooking->labour_booking_code,
+                        "start_date" => $start_date,
+                        "end_date" => $end_date,
+                        "start_time" => $start_time,
+                        "end_time" => $end_time,
+                        "price" => $request->labour_amount / $request->labour_quantity,
 
-        //             ];
+                    ];
 
-        //             $firebaseService = new SendNotificationJob();
-        //             $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
-        //             \Log::info("Notification send");
-        //         }
-        //     }
+                    $firebaseService = new SendNotificationJob();
+                    $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+                    \Log::info("Notification send");
+                }
+            }
 
-        //     return response([
-        //         "message" => "Booked Successfully",
-        //         "status" => true,
-        //     ], 200);
+            return response([
+                "message" => "Booked Successfully",
+                "status" => true,
+            ], 200);
 
-        // } catch (\Exception $e) {
-        //     \Log::error("Error in sending notification: " . $e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error("Error in sending notification: " . $e->getMessage());
 
-        //     return response([
-        //         "message" => "Something went wrong. Try Again Later",
-        //         "status" => true,
-        //     ], 400);
-        // }
+            return response([
+                "message" => "Something went wrong. Try Again Later",
+                "status" => true,
+            ], 400);
+        }
     }
 
     private function haversineGreatCircleDistance($lat1, $lon1, $lat2, $lon2)
