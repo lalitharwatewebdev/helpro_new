@@ -74,7 +74,11 @@ class LabourController extends Controller
 
         $labour_id = auth()->user();
         $categories = $labour_id->category()->first();
-        $category_id = 13;
+        $category_data = User::where('id', auth()->user()->id)->with(['category'])->first();
+        // \Log::info("ccccccccccccategory_data");
+        // \Log::info($category_data);
+
+        $category_id = $category_data->category[0]['id'] ?? '';
         $radius = 5;
         $booking_amount_data = AcceptedBooking::with("booking.checkout")->where("labour_id", auth()->user()->id)->get();
 
@@ -157,6 +161,8 @@ class LabourController extends Controller
         $bookings = BookingRequest::with("checkout", "checkout.user:id,name", "checkout.address.states:id,name", "checkout.address.cities:id,name", "checkout.area")->where("user_id", auth()->user()->id)
             ->where("category_id", $category_id)->first();
 
+        $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->first();
+
         // foreach ($bookings as $booking) {
 
         //     $start_date = $booking->checkout->start_date;
@@ -178,7 +184,7 @@ class LabourController extends Controller
         \Log::info("Wallet ::->" . $total_wallet_amount);
 
         return response([
-            "bookings" => $bookings,
+            "bookings" => $bookings->booking,
             "total_wallet_amount" => $total_wallet_amount->amount ?? 0,
             "total_booking_accepted" => $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,
@@ -394,7 +400,7 @@ class LabourController extends Controller
 
         if ($booking_status == "accepted") {
 
-            $data = LabourAcceptedBooking::with(['booking.user','booking.address.states:id,name','booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->get();
+            $data = LabourAcceptedBooking::with(['booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->get();
 
             \Log::info($data);
 

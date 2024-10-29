@@ -108,10 +108,10 @@ class LabourBookingController extends Controller
                     return $labour;
                 })->pluck("device_id")->toArray();
         }
-        return response([
-            "message" => "Booked Successfully",
-            "status" => true,
-        ], 200);
+        // return response([
+        //     "message" => "Booked Successfully",
+        //     "status" => true,
+        // ], 200);
         try {
             if (!empty($labours)) {
 
