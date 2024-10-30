@@ -95,6 +95,7 @@ Route::prefix('v1')->group(function () {
             Route::post("fetch-order", "fetchOrder");
             Route::get("get-booking", "bookingData");
             Route::post("send-review", "sendReview");
+            Route::post("post-paid-payment", "postPaidPayment");
 
         });
 
@@ -146,6 +147,8 @@ Route::prefix('v1')->group(function () {
         // labour booking routes
         Route::controller(LabourBookingController::class)->prefix("labour-booking")->group(function () {
             Route::post("/", "bookNew");
+            Route::post("work-done", "workDone");
+
         });
 
         // labour accepting booking route

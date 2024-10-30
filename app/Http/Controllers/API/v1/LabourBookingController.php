@@ -10,6 +10,7 @@ use App\Models\Address;
 
 // models
 use App\Models\Areas;
+use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\LabourBooking;
@@ -200,5 +201,23 @@ class LabourBookingController extends Controller
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return $earthRadius * $c;
+    }
+
+    public function workDone(Request $request)
+    {
+        $request->validate([
+            "booking_id" => "required",
+        ]);
+
+        $booking = Booking::where('id', $request->booking_id)->first();
+        $booking->is_work_done = 1;
+
+        $booking->save();
+
+        return response([
+            "message" => "Work Done Successfully",
+            "status" => true,
+        ], 200);
+
     }
 }

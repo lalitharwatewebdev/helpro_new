@@ -195,10 +195,22 @@ class CheckoutController extends Controller
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
 
         if ($fetchOrder['status'] == true) {
-            Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
-                "payment_status" => "captured",
-                "otp" => mt_rand(111111, 999999),
-            ]);
+
+            $booking_data = Booking::where('checkout_id', $fetchOrder["checkout_id"])->first();
+
+            if ($booking_data->transaction_type == "pre_paid") {
+                Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
+                    "payment_status" => "captured",
+                    "otp" => mt_rand(111111, 999999),
+                ]);
+            } else {
+                Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
+                    "payment_status" => "captured",
+                    "is_work_done" => "1",
+                    "otp" => mt_rand(111111, 999999),
+                ]);
+            }
+
             return response([
                 "message" => "Booking Done Successfully",
             ], 200);
@@ -279,5 +291,64 @@ class CheckoutController extends Controller
             "status" => true,
         ], 200);
 
+    }
+
+    public function postPaidPayment(Request $request)
+    {
+        $request->validate([
+            "booking_id" => "required",
+            "razorpay_type" => "required",
+            "amount" => "required",
+
+        ]);
+
+        $amount = $request->amount;
+        $booking = Booking::where('id', $request->booking_id)->first();
+
+        if ($request->razorpay_type == "online") {
+
+            if ($request->use_wallet == "yes") {
+                $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
+
+                if ($user_wallet->amount == 0) {
+
+                    $order = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
+                    $is_razorpay = true;
+                }
+
+                if ($user_wallet->amount < $amount) {
+                    $partial_amount = $amount - $user_wallet->amount;
+                    $user_wallet->decrement("amount", $user_wallet->amount);
+                    $order = $this->razorpay->createOrder($partial_amount, "INR", $booking->checkout_id);
+                    $is_razorpay = true;
+                } else {
+                    $is_razorpay = false;
+                    $user_wallet->decrement("amount", $amount);
+                    $booking->is_work_done = 1;
+                    $booking->save();
+                }
+
+                Transactions::create([
+                    "user_id" => auth()->user()->id,
+                    "amount" => $amount,
+                    "remark" => "Labours Purchased",
+                    "transaction_type" => "debited",
+                ]);
+            } else {
+                $order = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
+                $is_razorpay = 1;
+            }
+
+            return response()->json([
+                "message" => "Booking created successfully",
+                "order_id" => $order['id'] ?? null,
+                "checkout_id" => $booking->checkout_id,
+                "is_razorpay" => $is_razorpay,
+                "status" => true,
+            ], 200);
+
+        } else if ($request->razorpay_type == "offline") {
+
+        }
     }
 }
