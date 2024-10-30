@@ -152,6 +152,12 @@ class CheckoutController extends Controller
         $booking->quantity_required = $request->quantity;
         $booking->otp = mt_rand(111111, 999999);
         $booking->transaction_type = $request->transaction_type;
+        if ($request->transaction_type == 'pre_paid') {
+            $booking->razorpay_status = "created";
+        } else {
+            $booking->razorpay_status = "pending";
+        }
+
         $booking->save();
 
         $user_name = auth()->user()->firstname . " " . auth()->user()->lastname;
