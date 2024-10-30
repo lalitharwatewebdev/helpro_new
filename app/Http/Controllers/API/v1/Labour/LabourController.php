@@ -184,7 +184,7 @@ class LabourController extends Controller
         \Log::info("Wallet ::->" . $total_wallet_amount);
 
         return response([
-            "bookings" => $bookings->booking ?? [],
+            "bookings" => $bookings ?? [],
             "total_wallet_amount" => $total_wallet_amount->amount ?? 0,
             "total_booking_accepted" => $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,

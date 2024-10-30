@@ -201,7 +201,7 @@ class CheckoutController extends Controller
     public function bookingData()
     {
         // Fetch booking data with related models
-        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout.address.states:id,name', 'checkout.address.cities:id,name'])
+        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout', 'checkout.address.states:id,name', 'checkout.address.cities:id,name'])
             ->where('payment_status', 'captured')
             ->where('user_id', auth()->user()->id)
             ->latest()
