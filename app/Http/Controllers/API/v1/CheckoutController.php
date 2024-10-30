@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\Checkout;
 use App\Models\Transactions;
 use App\Models\User;
+use App\Models\UserReview;
 use App\Models\Wallet;
 use App\Providers\RazorpayServiceProvider;
 use DateTime;
@@ -246,5 +247,27 @@ class CheckoutController extends Controller
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return $earthRadius * $c;
+    }
+
+    public function sendReview(Request $request)
+    {
+        $request->validate([
+            "booking_id" => "required",
+            "rating" => "required",
+            "review" => "required",
+        ]);
+
+        $data = new UserReview();
+        $data->review = $request->review;
+        $data->rating = $request->rating;
+        $data->user_id = auth()->user()->id;
+        $data->booking_id = $request->booking_id;
+        $data->save();
+
+        return response([
+            "message" => "Review Added Successfully",
+            "status" => true,
+        ], 200);
+
     }
 }

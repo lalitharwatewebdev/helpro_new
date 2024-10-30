@@ -94,6 +94,8 @@ Route::prefix('v1')->group(function () {
             Route::post("store", "store");
             Route::post("fetch-order", "fetchOrder");
             Route::get("get-booking", "bookingData");
+            Route::post("send-review", "sendReview");
+
         });
 
         Route::controller(AddressController::class)->prefix("addresses")->group(function () {
