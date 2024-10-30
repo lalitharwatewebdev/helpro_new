@@ -71,6 +71,7 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        \Log::info("Store");
 
         \Log::info($request->all());
         $is_razorpay = true;
@@ -152,6 +153,9 @@ class CheckoutController extends Controller
         $booking->quantity_required = $request->quantity;
         $booking->otp = mt_rand(111111, 999999);
         $booking->transaction_type = $request->transaction_type;
+        $booking->labour_amount = $request->labour_amount;
+        $booking->commission_amount = $request->commission_amount;
+        $booking->total_labour_charges = $request->total_labour_charges;
         if ($request->transaction_type == 'pre_paid') {
             $booking->razorpay_status = "created";
         } else {
