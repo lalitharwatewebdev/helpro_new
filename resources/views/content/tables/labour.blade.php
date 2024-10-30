@@ -24,9 +24,9 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                 
-                    <form action="{{ route('admin.users.labour-export',['type'=>$type]) }}" method="GET">
+                     <form action="{{ route('admin.users.labour-export')}}" method="GET">
                     <div class="d-flex justify-content-end align-items-center mb-1">
+                        <input type="text" name="type" value="{{$type}}"/>
                         <div class="col-md-3">
                             <div class="form-group  text-left">
                                 <label for="month">Date </label>
@@ -41,7 +41,9 @@
 
 
                         </div>
+                        <div class="col-md-3">
                         <button class="btn btn-primary">Export</button>
+                        </div>
                     </div>
                 </form>
                     <livewire:labour-table type="{{ $type }}" />

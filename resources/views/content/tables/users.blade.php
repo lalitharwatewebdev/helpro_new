@@ -23,6 +23,28 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
+                    <form action="{{route('admin.users.export')}}" method="GET">
+                    <div class="d-flex justify-content-end align-items-center mb-1">
+                         <div class="col-md-3">
+                            <div class="form-group  text-left">
+                                <label for="month">Date </label>
+                                <input value="" type="text" class="form-control flatpickr flatpickr-input"
+                                    required="" name="month" id="month" placeholder=" Enter Date"
+                                    readonly="readonly">
+                                <div class="invalid-tooltip">Please provide a valid Month</div>
+
+
+                            </div>
+
+
+
+                        </div>
+                        <div class="col-md-3">
+                    <!--<button class="btn mb-1 btn-primary text-end" href={{route('admin.users.export')}}>Export</a>-->
+                    <button class="btn  btn-primary text-end">Export</a>
+                    </div>
+                    </div>
+                    </form>
                     <livewire:user-table />
                 </x-card>
             </div>
@@ -73,5 +95,11 @@
             // $(modal + ' [name=gender][value=' + data.gender + ']').prop('checked', true).trigger('change');
             $(modal).modal('show');
         }
+        
+          $(".flatpickr").flatpickr(
+            {
+                mode: "range"
+            }
+        );
     </script>
 @endsection
