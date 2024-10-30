@@ -64,27 +64,27 @@ class LabourTable extends DataTableComponent
             Column::make("Name", "name")
                 ->format(function ($value) {
                     return $value ?? "";
-                }),
+                })->searchable(),
 
             Column::make("Mobile No", "phone")
                 ->format(function ($value) {
                     return $value ?? "";
-                }),
+                })->searchable(),
 
             Column::make("State", "state")
                 ->format(function ($value, $row) {
                     return $row->states->name ?? "";
-                }),
+                })->searchable(),
 
             Column::make("City", "city")
                 ->format(function ($value, $row) {
                     return $row->cities->name ?? "";
-                }),
+                })->searchable(),
 
             Column::make("Rate per Day", "rate_per_day")
                 ->format(function ($value) {
                     return round($value) ?? "";
-                }),
+                })->searchable(),
 
             Column::make('profile_pic')
                 ->format(function ($row) {

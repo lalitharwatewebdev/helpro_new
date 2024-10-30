@@ -70,28 +70,28 @@ class UserTable extends DataTableComponent
             Column::make("Name", "name")
                 ->format(function ($value) {
                     return $value;
-                }),
+                })->searchable(),
 
             Column::make("Email", "email")
                 ->format(function ($value) {
                     return $value;
-                }),
+                })->searchable(),
 
             Column::make("Mobile No", "phone")
                 ->format(function ($value) {
                     return $value;
-                }),
+                })->searchable(),
 
             Column::make("State", "state")
                 ->format(function ($value, $row, Column $column) {
                     return $row->states->name ?? "";
-                })->html(),
+                })->html()->searchable(),
 
 
             Column::make("City", "city")
                 ->format(function ($value, $row) {
                     return $row->cities->name ?? "";
-                }),
+                })->searchable(),
 
 
             Column::make("View", "id")
