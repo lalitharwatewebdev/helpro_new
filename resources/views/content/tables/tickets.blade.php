@@ -20,14 +20,14 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                    <div class="col-lg-2">
+                    {{-- <div class="col-lg-2">
                         <label for="">Select Type</label>
                         <select class="form-control" name="" id="">
                             <option value="" disabled>Select Type</option>
                             <option value="user">User</option>
                             <option value="labour">labour</option>
                         </select>
-                    </div>
+                    </div> --}}
             
             @foreach ($tickets as $ticket)
                 <div>
