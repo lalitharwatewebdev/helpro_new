@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -88,5 +89,19 @@ class UserBookingController extends Controller
             'message' => 'Labour status updated successfully',
             'table' => 'labour-table',
         ]);
+    }
+
+    public function changeStatus(Request $request)
+    {
+
+        $booking = Booking::where('id', $request->id)->first();
+        $booking->booking_status = $request->status;
+        $booking->save();
+
+        return response([
+            'message' => 'Status Change successfully',
+            'table' => 'labour-table',
+        ]);
+
     }
 }

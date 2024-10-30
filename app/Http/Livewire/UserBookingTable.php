@@ -63,14 +63,26 @@ class UserBookingTable extends DataTableComponent
                     return (($this->page - 1) * $this->getPerPage()) + ($this->counter++);
                 })
                 ->html(),
-
-            Column::make("Labour Name", 'labour_id')
-                ->format(function ($value, $row, Column $column) {
-                    return $row->labour->name ?? "";
-                })
-                ->html(),
+            Column::make('Status')
+                ->label(function ($row, Column $column) {
+                    return "<select class='form-control' data-id='" . $row->id . "' name='booking_status' id='booking_status'>
+                    <option value=''>Select Status</option>
+                    <option value='accepted'>Accepted</option>
+                    <option value='rejected'>Rejected</option>
+                    </select>";
+                })->html(),
+            // Column::make("Labour Name", 'labour_id')
+            //     ->format(function ($value, $row, Column $column) {
+            //         return $row->labour->name ?? "";
+            //     })
+            //     ->html(),
 
             Column::make("Total Amount", 'total_amount')
+                ->format(function ($value, $row, Column $column) {
+                    return $value;
+                })
+                ->html(),
+            Column::make("Quantity", 'quantity_required')
                 ->format(function ($value, $row, Column $column) {
                     return $value;
                 })

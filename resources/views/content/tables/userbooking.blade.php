@@ -66,6 +66,34 @@
                 // $(`#${modal}`).modal('show');
                 window.location.href = "{{ route('admin.labours.add') }}"
             });
+
+            $(document).on('change', '#booking_status', function() {
+                var status = $(this).val();
+                var id = $(this).data('id');
+
+                console.log("status");
+                console.log(status);
+                console.log(id);
+                $.ajaxSetup({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                    }
+                });
+
+
+                $.ajax({
+                    type: 'post',
+                    url: "{{ route('admin.userbookings.changeStatus') }}",
+                    data: {
+                        status: status,
+                        id: id,
+
+                    },
+                    success: function(response) {
+                        window.location.href = "{{ route('admin.userbookings.pending') }}"
+                    }
+                });
+            });
         });
 
 

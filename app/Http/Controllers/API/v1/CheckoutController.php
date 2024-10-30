@@ -148,6 +148,8 @@ class CheckoutController extends Controller
         $booking->service_charges = $services_charges;
         if ($request->use_wallet == 'yes') {
             $booking->payment_status = 'captured';
+        } else {
+            $booking->payment_status = 'failed';
         }
         $booking->checkout_id = $data->id;
         $booking->quantity_required = $request->quantity;
@@ -325,6 +327,8 @@ class CheckoutController extends Controller
                     $is_razorpay = false;
                     $user_wallet->decrement("amount", $amount);
                     $booking->is_work_done = 1;
+                    $booking->razorpay_type = $request->razorpay_type;
+
                     $booking->save();
                 }
 

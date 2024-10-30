@@ -144,6 +144,8 @@ Route::prefix("admin")->name("admin.")->group(function () {
             Route::put('status', 'status')->name('status');
             Route::get("get-city", "getCity")->name("city");
             Route::get('details', "details")->name("details");
+            Route::get('changeStatus', "changeStatus")->name("changeStatus");
+
         });
 
     Route::name('transactions.')
