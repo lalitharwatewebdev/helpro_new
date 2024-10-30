@@ -16,7 +16,7 @@ class UserBookingTable extends DataTableComponent
     public $counter = 1;
     public $user_id;
     public $type;
-    public function mount( $type)
+    public function mount($type)
     {
         // $this->user_id = $user_id;
         $this->type = $type;
