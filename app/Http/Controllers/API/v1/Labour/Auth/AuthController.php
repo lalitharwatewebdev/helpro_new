@@ -267,6 +267,8 @@ class AuthController extends Controller
         $data->availability = $request->days_available;
         $data->qualification = $request->qualification;
         $data->account_number = $request->account_number;
+        $data->pin_code = $request->pincode;
+
         $data->save();
 
         // adding category in user data
