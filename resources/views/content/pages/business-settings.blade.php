@@ -150,7 +150,7 @@
             </div>
 
 
-            <div class="col-md-4 mt-3">
+            {{-- <div class="col-md-4 mt-3">
                 <x-input name="percentage_for_less_than" value="{{ $data['percentage_for_less_than'] ?? '' }}"
                     type="number" label="Percentage for Less Than 12 Hours" />
             </div>
@@ -158,7 +158,7 @@
 
                 <x-input name="percentage_for_less_than" value="{{ $data['percentage_for_less_than'] ?? '' }}"
                     type="number" label="Percentage for More than 12 Hours" />
-            </div>
+            </div> --}}
 
             <div class="col-md-4 mt-3">
 

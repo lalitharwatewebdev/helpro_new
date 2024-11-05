@@ -158,6 +158,8 @@ class CheckoutController extends Controller
         $booking->labour_amount = $request->labour_amount;
         $booking->commission_amount = $request->commission_amount;
         $booking->total_labour_charges = $request->total_labour_charges;
+        $booking->labour_booking_id = $request->labour_booking_id;
+
         if ($request->transaction_type == 'pre_paid') {
             $booking->razorpay_status = "created";
         } else {
@@ -174,7 +176,7 @@ class CheckoutController extends Controller
         $title = "New Job Available";
         $message = "You have a new job available.";
         $device_ids = $labour_get_data->toArray();
-        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => "32", "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name, "category_id" => $request->category_id];
+        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name, "category_id" => $request->category_id];
 
         $firebaseService = new SendNotificationJob();
         $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);

@@ -31,7 +31,9 @@
         <x-form id="add-category" method="POST" class="" :route="route('admin.category.store')">
             <div class="col-md-12 col-12 ">
                 <x-input name="title" />
-                <x-input name="price" />
+                {{-- <x-input name="price" /> --}}
+                <x-input name="percentage_for_less_than" type="number" label="Percentage for Less Than 12 Hours" />
+                <x-input name="percentage_for_more_than" type="number" label="Percentage for More than 12 Hours" />
                 <x-input-file name="image" />
             </div>
         </x-form>
@@ -40,7 +42,11 @@
         <x-form id="edit-category-modal" method="POST" class="" :route="route('admin.category.update')">
             <div class="col-md-12 col-12 ">
                 <x-input name="title" id="edit_title" />
-                <x-input name="price" id="edit_price" />
+                <x-input name="percentage_for_less_than" id="edit_percentage_for_less_than" type="number"
+                    label="Percentage for Less Than 12 Hours" />
+                <x-input name="percentage_for_more_than" id="edit_percentage_for_more_than" type="number"
+                    label="Percentage for More than 12 Hours" />
+                {{-- <x-input name="price" id="edit_price" /> --}}
                 <x-input-file name="image" />
                 <x-input name="id" type="hidden" />
             </div>
@@ -65,7 +71,12 @@
         function setValue(data, modal) {
             $(`${modal} #id`).val(data.id);
             $(`${modal} #edit_title`).val(data.title);
-            $(`${modal} #edit_price`).val(data.price);
+            $(`${modal} #edit_percentage_for_less_than`).val(data.percentage_for_less_than);
+            $(`${modal} #edit_percentage_for_more_than`).val(data.percentage_for_more_than);
+
+            $(`${modal} #edit_title`).val(data.title);
+
+            // $(`${modal} #edit_price`).val(data.price);
 
             $(modal).modal('show');
         }

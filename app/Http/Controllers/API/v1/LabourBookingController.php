@@ -174,6 +174,7 @@ class LabourBookingController extends Controller
 
             return response([
                 "message" => "Booked Successfully",
+                "labour_booking_id" => $labourBooking->id,
                 "status" => true,
             ], 200);
 

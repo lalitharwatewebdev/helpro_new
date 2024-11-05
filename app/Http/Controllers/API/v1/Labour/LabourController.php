@@ -409,7 +409,7 @@ class LabourController extends Controller
                 "success" => true,
             ], 200);
         } else {
-            $data = LabourRejectedBooking::with(['booking'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
+            $data = LabourRejectedBooking::with(['booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
             \Log::info("Rejected Labour Booking" . $data);
 
             return response([

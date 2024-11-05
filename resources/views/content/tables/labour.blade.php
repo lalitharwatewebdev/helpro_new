@@ -24,6 +24,28 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
+                     <form action="{{ route('admin.users.labour-export')}}" method="GET">
+                    <div class="d-flex justify-content-end align-items-center mb-1">
+                        <input type="text" name="type" value="{{$type}}"/>
+                        <div class="col-md-3">
+                            <div class="form-group  text-left">
+                                <label for="month">Date </label>
+                                <input value="" type="text" class="form-control flatpickr flatpickr-input"
+                                    required="" name="month" id="month" placeholder=" Enter Date"
+                                    readonly="readonly">
+                                <div class="invalid-tooltip">Please provide a valid Month</div>
+
+
+                            </div>
+
+
+
+                        </div>
+                        <div class="col-md-3">
+                        <button class="btn btn-primary">Export</button>
+                        </div>
+                    </div>
+                </form>
                     <livewire:labour-table type="{{ $type }}" />
                 </x-card>
             </div>
@@ -80,5 +102,11 @@
 
             $(modal).modal('show');
         }
+
+        $(".flatpickr").flatpickr(
+            {
+                mode: "range"
+            }
+        );
     </script>
 @endsection

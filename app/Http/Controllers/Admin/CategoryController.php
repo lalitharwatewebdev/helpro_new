@@ -45,7 +45,8 @@ class CategoryController extends Controller
         $data = new Category();
 
         $data->title = $request->title;
-        $data->price = $request->price;
+        $data->percentage_for_less_than = $request->percentage_for_less_than;
+        $data->percentage_for_more_than = $request->percentage_for_more_than;
 
         if ($request->hasFile("image")) {
             $data->image = FileUploader::uploadFile($request->file("image"), "images/category_images");
@@ -103,7 +104,9 @@ class CategoryController extends Controller
         $data = Category::where("id", $request->id)->first();
 
         $data->title = $request->title;
-        $data->price = $request->price;
+        $data->percentage_for_less_than = $request->percentage_for_less_than;
+        $data->percentage_for_more_than = $request->percentage_for_more_than;
+
 
         if ($request->hasFile("image")) {
             $data->image = FileUploader::uploadFile($request->file("image"), "images/category_images");

@@ -1,16 +1,14 @@
 <?php
 namespace App\Http\Livewire;
 
+use App\Exports\CustomExport;
 use App\Models\Category;
+use Excel;
 use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Excel;
-use App\Exports\CustomExport;
-use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
-        
 class CategoryTable extends DataTableComponent
 {
 
@@ -31,7 +29,7 @@ class CategoryTable extends DataTableComponent
         $this->setColumnSelectDisabled();
 
         $this->setPrimaryKey('id')
-        
+
             ->setDefaultSort('id', 'desc')
             ->setEmptyMessage('No Result Found')
             ->setTableAttributes([
@@ -45,32 +43,36 @@ class CategoryTable extends DataTableComponent
                 'toolbar-left-end' => [
                     'content.rapasoft.active-inactive', [
                         'route' => 'admin.category.index',
-                    ]
-                ]
+                    ],
+                ],
             ]);
     }
 
     public function columns(): array
     {
         return [
-          
-            Column::make('SrNo.', 'id')
-            ->format(function ($value, $row, Column $column) {
-                return (($this->page - 1) * $this->getPerPage()) + ($this->counter++);
-            })
-            ->html(),
 
-            Column::make("Name",'title')
-            ->format(function ($value, $row, Column $column) {
-                return $value;
-            })
-            ->html(),
-            Column::make("price")
-            ->collapseOnTablet()
-            ->searchable()
-            ->sortable(), 
-                
-                Column::make('image')
+            Column::make('SrNo.', 'id')
+                ->format(function ($value, $row, Column $column) {
+                    return (($this->page - 1) * $this->getPerPage()) + ($this->counter++);
+                })
+                ->html(),
+
+            Column::make("Name", 'title')
+                ->format(function ($value, $row, Column $column) {
+                    return $value;
+                })
+                ->html(),
+            Column::make("percentage_for_less_than")
+                ->collapseOnTablet()
+                ->searchable()
+                ->sortable(),
+            Column::make("percentage_for_more_than")
+                ->collapseOnTablet()
+                ->searchable()
+                ->sortable(),
+
+            Column::make('image')
                 ->format(function ($row) {
                     if ($row) {
                         return '<img src="' . asset($row) . '" class="view-on-click  rounded-circle">';
@@ -80,15 +82,15 @@ class CategoryTable extends DataTableComponent
                 })
                 ->html(),
 
-                // Column::make('Created at', 'created_at')
-                // ->format(function ($value) {
-                //     return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
+            // Column::make('Created at', 'created_at')
+            // ->format(function ($value) {
+            //     return '<span class="badge badge-light-success">' . date("M jS, Y h:i A", strtotime($value)) . '</span>';
 
-                // })
-                // ->html()
-                // ->collapseOnTablet()
-                // ->sortable(),
-                Column::make('Actions')
+            // })
+            // ->html()
+            // ->collapseOnTablet()
+            // ->sortable(),
+            Column::make('Actions')
                 ->label(function ($row, Column $column) {
                     $delete_route = route('admin.category.destroy', $row->id);
                     $edit_route = route('admin.category.edit', $row->id);
@@ -110,20 +112,20 @@ class CategoryTable extends DataTableComponent
             //     ->collapseOnTablet()
             //     ->sortable(),
         ];
-    }   
+    }
 
     public function filters(): array
     {
         return [
             SelectFilter::make('Status')
-            ->options([
-                '' => 'All',
-                'active' => 'Active',
-                'blocked' => 'Blocked',
-            ])
-            ->filter(function (Builder $builder, string $value) {
-                $builder->where('status', $value);
-            }),
+                ->options([
+                    '' => 'All',
+                    'active' => 'Active',
+                    'blocked' => 'Blocked',
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    $builder->where('status', $value);
+                }),
 
             // TextFilter::make('Name')
             //     ->config([
@@ -157,4 +159,3 @@ class CategoryTable extends DataTableComponent
         return Excel::download(new CustomExport($this->getSelected(), $modelData), 'category.xlsx');
     }
 }
-        

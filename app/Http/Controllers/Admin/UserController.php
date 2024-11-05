@@ -8,6 +8,9 @@ use App\Models\User;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Exports\UsersExport;
+use App\Exports\LabourExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -78,5 +81,16 @@ class UserController extends Controller
         $user_booking = Booking::with('labour', "checkout")->where("user_id", $request->query("id"))->where("payment_status", "captured")->get();
         // return $user_booking;
         return view("content.tables.details-users", compact("data"));
+    }
+    
+     public function export(Request $request){
+         [$start_date, $end_date] = explode(" to ", $request->month);
+        return Excel::download(new UsersExport($start_date,$end_date), 'users.xlsx');
+    }
+    
+    public function labourExport(Request $request){
+        \Log::info($request->all());
+        [$start_date, $end_date] = explode(" to ", $request->month); 
+       return Excel::download(new LabourExport($start_date,$end_date,$request->type),"labours.xlsx");
     }
 }

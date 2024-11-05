@@ -14,4 +14,12 @@ class LabourRejectedBooking extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function labour(){
+        return $this->belongsTo(User::class,"labour_id");
+    }
+
+    public function booking(){
+        return $this->belongsTo(LabourBooking::class,"booking_id");
+    }
 }
