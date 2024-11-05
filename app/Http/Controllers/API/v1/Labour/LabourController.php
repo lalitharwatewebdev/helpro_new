@@ -290,6 +290,8 @@ class LabourController extends Controller
     {
         $action = $request->action;
         $booking_id = $request->booking_id;
+        $reason = $request->reason ?? '';
+
         $business_settings = BusinessSetting::pluck("value", "key")->toArray();
 
         // if user rejected the booking
@@ -311,6 +313,8 @@ class LabourController extends Controller
                 "checkout_id" => $booking_data->checkout_id,
                 "amount" => $final_price,
                 "booking_id" => $booking_id,
+                "reason" => $reason,
+
             ]);
 
             // and also removed from booking request so that it is not displayed on front page of labour app
