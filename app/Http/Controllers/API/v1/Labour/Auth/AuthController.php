@@ -342,6 +342,8 @@ class AuthController extends Controller
         $data = LabourAcceptedBooking::where('labour_id', auth()->user()->id)->where('booking_id', $request->booking_id)->first();
         $data->current_status = 2;
         $data->end_time = date('Y-m-d H:s', strtotime(now()));
+        $data->is_work_done = 1;
+
         $data->save();
 
         return response([

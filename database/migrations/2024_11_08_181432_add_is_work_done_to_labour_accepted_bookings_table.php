@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('labour_accepted_bookings', function (Blueprint $table) {
-            $table->string()->default(0);
+            $table->string('is_work_done')->default(0);
         });
     }
 

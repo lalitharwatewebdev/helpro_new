@@ -86,7 +86,7 @@ class LabourController extends Controller
         // $total_amount = $booking_amount_data->sum(function($acceptedBooking){
         //     return $acceptedBooking;
         //     $start_date = $acceptedBooking->checkout->start_time;
-
+        
         //     $end_date = $acceptedBooking->checkout->end_time;
         //     $diff = (strtotime($start_date) - strtotime($end_date));
         //     $labour_quantity = $acceptedBooking->checkout->labour_quantity;
