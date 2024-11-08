@@ -11,6 +11,7 @@ use App\Models\BookingRequest;
 use App\Models\BusinessSetting;
 use App\Models\Checkout;
 use App\Models\LabourAcceptedBooking;
+use App\Models\LabourBooking;
 use App\Models\LabourRejectedBooking;
 use App\Models\RejectedBooking;
 use App\Models\Transactions;
@@ -445,5 +446,30 @@ class LabourController extends Controller
             "data" => $data,
             "status" => true,
         ], 200);
+    }
+
+    public function getLabourAmount(Request $request)
+    {
+        $booking_data = Booking::where('id', $request->booking_id)->first();
+
+        $labour_booking_data = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
+
+        $is_accept_booking = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->where('labour_id', auth()->user()->id)->get();
+
+        $is_accept_booking->is_work_done = 1;
+        $is_accept_booking->save();
+
+        $is_all_accepted_booking = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->where('is_work_done', '0')->get();
+
+        if (empty($is_all_accepted_booking)) {
+            $booking_data->is_work_done = 1;
+            $booking_data->save();
+        }
+
+        return response([
+            "message" => "Work Done Successfully",
+            "status" => true,
+        ], 200);
+
     }
 }
