@@ -79,14 +79,14 @@ class LabourController extends Controller
         // \Log::info("ccccccccccccategory_data");
         // \Log::info($category_data);
 
-        $category_id = $category_data->category[0]['id'] ?? '';
+        $category_id = $category_data->category[0]['id'] ?? '13';
         $radius = 5;
         $booking_amount_data = AcceptedBooking::with("booking.checkout")->where("labour_id", auth()->user()->id)->get();
 
         // $total_amount = $booking_amount_data->sum(function($acceptedBooking){
         //     return $acceptedBooking;
         //     $start_date = $acceptedBooking->checkout->start_time;
-        
+
         //     $end_date = $acceptedBooking->checkout->end_time;
         //     $diff = (strtotime($start_date) - strtotime($end_date));
         //     $labour_quantity = $acceptedBooking->checkout->labour_quantity;
@@ -128,10 +128,17 @@ class LabourController extends Controller
                 );
                 return $distance <= $radius;
             })->first();
+        // \Log::info($checkouts);
+        \Log::info($area);
+        \Log::info($category_id);
 
         // getting checkout id as per user location
-        $checkouts = Checkout::where("area_id", $area->id)
-            ->where("category_id", $category_id)->get();
+        // if (!empty($area->id) && !empty($category_id)) {
+            $checkouts = Checkout::where("area_id", $area->id)
+                ->where("category_id", $category_id)->get();
+        // } else {
+        //     $checkout = [];
+        // }
 
         // return $checkout;
         foreach ($checkouts as $checkout) {
