@@ -134,10 +134,10 @@ class LabourController extends Controller
 
         // getting checkout id as per user location
         // if (!empty($area->id) && !empty($category_id)) {
-            $checkouts = Checkout::where("area_id", $area->id)
-                ->where("category_id", $category_id)->get();
-                // $checkouts = Checkout::where("area_id", $area->id)
-                // ->where("category_id", $category_id)->get();
+        $checkouts = Checkout::where("area_id", $area->id)
+            ->where("category_id", $category_id)->get();
+        // $checkouts = Checkout::where("area_id", $area->id)
+        // ->where("category_id", $category_id)->get();
         // } else {
         //     $checkout = [];
         // }
@@ -155,7 +155,7 @@ class LabourController extends Controller
 
                 if (empty($current_user_booking) && empty($accepted_booking_by_labour) && empty($rejected_booking_by_labour) && ($get_bookings->quantity_required != $get_bookings->current_quantity)) {
                     $request_booking = new BookingRequest();
-                    $request_booking->user_id = auth()->user()->id??'';
+                    $request_booking->user_id = auth()->user()->id ?? '';
                     $request_booking->area_id = $area->id;
                     $request_booking->checkout_id = $checkout->id;
                     $request_booking->category_id = $category_id;
@@ -173,8 +173,9 @@ class LabourController extends Controller
 
         $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->where('current_status', '!=', '2')->first();
 
+        $labour_book = LabourBooking::where('id', $bookings->booking_id)->first();
 
-        $get_bookings = Booking::where("checkout_id", $checkout->id)->whereColumn("quantity_required", "!=", "current_quantity")->first();
+        $razorpay_status = Booking::where("labour_booking_id", $labour_book->id)->first();
 
         // foreach ($bookings as $booking) {
 
@@ -201,6 +202,7 @@ class LabourController extends Controller
             "total_wallet_amount" => $total_wallet_amount->amount ?? 0,
             "total_booking_accepted" => $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,
+            'razorpay_status' => $razorpay_status->razorpay_type ?? '',
             "status" => true,
         ], 200);
     }
