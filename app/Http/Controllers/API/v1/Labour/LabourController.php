@@ -421,6 +421,12 @@ class LabourController extends Controller
 
             $data = LabourAcceptedBooking::with(['booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
 
+            foreach ($data as $key => $value) {
+                $book_data = Booking::where('labour_booking_id', $value->booking_id)->first();
+
+                $data[$key]['razorpay_status'] = $book_data->razorpay_type ?? '';
+            }
+
             \Log::info($data);
 
             return response([
@@ -430,6 +436,12 @@ class LabourController extends Controller
         } else {
             $data = LabourRejectedBooking::with(['booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
             \Log::info("Rejected Labour Booking" . $data);
+
+            foreach ($data as $key => $value) {
+                $book_data = Booking::where('labour_booking_id', $value->booking_id)->first();
+
+                $data[$key]['razorpay_status'] = $book_data->razorpay_type ?? '';
+            }
 
             return response([
                 "data" => $data,
