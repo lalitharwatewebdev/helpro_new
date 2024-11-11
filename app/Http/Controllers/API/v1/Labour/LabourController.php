@@ -79,7 +79,7 @@ class LabourController extends Controller
         // \Log::info("ccccccccccccategory_data");
         // \Log::info($category_data);
 
-        $category_id = $category_data->category[0]['id'] ?? '13';
+        $category_id = $category_data->category[0]['id'] ?? '';
         $radius = 5;
         $booking_amount_data = AcceptedBooking::with("booking.checkout")->where("labour_id", auth()->user()->id)->get();
 
@@ -136,6 +136,8 @@ class LabourController extends Controller
         // if (!empty($area->id) && !empty($category_id)) {
             $checkouts = Checkout::where("area_id", $area->id)
                 ->where("category_id", $category_id)->get();
+                // $checkouts = Checkout::where("area_id", $area->id)
+                // ->where("category_id", $category_id)->get();
         // } else {
         //     $checkout = [];
         // }
@@ -153,7 +155,7 @@ class LabourController extends Controller
 
                 if (empty($current_user_booking) && empty($accepted_booking_by_labour) && empty($rejected_booking_by_labour) && ($get_bookings->quantity_required != $get_bookings->current_quantity)) {
                     $request_booking = new BookingRequest();
-                    $request_booking->user_id = auth()->user()->id;
+                    $request_booking->user_id = auth()->user()->id??'';
                     $request_booking->area_id = $area->id;
                     $request_booking->checkout_id = $checkout->id;
                     $request_booking->category_id = $category_id;
@@ -170,6 +172,9 @@ class LabourController extends Controller
             ->where("category_id", $category_id)->first();
 
         $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->where('current_status', '!=', '2')->first();
+
+
+        $get_bookings = Booking::where("checkout_id", $checkout->id)->whereColumn("quantity_required", "!=", "current_quantity")->first();
 
         // foreach ($bookings as $booking) {
 
