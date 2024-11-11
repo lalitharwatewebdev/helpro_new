@@ -211,7 +211,7 @@ class LabourBookingController extends Controller
         ]);
 
         $booking = Booking::where('id', $request->booking_id)->first();
-        $booking->is_work_done = 1;
+        $booking->is_user_work_done = 1;
 
         $booking->save();
 
