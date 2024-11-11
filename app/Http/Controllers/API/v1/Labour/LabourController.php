@@ -92,6 +92,8 @@ class LabourController extends Controller
         //     $labour_quantity = $acceptedBooking->checkout->labour_quantity;
         //     $area_price = $acceptedBooking->checkout->area->price;
         //     return ($area_price * $diff) / $labour_quantity;
+
+        // return null
         // });
 
         $total_booking_accepted = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->count();
