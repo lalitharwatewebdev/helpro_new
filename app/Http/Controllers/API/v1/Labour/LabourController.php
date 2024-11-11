@@ -11,6 +11,7 @@ use App\Models\BookingRequest;
 use App\Models\BusinessSetting;
 use App\Models\Checkout;
 use App\Models\LabourAcceptedBooking;
+use App\Models\LabourBooking;
 use App\Models\LabourRejectedBooking;
 use App\Models\RejectedBooking;
 use App\Models\Transactions;
@@ -127,10 +128,19 @@ class LabourController extends Controller
                 );
                 return $distance <= $radius;
             })->first();
+        // \Log::info($checkouts);
+        \Log::info($area);
+        \Log::info($category_id);
 
         // getting checkout id as per user location
-        $checkouts = Checkout::where("area_id", $area->id)
-            ->where("category_id", $category_id)->get();
+        // if (!empty($area->id) && !empty($category_id)) {
+            $checkouts = Checkout::where("area_id", $area->id)
+                ->where("category_id", $category_id)->get();
+                // $checkouts = Checkout::where("area_id", $area->id)
+                // ->where("category_id", $category_id)->get();
+        // } else {
+        //     $checkout = [];
+        // }
 
         // return $checkout;
         foreach ($checkouts as $checkout) {
@@ -145,7 +155,7 @@ class LabourController extends Controller
 
                 if (empty($current_user_booking) && empty($accepted_booking_by_labour) && empty($rejected_booking_by_labour) && ($get_bookings->quantity_required != $get_bookings->current_quantity)) {
                     $request_booking = new BookingRequest();
-                    $request_booking->user_id = auth()->user()->id;
+                    $request_booking->user_id = auth()->user()->id??'';
                     $request_booking->area_id = $area->id;
                     $request_booking->checkout_id = $checkout->id;
                     $request_booking->category_id = $category_id;
@@ -290,6 +300,8 @@ class LabourController extends Controller
     {
         $action = $request->action;
         $booking_id = $request->booking_id;
+        $reason = $request->reason ?? '';
+
         $business_settings = BusinessSetting::pluck("value", "key")->toArray();
 
         // if user rejected the booking
@@ -311,6 +323,8 @@ class LabourController extends Controller
                 "checkout_id" => $booking_data->checkout_id,
                 "amount" => $final_price,
                 "booking_id" => $booking_id,
+                "reason" => $reason,
+
             ]);
 
             // and also removed from booking request so that it is not displayed on front page of labour app
@@ -441,5 +455,30 @@ class LabourController extends Controller
             "data" => $data,
             "status" => true,
         ], 200);
+    }
+
+    public function getLabourAmount(Request $request)
+    {
+        $booking_data = Booking::where('id', $request->booking_id)->first();
+
+        $labour_booking_data = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
+
+        $is_accept_booking = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->where('labour_id', auth()->user()->id)->get();
+
+        $is_accept_booking->is_work_done = 1;
+        $is_accept_booking->save();
+
+        $is_all_accepted_booking = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->where('is_work_done', '0')->get();
+
+        if (empty($is_all_accepted_booking)) {
+            $booking_data->is_work_done = 1;
+            $booking_data->save();
+        }
+
+        return response([
+            "message" => "Work Done Successfully",
+            "status" => true,
+        ], 200);
+
     }
 }
