@@ -173,9 +173,14 @@ class LabourController extends Controller
 
         $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->where('current_status', '!=', '2')->first();
 
-        $labour_book = LabourBooking::where('id', $bookings->booking_id)->first();
+        if (!empty($bookings)) {
 
-        $razorpay_status = Booking::where("labour_booking_id", $labour_book->id)->first();
+            $labour_book = LabourBooking::where('id', $bookings->booking_id)->first();
+            $razorpay_status = Booking::where("labour_booking_id", $labour_book->id)->first();
+            $razorpay_type = $razorpay_status->razorpay_type ?? '';
+        } else {
+            $razorpay_type = "online";
+        }
 
         // foreach ($bookings as $booking) {
 
@@ -202,7 +207,7 @@ class LabourController extends Controller
             "total_wallet_amount" => $total_wallet_amount->amount ?? 0,
             "total_booking_accepted" => $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,
-            'razorpay_status' => $razorpay_status->razorpay_type ?? '',
+            'razorpay_status' => $razorpay_type ?? '',
             "status" => true,
         ], 200);
     }
