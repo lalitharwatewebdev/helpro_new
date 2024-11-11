@@ -3,19 +3,18 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Models\LabourAcceptedBooking;
-use App\Models\LabourRejectedBooking;
-use App\Models\LabourBooking;
-use Illuminate\Http\Request;
-
 use App\Jobs\SendNotificationJob;
+use App\Models\LabourAcceptedBooking;
+use App\Models\LabourBooking;
+use App\Models\LabourRejectedBooking;
+use Illuminate\Http\Request;
 
 class LabourAcceptBookingController extends Controller
 {
     public function labourAcceptBooking(Request $request)
     {
         $request->validate([
-            "labour_booking_code" => "required"
+            "labour_booking_code" => "required",
         ]);
         \Log::info("Whether to acceot for reject");
         // first get data from labour_bookings table by labour_booking_code
@@ -40,13 +39,13 @@ class LabourAcceptBookingController extends Controller
 
                     return response([
                         "message" => "Booking Accepted Successfully",
-                        "status" => true
+                        "status" => true,
                     ], 200);
                 } else {
 
                     return response([
                         "message" => "Slot is not empty",
-                        "status" => true
+                        "status" => true,
                     ], 200);
                 }
             }
@@ -56,23 +55,25 @@ class LabourAcceptBookingController extends Controller
                 $labourAccept = new LabourRejectedBooking();
                 $labourAccept->labour_id = auth()->user()->id;
                 $labourAccept->booking_id = $labour_booking_code->id;
+                $labourAccept->reason = $request->reason;
+
                 $labourAccept->save();
 
-                if($labourAccept){
+                if ($labourAccept) {
                     $firebaseService = new SendNotificationJob();
-                    $firebaseService->sendNotification($labour_booking_code->user->device_id, "Booking Accepted", "Booking Accepted by " . auth()->user()->name);
+                    $firebaseService->sendNotification($labour_booking_code->user->device_id, "Booking Rejected", "Booking Rejected by " . auth()->user()->name);
                 }
 
                 return response([
                     "message" => "Booking Rejected",
-                    "status" => true
+                    "status" => true,
                 ], 400);
             }
 
         } else {
             return response([
                 "message" => "Invalid Booking id",
-                "status" => true
+                "status" => true,
             ], 200);
         }
     }

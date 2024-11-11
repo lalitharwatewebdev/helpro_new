@@ -173,6 +173,9 @@ class LabourController extends Controller
 
         $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->where('current_status', '!=', '2')->first();
 
+
+        $get_bookings = Booking::where("checkout_id", $checkout->id)->whereColumn("quantity_required", "!=", "current_quantity")->first();
+
         // foreach ($bookings as $booking) {
 
         //     $start_date = $booking->checkout->start_date;

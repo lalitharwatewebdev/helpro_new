@@ -76,7 +76,11 @@ class UserBookingTable extends DataTableComponent
             //         return $row->labour->name ?? "";
             //     })
             //     ->html(),
-
+            Column::make("User", 'user_id')
+                ->format(function ($value, $row, Column $column) {
+                    return $row->user->name ?? "";
+                })
+                ->html(),
             Column::make("Total Amount", 'total_amount')
                 ->format(function ($value, $row, Column $column) {
                     return $value;

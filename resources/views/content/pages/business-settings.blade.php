@@ -148,7 +148,9 @@
                 <x-input name="minimum_withdrawal" value="{{ $data['minimum_withdrawal'] ?? '' }}" type="number"
                     label="Minimum Withdrawal" />
             </div>
-
+            <div class="col-md-4 mt-3">
+                <x-input name="gst" value="{{ $data['gst'] ?? '' }}" type="number" label="GST" />
+            </div>
 
             {{-- <div class="col-md-4 mt-3">
                 <x-input name="percentage_for_less_than" value="{{ $data['percentage_for_less_than'] ?? '' }}"

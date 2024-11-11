@@ -78,6 +78,7 @@ Route::prefix('v1')->group(function () {
 
         Route::controller(LabourController::class)->prefix("labours")->group(function () {
             Route::get("/", "get");
+
         });
 
         Route::controller(CartController::class)->prefix("carts")->group(function () {
@@ -213,6 +214,8 @@ Route::prefix('v1')->group(function () {
                 Route::post("get-booking", "getBooking");
                 Route::post("labour-history", "labourHistory");
                 Route::post("current-job", "currentJob");
+                Route::post("get-labour-amount", "getLabourAmount");
+
             });
 
             Route::controller(LabourWalletController::class)->prefix("wallets")->group(function () {

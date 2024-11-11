@@ -354,7 +354,17 @@ class CheckoutController extends Controller
             ], 200);
 
         } else if ($request->razorpay_type == "offline") {
-
+            $booking = Booking::where('id', $request->booking_id)->first();
+            $booking->razorpay_type = "offline";
+            $booking->save();
+            $is_razorpay = false;
+            return response()->json([
+                "message" => "Booking created successfully",
+                "order_id" => null,
+                "checkout_id" => $booking->checkout_id,
+                "is_razorpay" => $is_razorpay,
+                "status" => true,
+            ], 200);
         }
     }
 }

@@ -94,8 +94,8 @@ class LabourBookingController extends Controller
                     $query->where('category_id', $category_id);
                 })
                 ->get()
-                ->filter(function ($labour) use ($latitude, $longitude, $radius) {
-                    [$labourLatitude, $labourLongitude] = explode(',', $labour->lat_long);
+                ->filter(function ($labour) use ($latitude, $longitude, $radius, $request) {
+                    [$labourLatitude, $labourLongitude] = explode(',', $request->lat_long);
                     $distance = $this->haversineGreatCircleDistance(
                         $latitude,
                         $longitude,
