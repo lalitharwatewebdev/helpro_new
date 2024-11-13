@@ -86,9 +86,16 @@ class LabourBookingController extends Controller
             ->with("category:id,title,image")->take(1)
             ->get();
 
+        \Log::info("areas");
+        \Log::info($areas);
+        \Log::info(!empty($areas));
+
         $labours = '';
 
         if (!empty($areas)) {
+
+            \Log::info("inside area");
+            \Log::info($areas);
             $labours = User::where('type', 'labour')
                 ->whereHas('category', function ($query) use ($category_id) {
                     $query->where('category_id', $category_id);
@@ -113,9 +120,13 @@ class LabourBookingController extends Controller
         //     "message" => "Booked Successfully",
         //     "status" => true,
         // ], 200);
+
+        \Log::info("labours");
+        \Log::info($labours);
         try {
             if (!empty($labours)) {
-
+                \Log::info("inside labour");
+                \Log::info($labours);
                 $labourBooking = new LabourBooking();
                 $labourBooking->user_id = auth()->user()->id;
                 $labourBooking->category_id = $request->category_id;
@@ -147,27 +158,27 @@ class LabourBookingController extends Controller
                         ], 400);
                     }
 
-                    $title = "New Job Available";
-                    $message = "You have a new job available.";
-                    $start_time = $request->start_time;
-                    $end_time = $request->end_time;
-                    $start_date = $request->start_date;
-                    $end_date = $request->end_date;
-                    $device_ids = $labours;
-                    $additional_data = [
-                        "category_name" => $category_data->title,
-                        "address" => $user_address->address,
-                        "booking_code" => $labourBooking->labour_booking_code,
-                        "start_date" => $start_date,
-                        "end_date" => $end_date,
-                        "start_time" => $start_time,
-                        "end_time" => $end_time,
-                        "price" => $request->labour_amount / $request->labour_quantity,
+                    // $title = "New Job Available";
+                    // $message = "You have a new job available.";
+                    // $start_time = $request->start_time;
+                    // $end_time = $request->end_time;
+                    // $start_date = $request->start_date;
+                    // $end_date = $request->end_date;
+                    // $device_ids = $labours;
+                    // $additional_data = [
+                    //     "category_name" => $category_data->title,
+                    //     "address" => $user_address->address,
+                    //     "booking_code" => $labourBooking->labour_booking_code,
+                    //     "start_date" => $start_date,
+                    //     "end_date" => $end_date,
+                    //     "start_time" => $start_time,
+                    //     "end_time" => $end_time,
+                    //     "price" => $request->labour_amount / $request->labour_quantity,
 
-                    ];
+                    // ];
 
-                    $firebaseService = new SendNotificationJob();
-                    $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+                    // $firebaseService = new SendNotificationJob();
+                    // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
                     \Log::info("Notification send");
                 }
             }

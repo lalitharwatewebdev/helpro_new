@@ -38,7 +38,7 @@ class UserController extends Controller
 
         $data->name = $request->name;
         $data->email = $request->email;
-        $data->phone = $request->mobile_no;
+        $data->phone = $request->phone;
 
         $data->save();
 

@@ -110,7 +110,7 @@
             <div class="card cursor-pointer">
                 <div class="card-header">
                     <div>
-                        <h2 class="font-weight-bolder mb-0">{{ $total_categories ?? 0 }}</h2>
+                        <h2 class="font-weight-bolder mb-0">{{ $total_category ?? 0 }}</h2>
                         <h6 class="card-text">Total Categories</h6>
                     </div>
                     <div class="avatar bg-light-primary p-50 m-0">
