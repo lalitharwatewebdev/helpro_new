@@ -23,10 +23,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info($request->profile_pic);
-        \Log::info("store");
-
-        \Log::info($request->all());
+       
         $user_referral = '';
         $data = User::where("id", auth()->user()->id)->first();
 
@@ -52,6 +49,7 @@ class UserController extends Controller
         $data->address = $request->address;
         $data->lat_long = $request->lat_long;
         $data->gst_no = $request->gst_no;
+        $data->phone = $request->phone;
 
         $data->referral_code = $this->referralGenerator($request->username);
 
