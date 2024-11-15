@@ -173,13 +173,13 @@ class CheckoutController extends Controller
         $labour_get_data = User::where("type", "labour")->pluck("device_id");
         // \Log::info("labour's device_id ===>", $labour_get_data);
         $user_address = Address::where("user_id", auth()->user()->id)->first();
-        $title = "New Job Available";
-        $message = "You have a new job available.";
+        $title = "New Job Available1111";
+        $message = "You have a new job available11.";
         $device_ids = $labour_get_data->toArray();
         $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name, "category_id" => $request->category_id];
 
-        // $firebaseService = new SendNotificationJob();
-        // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        $firebaseService = new SendNotificationJob();
+        $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
 
         return response()->json([
             "message" => "Booking created successfully",

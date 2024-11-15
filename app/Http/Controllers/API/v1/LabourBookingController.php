@@ -158,27 +158,27 @@ class LabourBookingController extends Controller
                         ], 400);
                     }
 
-                    // $title = "New Job Available";
-                    // $message = "You have a new job available.";
-                    // $start_time = $request->start_time;
-                    // $end_time = $request->end_time;
-                    // $start_date = $request->start_date;
-                    // $end_date = $request->end_date;
-                    // $device_ids = $labours;
-                    // $additional_data = [
-                    //     "category_name" => $category_data->title,
-                    //     "address" => $user_address->address,
-                    //     "booking_code" => $labourBooking->labour_booking_code,
-                    //     "start_date" => $start_date,
-                    //     "end_date" => $end_date,
-                    //     "start_time" => $start_time,
-                    //     "end_time" => $end_time,
-                    //     "price" => $request->labour_amount / $request->labour_quantity,
+                    $title = "New Job Available";
+                    $message = "You have a new job available.";
+                    $start_time = $request->start_time;
+                    $end_time = $request->end_time;
+                    $start_date = $request->start_date;
+                    $end_date = $request->end_date;
+                    $device_ids = $labours;
+                    $additional_data = [
+                        "category_name" => $category_data->title,
+                        "address" => $user_address->address,
+                        "booking_code" => $labourBooking->labour_booking_code,
+                        "start_date" => $start_date,
+                        "end_date" => $end_date,
+                        "start_time" => $start_time,
+                        "end_time" => $end_time,
+                        "price" => $request->labour_amount / $request->labour_quantity,
 
-                    // ];
+                    ];
 
-                    // $firebaseService = new SendNotificationJob();
-                    // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+                    $firebaseService = new SendNotificationJob();
+                    $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
                     \Log::info("Notification send");
                 }
             }
