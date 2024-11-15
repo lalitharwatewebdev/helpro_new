@@ -91,8 +91,6 @@ class CheckoutController extends Controller
         $labour_arr = [];
         $diff = (strtotime($request->end_date) - strtotime($request->start_date));
         $date_result = abs(round($diff) / 86400) + 1;
-        \Log::info("date_result");
-        \Log::info($date_result);
 
         // $amount = (intval($area->price) * intval($request->quantity)) * $date_result + $services_charges;
         $amount = $request->amount;
@@ -128,6 +126,8 @@ class CheckoutController extends Controller
                 if ($user_wallet->amount < $amount) {
                     $partial_amount = $amount - $user_wallet->amount;
                     $user_wallet->decrement("amount", $user_wallet->amount);
+                    \Log::info("partial_amount");
+                    \Log::info($partial_amount);
                     $order = $this->razorpay->createOrder($partial_amount, "INR", $data->id);
                     $is_razorpay = true;
                 } else {
@@ -184,10 +184,11 @@ class CheckoutController extends Controller
 
         // $firebaseService = new SendNotificationJob();
         // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        // \Log::info($order);
 
         return response()->json([
             "message" => "Booking created successfully",
-            "order_id" => $order['id'] ?? null,
+            "order_id" => $order->id ?? $order['id'] ?? null,
             "checkout_id" => $data->id,
             "is_razorpay" => $is_razorpay,
             "status" => true,
@@ -292,7 +293,7 @@ class CheckoutController extends Controller
             \Log::info($labours);
             $title = "New Job Available1";
             $message = "You have a new job available.";
-            $device_ids = $labours->toArray();
+            $device_ids = $labours;
             $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking_data->id, "start_time" => $this->formatTimeWithAMPM($checkout_data->start_time), "end_time" => $this->formatTimeWithAMPM($checkout_data->end_time), "price" => $booking_data->total_amount, "start_date" => $this->formatDateWithSuffix($checkout_data->start_date), "end_date" => $this->formatDateWithSuffix($checkout_data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
 
             $firebaseService = new SendNotificationJob();
