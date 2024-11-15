@@ -157,7 +157,7 @@ class LabourBookingController extends Controller
                             "status" => true,
                         ], 400);
                     }
-
+                    
                     $title = "New Job Available";
                     $message = "You have a new job available.";
                     $start_time = $request->start_time;

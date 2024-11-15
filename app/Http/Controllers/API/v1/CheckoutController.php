@@ -261,8 +261,8 @@ class CheckoutController extends Controller
                         $query->where('category_id', $category_id);
                     })
                     ->get()
-                    ->filter(function ($labour) use ($latitude, $longitude, $radius, $request,$checkout_data) {
-                        [$labourLatitude, $labourLongitude] = explode(',', $request->lat_long);
+                    ->filter(function ($labour) use ($latitude, $longitude, $radius, $request, $checkout_data) {
+                        [$labourLatitude, $labourLongitude] = explode(',', $checkout_data->lat_long);
                         $distance = $this->haversineGreatCircleDistance(
                             $latitude,
                             $longitude,
@@ -288,10 +288,11 @@ class CheckoutController extends Controller
 
             $diff = (strtotime($checkout_data->end_date) - strtotime($checkout_data->start_date));
             $date_result = abs(round($diff) / 86400) + 1;
-
+            \Log::info("labours deatils");
+            \Log::info($labours);
             $title = "New Job Available1";
             $message = "You have a new job available.";
-            $device_ids = $labours;
+            $device_ids = $labours->toArray();
             $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking_data->id, "start_time" => $this->formatTimeWithAMPM($checkout_data->start_time), "end_time" => $this->formatTimeWithAMPM($checkout_data->end_time), "price" => $booking_data->total_amount, "start_date" => $this->formatDateWithSuffix($checkout_data->start_date), "end_date" => $this->formatDateWithSuffix($checkout_data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
 
             $firebaseService = new SendNotificationJob();
