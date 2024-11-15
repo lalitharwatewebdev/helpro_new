@@ -177,8 +177,8 @@ class LabourBookingController extends Controller
 
                     ];
 
-                    $firebaseService = new SendNotificationJob();
-                    $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+                    // $firebaseService = new SendNotificationJob();
+                    // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
                     \Log::info("Notification send");
                 }
             }

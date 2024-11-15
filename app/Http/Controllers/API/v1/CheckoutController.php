@@ -11,6 +11,7 @@ use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\Checkout;
+use App\Models\LabourBooking;
 use App\Models\Transactions;
 use App\Models\User;
 use App\Models\UserReview;
@@ -109,6 +110,9 @@ class CheckoutController extends Controller
         $data->alternate_number = $request->alternate_number;
         $data->note = $request->note;
         $data->transaction_type = $request->transaction_type;
+        $data->labour_booking_id = $request->labour_booking_id;
+        $data->lat_long = $request->lat_long;
+
         $data->save();
 
         if ($request->transaction_type == 'pre_paid') {
@@ -173,13 +177,13 @@ class CheckoutController extends Controller
         $labour_get_data = User::where("type", "labour")->pluck("device_id");
         // \Log::info("labour's device_id ===>", $labour_get_data);
         $user_address = Address::where("user_id", auth()->user()->id)->first();
-        $title = "New Job Available1111";
-        $message = "You have a new job available11.";
+        $title = "New Job Available";
+        $message = "You have a new job available.";
         $device_ids = $labour_get_data->toArray();
         $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name, "category_id" => $request->category_id];
 
-        $firebaseService = new SendNotificationJob();
-        $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        // $firebaseService = new SendNotificationJob();
+        // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
 
         return response()->json([
             "message" => "Booking created successfully",
@@ -214,13 +218,84 @@ class CheckoutController extends Controller
                     "otp" => mt_rand(111111, 999999),
                 ]);
             }
-            $title = "New Job Available";
+
+            $checkout_data = Checkout::where('id', $fetchOrder["checkout_id"])->first();
+            $labour_booking_data = LabourBooking::where('id', $checkout_data->labour_booking_id)->first();
+
+            $category_id = $checkout_data->category_id;
+            $user = User::find(auth()->user()->id);
+            // $user->update(["lat_long" => $request->lat_long]);
+            $earthRadius = 6371; // Earth radius in kilometers
+            $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+            $radius = $business_settings['radius'];
+            list($latitude, $longitude) = explode(',', $checkout_data->lat_long);
+
+            $latFrom = deg2rad($latitude);
+            $lonFrom = deg2rad($longitude);
+
+            // Calculate bounding box
+            $latDelta = $radius / $earthRadius;
+            $lonDelta = $radius / ($earthRadius * cos($latFrom));
+
+            $latMin = rad2deg($latFrom - $latDelta);
+            $latMax = rad2deg($latFrom + $latDelta);
+            $lonMin = rad2deg($lonFrom - $lonDelta);
+            $lonMax = rad2deg($lonFrom + $lonDelta);
+
+            // get area first nearest to user's co-ordinate
+            $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+                ->where('category_id', $checkout_data->category_id)
+                ->whereBetween('latitude', [$latMin, $latMax])
+                ->whereBetween('longitude', [$lonMin, $lonMax])
+                ->with("category:id,title,image")->take(1)
+                ->get();
+
+            $labours = '';
+
+            if (!empty($areas)) {
+
+                \Log::info("inside area");
+                \Log::info($areas);
+                $labours = User::where('type', 'labour')
+                    ->whereHas('category', function ($query) use ($category_id) {
+                        $query->where('category_id', $category_id);
+                    })
+                    ->get()
+                    ->filter(function ($labour) use ($latitude, $longitude, $radius, $request,$checkout_data) {
+                        [$labourLatitude, $labourLongitude] = explode(',', $request->lat_long);
+                        $distance = $this->haversineGreatCircleDistance(
+                            $latitude,
+                            $longitude,
+                            $labourLatitude,
+                            $labourLongitude
+                        );
+                        return $distance <= $radius;
+                    })
+                    ->map(function ($labour) {
+                        $labour->type = 'labour';
+                        return $labour;
+                    })->pluck("device_id")->toArray();
+            }
+
+            $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
+
+            if (!$user_address) {
+                return response([
+                    "message" => "Address is required",
+                    "status" => true,
+                ], 400);
+            }
+
+            $diff = (strtotime($checkout_data->end_date) - strtotime($checkout_data->start_date));
+            $date_result = abs(round($diff) / 86400) + 1;
+
+            $title = "New Job Available1";
             $message = "You have a new job available.";
-            $device_ids = $labour_get_data->toArray();
-            $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name, "category_id" => $request->category_id];
-    
-            // $firebaseService = new SendNotificationJob();
-            // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+            $device_ids = $labours;
+            $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking_data->id, "start_time" => $this->formatTimeWithAMPM($checkout_data->start_time), "end_time" => $this->formatTimeWithAMPM($checkout_data->end_time), "price" => $booking_data->total_amount, "start_date" => $this->formatDateWithSuffix($checkout_data->start_date), "end_date" => $this->formatDateWithSuffix($checkout_data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
+
+            $firebaseService = new SendNotificationJob();
+            $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
             return response([
                 "message" => "Booking Done Successfully",
             ], 200);

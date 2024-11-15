@@ -136,8 +136,10 @@ class LabourController extends Controller
 
         // getting checkout id as per user location
         // if (!empty($area->id) && !empty($category_id)) {
-        $checkouts = Checkout::where("area_id", $area->id)
-            ->where("category_id", $category_id)->get();
+        // $checkouts = Checkout::where("area_id", $area->id)
+        //     ->where("category_id", $category_id)->get();
+
+        $checkouts = Checkout::where("category_id", $category_id)->get();
         // $checkouts = Checkout::where("area_id", $area->id)
         // ->where("category_id", $category_id)->get();
         // } else {
@@ -158,7 +160,7 @@ class LabourController extends Controller
                 if (empty($current_user_booking) && empty($accepted_booking_by_labour) && empty($rejected_booking_by_labour) && ($get_bookings->quantity_required != $get_bookings->current_quantity)) {
                     $request_booking = new BookingRequest();
                     $request_booking->user_id = auth()->user()->id ?? '';
-                    $request_booking->area_id = $area->id;
+                    // $request_booking->area_id = $area->id;
                     $request_booking->checkout_id = $checkout->id;
                     $request_booking->category_id = $category_id;
                     $request_booking->booking_id = $get_bookings->id;
