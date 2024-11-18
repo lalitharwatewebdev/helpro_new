@@ -144,6 +144,8 @@ class CheckoutController extends Controller
             } else {
                 $order = $this->razorpay->createOrder($amount, "INR", $data->id);
             }
+        }else{
+            $is_razorpay = false;
         }
 
         $booking = new Booking();
