@@ -22,7 +22,7 @@ class LabourAcceptBookingController extends Controller
 
         // first get data from labour_bookings table by labour_booking_code
         $booking_id = Booking::where('id', $request->booking_id)->first();
-        $labour_booking_code = LabourBooking::with("user")->where("labour_booking_code", $booking_id->labour_booking_id)->first();
+        $labour_booking_code = LabourBooking::with("user")->where("id", $booking_id->labour_booking_id)->first();
         if (!empty($labour_booking_code)) {
             // checking if labour booking is done
 
@@ -65,7 +65,7 @@ class LabourAcceptBookingController extends Controller
 
                 if ($labourAccept) {
                     $firebaseService = new SendNotificationJob();
-                    $firebaseService->sendNotification($labour_booking_code->user->device_id, "Booking Rejected", "Booking Rejected by " . auth()->user()->name);
+                    $firebaseService->sendNotification([$labour_booking_code->user->device_id], "Booking Rejected", "Booking Rejected by " . auth()->user()->name);
                 }
 
                 return response([
