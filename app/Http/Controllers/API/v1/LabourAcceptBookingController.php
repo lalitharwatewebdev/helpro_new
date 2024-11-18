@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\SendNotificationJob;
+use App\Models\Booking;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\LabourRejectedBooking;
@@ -17,8 +18,11 @@ class LabourAcceptBookingController extends Controller
             "labour_booking_code" => "required",
         ]);
         \Log::info("Whether to acceot for reject");
+        \Log::info($request->all());
+
         // first get data from labour_bookings table by labour_booking_code
-        $labour_booking_code = LabourBooking::with("user")->where("labour_booking_code", $request->labour_booking_code)->first();
+        $booking_id = Booking::where('id', $request->booking_id)->first();
+        $labour_booking_code = LabourBooking::with("user")->where("labour_booking_code", $booking_id->labour_booking_id)->first();
         if (!empty($labour_booking_code)) {
             // checking if labour booking is done
 
