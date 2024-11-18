@@ -172,18 +172,82 @@ class CheckoutController extends Controller
 
         $booking->save();
 
-        $user_name = auth()->user()->firstname . " " . auth()->user()->lastname;
+        $category_id = $data->category_id;
+        $user = User::find(auth()->user()->id);
+        // $user->update(["lat_long" => $request->lat_long]);
+        $earthRadius = 6371; // Earth radius in kilometers
+        $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+        $radius = $business_settings['radius'];
+        list($latitude, $longitude) = explode(',', $data->lat_long);
 
-        $labour_get_data = User::where("type", "labour")->pluck("device_id");
+        $latFrom = deg2rad($latitude);
+        $lonFrom = deg2rad($longitude);
+
+        // Calculate bounding box
+        $latDelta = $radius / $earthRadius;
+        $lonDelta = $radius / ($earthRadius * cos($latFrom));
+
+        $latMin = rad2deg($latFrom - $latDelta);
+        $latMax = rad2deg($latFrom + $latDelta);
+        $lonMin = rad2deg($lonFrom - $lonDelta);
+        $lonMax = rad2deg($lonFrom + $lonDelta);
+
+        // get area first nearest to user's co-ordinate
+        $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+            ->where('category_id', $data->category_id)
+            ->whereBetween('latitude', [$latMin, $latMax])
+            ->whereBetween('longitude', [$lonMin, $lonMax])
+            ->with("category:id,title,image")->take(1)
+            ->get();
+
+        $labours = '';
+
+        if (!empty($areas)) {
+
+            \Log::info("inside area");
+            \Log::info($areas);
+            $labours = User::where('type', 'labour')
+                ->whereHas('category', function ($query) use ($category_id) {
+                    $query->where('category_id', $category_id);
+                })
+                ->get()
+                ->filter(function ($labour) use ($latitude, $longitude, $radius, $request, $data) {
+                    [$labourLatitude, $labourLongitude] = explode(',', $data->lat_long);
+                    $distance = $this->haversineGreatCircleDistance(
+                        $latitude,
+                        $longitude,
+                        $labourLatitude,
+                        $labourLongitude
+                    );
+                    return $distance <= $radius;
+                })
+                ->map(function ($labour) {
+                    $labour->type = 'labour';
+                    return $labour;
+                })->pluck("device_id")->toArray();
+        }
+
+        $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
+
+        if (!$user_address) {
+            return response([
+                "message" => "Address is required",
+                "status" => true,
+            ], 400);
+        }
+        $labour_booking_data = LabourBooking::where('id', $data->labour_booking_id)->first();
         // \Log::info("labour's device_id ===>", $labour_get_data);
         $user_address = Address::where("user_id", auth()->user()->id)->first();
-        $title = "New Job Available";
+        $title = "New Job Available2";
         $message = "You have a new job available.";
-        $device_ids = $labour_get_data->toArray();
-        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name, "category_id" => $request->category_id];
+        $device_ids = $labours;
+        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
 
-        // $firebaseService = new SendNotificationJob();
-        // $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        if ($request->transaction_type == "post_paid") {
+            $firebaseService = new SendNotificationJob();
+            $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        }
+
         // \Log::info($order);
 
         return response()->json([
@@ -291,7 +355,7 @@ class CheckoutController extends Controller
             $date_result = abs(round($diff) / 86400) + 1;
             \Log::info("labours deatils");
             \Log::info($labours);
-            $title = "New Job Available1";
+            $title = "New Job Available";
             $message = "You have a new job available.";
             $device_ids = $labours;
             $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking_data->id, "start_time" => $this->formatTimeWithAMPM($checkout_data->start_time), "end_time" => $this->formatTimeWithAMPM($checkout_data->end_time), "price" => $booking_data->total_amount, "start_date" => $this->formatDateWithSuffix($checkout_data->start_date), "end_date" => $this->formatDateWithSuffix($checkout_data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
