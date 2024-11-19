@@ -492,12 +492,12 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
     //     Route::put('status', 'status')->name('status');
     // });
 
-     Route::name('redeem.')
-    ->prefix('redeem')
-    ->controller(LabourRedeemController::class)->group(function () {
+    Route::name('redeem.')
+        ->prefix('redeem')
+        ->controller(LabourRedeemController::class)->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get("{id}/accept-redeem",'acceptLabourRedeem')->name("accept-redeem");
-        Route::get("add-services","addAreas")->name("add-areas");
+        Route::post("accept-redeem", 'acceptLabourRedeem')->name("accept-redeem");
+        Route::get("add-services", "addAreas")->name("add-areas");
         Route::get("details", "details")->name("details");
         Route::get('blocked', 'index')->name('blocked');
         Route::get('deleted', 'index')->name('deleted');
