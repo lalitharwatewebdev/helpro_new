@@ -487,7 +487,7 @@ class LabourController extends Controller
     {
         // \Log::info("booking_data_all");
         // \Log::info($request->all());
-        $booking_data = Booking::where('id', $request->booking_id)->first();
+        $booking_data = Booking::where('labour_booking_id', $request->booking_id)->first();
         // \Log::info("booking_datassss");
         // \Log::info($booking_data);
         // $labour_booking_data = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
