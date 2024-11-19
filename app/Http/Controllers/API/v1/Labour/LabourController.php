@@ -204,7 +204,7 @@ class LabourController extends Controller
 
         // getting total amount of money from wallet
         $total_wallet_amount = Wallet::where("user_id", auth()->user()->id)->first();
-        // \Log::info("Wallet ::->" . $total_wallet_amount);
+        \Log::info("Wallet ::->" . $total_wallet_amount->amount??0);
 
         return response([
             "bookings" => $bookings ?? [],
