@@ -485,16 +485,19 @@ class LabourController extends Controller
 
     public function getLabourAmount(Request $request)
     {
+        // \Log::info("booking_data_all");
+        // \Log::info($request->all());
         $booking_data = Booking::where('id', $request->booking_id)->first();
+        // \Log::info("booking_datassss");
+        // \Log::info($booking_data);
+        // $labour_booking_data = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
 
-        $labour_booking_data = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
-
-        $is_accept_booking = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->where('labour_id', auth()->user()->id)->get();
+        $is_accept_booking = LabourAcceptedBooking::where('booking_id', $request->booking_id)->where('labour_id', auth()->user()->id)->get();
 
         $is_accept_booking->is_work_done = 1;
         $is_accept_booking->save();
 
-        $is_all_accepted_booking = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->where('is_work_done', '0')->get();
+        $is_all_accepted_booking = LabourAcceptedBooking::where('booking_id', $request->booking_id)->where('is_work_done', '0')->get();
 
         if (empty($is_all_accepted_booking)) {
             $booking_data->is_work_done = 1;
