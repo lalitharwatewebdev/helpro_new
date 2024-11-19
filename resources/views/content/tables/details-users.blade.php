@@ -11,7 +11,7 @@
             transform: scale(1) !important;
         }
     </style>
-    
+
 @endsection
 
 @section('content')
@@ -41,14 +41,15 @@
                         </div>
 
                         <div class="col-lg-3 col-md-6 mb-2">
-                            <span> <b>Profile Image:</b> 
+                            <span> <b>Profile Image:</b>
                                 @if (!is_null($data->profile_pic))
-                                <img src="{{ asset("$data->profile_pic") }}" class="view-on-click  rounded-circle"
-                                    style="width:40px">
-                            @else
-                                <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
-                                    style="width:40px">
-                            @endif </span>
+                                    <img src="{{ asset("$data->profile_pic") }}" class="view-on-click  rounded-circle"
+                                        style="width:40px">
+                                @else
+                                    <img src="{{ asset('images/placeholder.jpg') }}" class="view-on-click   rounded-circle"
+                                        style="width:40px">
+                                @endif
+                            </span>
                         </div>
 
                         {{-- <div class="col-lg-3 col-md-6 mb-2">
@@ -97,7 +98,7 @@
 
                     @endphp
 
-                    <livewire:user-booking-table user_id="{{ $user_id }}" />
+                    <livewire:user-booking-table user_id="{{ $user_id }}" type="user" />
                 </x-card>
             </div>
     </section>

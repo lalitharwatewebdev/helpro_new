@@ -37,7 +37,7 @@
                                     <div class="d-flex justify-content-center">
                                         <div class="col-md-6">
                                             <x-form x-form id="add-slider" method="POST" class="" :route="route('admin.labours.update')">
-                                                <x-input type="hidden" name="id" value="{{$data->id}}"/>
+                                                <x-input type="hidden" name="id" value="{{ $data->id }}" />
                                                 <label for="">Labour Type</label>
                                                 <select name="type" class="form-control select2" id="">
                                                     <option value="pending"
@@ -192,7 +192,7 @@
                                         $user_id = request()->query('id');
                                     @endphp
 
-                                    <livewire:labour-booking-table user_id="{{ $user_id }}" />
+                                    <livewire:labour-booking-table user_id="{{ $user_id }}" type="labour" />
                                 </x-card>
                             </div>
                         </div>
