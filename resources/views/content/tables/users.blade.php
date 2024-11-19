@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     {{-- </form> --}}
-                    <livewire:user-table />
+                    <livewire:user-table type={{$type}} />
                 </x-card>
             </div>
         </div>
