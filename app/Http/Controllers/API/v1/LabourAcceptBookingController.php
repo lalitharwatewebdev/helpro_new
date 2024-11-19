@@ -21,7 +21,7 @@ class LabourAcceptBookingController extends Controller
         \Log::info($request->all());
 
         // first get data from labour_bookings table by labour_booking_code
-        $booking_id = Booking::where('id', $request->booking_id)->first();
+        $booking_id = Booking::where('id', $request->labour_booking_code)->first();
         $labour_booking_code = LabourBooking::with("user")->where("id", $booking_id->labour_booking_id)->first();
         if (!empty($labour_booking_code)) {
             // checking if labour booking is done
