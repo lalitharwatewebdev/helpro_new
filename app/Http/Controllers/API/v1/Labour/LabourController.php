@@ -97,9 +97,9 @@ class LabourController extends Controller
         // });
 
         $total_booking_accepted = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->count();
-        \Log::info("Accepted " . $total_booking_accepted);
+        // \Log::info("Accepted " . $total_booking_accepted);
         $total_rejected_booking = LabourRejectedBooking::where("labour_id", auth()->user()->id)->count();
-        \Log::info("Rejected " . $total_rejected_booking);
+        // \Log::info("Rejected " . $total_rejected_booking);
 
         // Convert latitude and longitude from degrees to radians
         $latFrom = deg2rad($latitude);
@@ -131,8 +131,8 @@ class LabourController extends Controller
                 return $distance <= $radius;
             })->first();
         // \Log::info($checkouts);
-        \Log::info($area);
-        \Log::info($category_id);
+        // \Log::info($area);
+        // \Log::info($category_id);
 
         // getting checkout id as per user location
         // if (!empty($area->id) && !empty($category_id)) {
@@ -204,7 +204,7 @@ class LabourController extends Controller
 
         // getting total amount of money from wallet
         $total_wallet_amount = Wallet::where("user_id", auth()->user()->id)->first();
-        \Log::info("Wallet ::->" . $total_wallet_amount);
+        // \Log::info("Wallet ::->" . $total_wallet_amount);
 
         return response([
             "bookings" => $bookings ?? [],
@@ -436,7 +436,7 @@ class LabourController extends Controller
                 $data[$key]['razorpay_status'] = $book_data->razorpay_type ?? '';
             }
 
-            \Log::info($data);
+            // \Log::info($data);
 
             return response([
                 "data" => $data,
@@ -485,11 +485,12 @@ class LabourController extends Controller
 
     public function getLabourAmount(Request $request)
     {
-        // \Log::info("booking_data_all");
-        // \Log::info($request->all());
+        \Log::info("booking_data_all");
+        \Log::info($request->all());
         $booking_data = Booking::where('labour_booking_id', $request->booking_id)->first();
-        // \Log::info("booking_datassss");
-        // \Log::info($booking_data);
+        \Log::info("booking_datassss");
+        \Log::info($booking_data);
+        \Log::info(auth()->user()->id);
         // $labour_booking_data = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
 
         $is_accept_booking = LabourAcceptedBooking::where('booking_id', $request->booking_id)->where('labour_id', auth()->user()->id)->get();
