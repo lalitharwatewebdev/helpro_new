@@ -24,9 +24,9 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                     <form action="{{ route('admin.users.labour-export')}}" method="GET">
+                    {{-- <form action="{{ route('admin.users.labour-export') }}" method="GET"> --}}
                     <div class="d-flex justify-content-end align-items-center mb-1">
-                        <input type="text" name="type" value="{{$type}}"/>
+                        <input type="hidden" name="type" value="{{ $type }}" />
                         <div class="col-md-3">
                             <div class="form-group  text-left">
                                 <label for="month">Date </label>
@@ -42,10 +42,10 @@
 
                         </div>
                         <div class="col-md-3">
-                        <button class="btn btn-primary">Export</button>
+                            <button class="btn btn-primary" onclick="exportData()">Export</button>
                         </div>
                     </div>
-                </form>
+                    {{-- </form> --}}
                     <livewire:labour-table type="{{ $type }}" />
                 </x-card>
             </div>
@@ -79,9 +79,19 @@
 
         </x-form>
     </x-side-modal>
+    <x-modal title="Export Password" footer="false" id="export-password">
+        <x-slot name="body">
+            <x-form successCallback="test" id="add-password" method="POST" class="" :route="route('admin.users.verifyPassword')">
+                <x-input name="password"></x-input>
+            </x-form>
+        </x-slot>
+    </x-modal>
 @endsection
 @section('page-script')
     <script>
+        function exportData() {
+            $('#export-password').modal('show');
+        }
         $(document).ready(function() {
             $(document).on('click', '[data-show]', function() {
                 const modal = $(this).data('show');
@@ -103,10 +113,24 @@
             $(modal).modal('show');
         }
 
-        $(".flatpickr").flatpickr(
-            {
-                mode: "range"
+        $(".flatpickr").flatpickr({
+            mode: "range"
+        });
+
+
+        function test(response) {
+
+
+            if (response.success === true) {
+
+                var month = $('#month').val();
+                // alert("hi");
+
+
+                window.location.href = "{{ url('admin/users/labour-export?month=') }}" + month
+
             }
-        );
+
+        }
     </script>
 @endsection
