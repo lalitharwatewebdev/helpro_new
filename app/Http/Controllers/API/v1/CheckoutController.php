@@ -144,7 +144,7 @@ class CheckoutController extends Controller
             } else {
                 $order = $this->razorpay->createOrder($amount, "INR", $data->id);
             }
-        }else{
+        } else {
             $is_razorpay = false;
         }
 
@@ -170,6 +170,8 @@ class CheckoutController extends Controller
             $booking->razorpay_status = "created";
         } else {
             $booking->razorpay_status = "pending";
+            $booking->razorpay_type = "offline";
+
         }
 
         $booking->save();
