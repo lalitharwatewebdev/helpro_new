@@ -116,6 +116,13 @@
       "isAdmin": false
     },
     {
+      "url": "admin/redeem",
+      "name": "Labour Redeem Management",
+      "icon": "<i data-feather='user'></i>",
+      "slug": "admin.redeems.index",
+      "isAdmin": false
+    },
+    {
       "name": "Business Settings",
       "icon": "<i data-feather='user'></i>",
       "isAdmin": false,
