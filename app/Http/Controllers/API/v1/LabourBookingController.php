@@ -13,6 +13,7 @@ use App\Models\Areas;
 use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\Category;
+use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -222,9 +223,14 @@ class LabourBookingController extends Controller
         ]);
 
         $booking = Booking::where('id', $request->booking_id)->first();
+
+        $labour_booking_data = LabourAcceptedBooking::where('')->get();
         $booking->is_user_work_done = 1;
 
         $booking->save();
+
+
+     
 
         return response([
             "message" => "Work Done Successfully",

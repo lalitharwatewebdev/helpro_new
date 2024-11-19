@@ -228,7 +228,7 @@ class CheckoutController extends Controller
                 ->map(function ($labour) {
                     $labour->type = 'labour';
                     return $labour;
-                })->whereNotNull()->pluck("device_id")->toArray();
+                })->whereNotNull('device_id')->pluck("device_id")->toArray();
         }
 
         $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();

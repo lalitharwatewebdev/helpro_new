@@ -33,7 +33,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/logout', [LogoutController::class, 'logout'])->name('logout-admin');
 });
 
-Route::prefix("admin")->name("admin.")->middleware(['superadmin'])->group(function () {
+Route::prefix("admin")->name("admin.")->group(function () {
     Route::name('home.')->controller(DashboardController::class)->group(function () {
         Route::get('/', 'home')->name('index');
         Route::get('invoice-download', 'downloadPdf')->name('invoice-download');
@@ -301,6 +301,8 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::post('update', 'update')->name('update');
         Route::put('status', 'status')->name('status');
         Route::get("export", "export")->name("export");
+        Route::get("labour-export", "labourExport")->name("labour-export");
+
 
     });
 
