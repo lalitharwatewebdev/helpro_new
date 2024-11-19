@@ -293,10 +293,15 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::get('blocked', 'index')->name('blocked');
         Route::get('deleted', 'index')->name('deleted');
         Route::post('store', 'store')->name('store');
+        Route::post('saveExportPassword', 'saveExportPassword')->name('saveExportPassword');
+        Route::get("exportpassword", "exportpassword")->name("exportpassword");
+        Route::post('verifyPassword', 'verifyPassword')->name('verifyPassword');
         Route::get('{id}/edit', "edit")->name('edit');
         Route::delete('/{id}', 'destroy')->name('destroy');
         Route::post('update', 'update')->name('update');
         Route::put('status', 'status')->name('status');
+        Route::get("export", "export")->name("export");
+
     });
 
     // Route::name('business-settings.')
