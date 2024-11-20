@@ -149,4 +149,8 @@ class CategoryController extends Controller
             'table' => 'student-table',
         ]);
     }
+
+    public function export(){
+        return Excel::download(new UsersExport($start_date, $end_date), 'users.xlsx');
+    }
 }
