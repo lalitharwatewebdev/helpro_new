@@ -24,14 +24,14 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                    <livewire:labour-redeem-table/>
+                    <livewire:labour-redeem-table />
                 </x-card>
             </div>
         </div>
     </section>
 
 
-   
+
 @endsection
 @section('page-script')
     <script>
@@ -54,6 +54,35 @@
             // $(`${modal} #image`).val(data.image);
 
             $(modal).modal('show');
+        }
+
+        function changeStatus(mod) {
+
+            var status = $(mod).val();
+            var id = $(mod).data('id');
+
+            console.log(status);
+            console.log(id);
+
+
+            $.ajaxSetup({
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "{{ route('admin.redeem.accept-redeem') }}",
+                data: {
+                    status: status,
+                    id: id,
+
+                },
+                success: function(response) {
+                    console.log(response);
+
+                }
+            });
         }
     </script>
 @endsection

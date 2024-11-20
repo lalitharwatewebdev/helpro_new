@@ -23,7 +23,29 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                    <livewire:user-table />
+                    {{-- <form action="{{route('admin.users.export')}}" method="GET"> --}}
+                    <div class="d-flex justify-content-end align-items-center mb-1">
+                        <div class="col-md-3">
+                            <div class="form-group  text-left">
+                                <label for="month">Date </label>
+                                <input value="" type="text" class="form-control flatpickr flatpickr-input"
+                                    required="" name="month" id="month" placeholder=" Enter Date"
+                                    readonly="readonly">
+                                <div class="invalid-tooltip">Please provide a valid Month</div>
+
+
+                            </div>
+
+
+
+                        </div>
+                        <div class="col-md-3">
+                            <!--<button class="btn mb-1 btn-primary text-end" href={{ route('admin.users.export') }}>Export</a>-->
+                            <button class="btn  btn-primary text-end" onclick="exportData()">Export</a>
+                        </div>
+                    </div>
+                    {{-- </form> --}}
+                    <livewire:user-table type={{$type}} />
                 </x-card>
             </div>
         </div>
@@ -49,9 +71,19 @@
 
         </x-form>
     </x-side-modal>
+    <x-modal title="Export Password" footer="false" id="export-password">
+        <x-slot name="body">
+            <x-form successCallback="test" id="add-password" method="POST" class="" :route="route('admin.users.verifyPassword')">
+                <x-input name="password"></x-input>
+            </x-form>
+        </x-slot>
+    </x-modal>
 @endsection
 @section('page-script')
     <script>
+        function exportData() {
+            $('#export-password').modal('show');
+        }
         $(document).ready(function() {
             // $('#users-table_wrapper .dt-buttons').append(
             //     `<button type="button" data-show="add-users-modal" class="btn btn-flat-success border border-success waves-effect float-md-right">Add</button>`
@@ -66,12 +98,34 @@
             console.log(data);
             $(modal + ' #id').val(data.id);
             $(modal + ' #name').val(data.name);
-             $(modal + ' #phone').val(data.phone);
-             $(modal + ' #email').val(data.email);
+            $(modal + ' #phone').val(data.phone);
+            $(modal + ' #email').val(data.email);
             // $(modal + ' #phone').val(data.phone);
             // $(modal + ' #address').val(data.address);
             // $(modal + ' [name=gender][value=' + data.gender + ']').prop('checked', true).trigger('change');
             $(modal).modal('show');
+        }
+
+        $(".flatpickr").flatpickr({
+            mode: "range"
+        });
+
+        function test(response) {
+            console.log(response.success);
+            console.log(response.success === true);
+
+
+            if (response.success === true) {
+                console.log("inser");
+
+                var month = $('#month').val();
+                // alert("hi");
+
+
+                window.location.href = "{{ url('admin/users/export?month=') }}" + month
+                
+            }
+
         }
     </script>
 @endsection

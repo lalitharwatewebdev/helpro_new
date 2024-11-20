@@ -14,118 +14,31 @@ use App\Helpers\OTPGenerator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)    {
+    // tested and working
+    public function register(Request $request)
+    {
+     
+        $user = User::find(auth()->user()->id);
+        $user->name = $request->username;
+        $user->email = $request->email;
+        $user->gst_no = $request->gst_no;
 
-        \Log::info($request->all());
-
-        if (!empty($request->image)) {
-            $image = FileUploader::uploadFile($request->file('image'), 'images/usersimage');
+        
+        if($request->profile_pic){
+            
+        $user->profile_pic = FileUploader::uploadFile($request->profile_pic,"images/profile_pic");
         }
+        $user->gender = $request->gender;
+        $user->save();
 
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'second_name' => $request->second_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'image' => $image,
-            'address' => $request->address,
-            'gender' => $request->gender,
-            'password' => Hash::make($request->password),
-            'device_id' => $request->device_id,
-            'firebase_uid' => $request->fuid
-        ]);
-        $token = $user->createToken('myapptoken')->plainTextToken;
-
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
-        return response($response, 201);
+        return response([
+            "message" => "User Data Saved Successfully",
+            "status" => true
+            ],200);
     }
-
-    // public function OtpLogin(Request $request){
-
-    //     $request->validate([
-    //         // "phone" => "required|numeric",
-    //         // "device_id" => "required"
-    //     ]);
-
-    //     \Log::info($request->token);
-
-    //     $type = "old";
-
-    //       $auth = app('firebase.auth');
-    //     try {
-    //         $verifiedIdToken = $auth->verifyIdToken($request->token);
-    //     } catch (FailedToVerifyToken $e) {
-    //         return response()->json([
-    //             'message' => 'The token is invalid: ' . $e->getMessage(),
-    //         ], 401);
-    //     }
-    //     $uid = $verifiedIdToken->claims()->get('sub');
-    //     $firebase_user = $auth->getUser($uid);
-    //     $phone = substr($firebase_user->phoneNumber, 3);
-    //     $user = User::where('phone', $request->phone)->where("type","user")->first();
-    //     if(!empty($user)){
-    //         if($user->name == null){
-    //             $type = "new";
-
-    //         }
-    //         $token = $user->createToken("user")->plainTextToken;
-    //         $user->update([
-    //             "device_id" => $request->device_id,
-    //             "type" => "user"
-    //         ]);
-
-    //         return response([
-    //             "data" => $user,
-    //             "token" => $token,
-    //             "type" => $type,
-    //             "status" => true
-    //         ],200);
-    //     }
-    //     else{
-    //         $data = User::create([
-    //             "phone" => $request->phone,
-    //             "device_id" => $request->device_id,
-    //             "type" => "user"
-    //         ]);
-    //         $token = $data->createToken("user")->plainTextToken;
-
-    //         return response([
-    //             "data" => $data,
-    //             "token" => $token,
-    //             "type" => "new",
-    //             "status" => true
-    //         ],200);
-    //     }
-
-
-
-    // }
-
-    // public function loginOne(Request $request)
-    // {
-    //     // return $request->all();
-    //     $t = $request->validate([
-    //         'email' => 'required|email',
-    //         'password' => 'required'
-    //     ]);
-
-    //     $user = User::where('email', $request['email'])->first();
-    //     if (!$user || !Hash::check($request['password'], $user->password)) {
-    //         return response([
-    //             'message' => 'Bad Credential!'
-    //         ], 401);
-    //     }
-    //     $response = [
-    //         'user' => $user,
-    //         'token' => $user->createToken('user')->plainTextToken,
-    //     ];
-    //     return response($response, 200);
-    // }
-
-    public function generateOTP(Request $request)
+    
+    //remove comment to send otp and working
+     public function generateOTP(Request $request)
     {
         $request->validate([
             "phone" => "required"
@@ -135,7 +48,7 @@ class AuthController extends Controller
 
             return response([
                 "phone" => $request->phone,
-                "message" => "OTP send to your Mobile Number",
+                "message" => "OTP send to your Mobile Number now",
                 "status" => true
 
             ], 200);
@@ -150,8 +63,8 @@ class AuthController extends Controller
 
         $data->save();
 
-
-        $res =   OTPGenerator::sendMessage($otp, $request->phone);
+        \Log::info("Generated OTP:: ". $data->generated_otp);
+        OTPGenerator::sendMessage($otp, $request->phone);
 
         return response([
             "message" => "OTP send to your Mobile Number",
@@ -159,81 +72,73 @@ class AuthController extends Controller
         ], 200);
     }
 
-
+    //tested and working
     public function OTPLogin(Request $request)
     {
 
-       \Log::info("User Login Details:: ",$request->all());
-
+         \Log::info("User Login Details:: ",$request->all());
+         
       
         $request->validate([
             "phone" => "required",
-            "otp" => "required"
+            "otp" => "required",
+            "device_id" => "required|string"
         ]);
 
-        $type = "old";
-
         $user = User::where("phone", $request->phone)->where("type","user")->first();
+        
         $otp = OTP::where("phone", $request->phone)->latest()->first();
-        // return $otp;
-
-
-        if (!empty($user)) {
-
-            if ($otp->generated_otp == $request->otp) {
-                if ($user->name == null) {
-                    $type = 'new';
-
+        
+        if($user){
+            if($otp->generated_otp == $request->otp){
+                if($user->name != null){
                     $user->update([
                         "device_id" => $request->device_id
                     ]);
-                    $token = $user->createToken("otp_login")->plainTextToken;
-
+                    $token = $user->createToken("user-otp-login")->plainTextToken;
                     return response([
-                        "message" => "User Authenticated",
+                        "message" => "User Authenticated Successfully",
                         "token" => $token,
-                        "type" => $type,
-                        "status" => true,
-
-                    ], 200);
-                } else {
-                    $type = 'old';
-                    $token = $user->createToken("otp_login")->plainTextToken;
-
-                    $user->update([
-                        "device_id" => $request->device_id
-                    ]);
-
-                    return response([
-                        "message" => "User Authenticated",
-                        "token" => $token,
-                        "type" => $type,
-                        "status" => true,
-
-                    ], 200);
+                        "type" => "old",
+                        "status" => true
+                    ],200);
                 }
-            } else {
+                if($user->name == null){
+                 
+                    $user->update([
+                        "device_id" => $request->device_id
+                    ]);
+                    $token = $user->createToken("user-otp-login")->plainTextToken;
+                    return response([
+                        "message" => "User Authenticated Successfully",
+                        "token" => $token,
+                        "type" => "new",
+                        "status" => true
+                    ],200); 
+                }
+            }
+            else{
                 return response([
                     "message" => "Invalid OTP",
-                    "status" => false
-                ], 400);
+                    "status" => true
+                ],400);
             }
-        } 
+        }
         else{
-            $type = "new";
-            $user = User::create([
-                "device_id" => $request->device_id,
-                "phone" => $request->phone,
-            ]);
+            $user = new User();
+            $user->phone = $request->phone;
+            $user->device_id = $request->device_id;
+             $user->type = 'user';
+            $user->save();
 
-            $token = $user->createToken("user")->plainTextToken;
+            $token = $user->createToken("user-otp-login")->plainTextToken;
 
             return response([
-                "type" => $type,
                 "token" => $token,
-                "message" => "User Account Created",
-                "status" => true
-            ],200);
+                "message" => "User Authenticated",
+                "status" => true,
+                "type" => "new"
+            ]);
         }
     }
 
@@ -241,13 +146,13 @@ class AuthController extends Controller
     public function googleLogin(Request $request)
     {
         
-     
-        // return $request->all();
+        \Log::info($request->all());
+       
+        
         $t = $request->validate([
             'token' => 'required|string',
             'device_id' => 'required|string',
         ]);
-        // return $t;
         $auth = app('firebase.auth');
         try {
             $verifiedIdToken = $auth->verifyIdToken($request->token);
@@ -259,46 +164,55 @@ class AuthController extends Controller
         $uid = $verifiedIdToken->claims()->get('sub');
         $firebase_user = $auth->getUser($uid);
         $email = $firebase_user->email;
-        $user = User::where('email', $email)->first();
+        $user = User::where('email', $email)->where("type","user")->first();
 
-        $type = 'old';
-        // if (!empty($user)) {
-        //     if ($user->name != null && $user->phone != null) {
-        //         $user->update([
-        //             'device_id' => $request->device_id,
-        //             'firebase_uid' => $uid,
-        //         ]);
-        //     } else {
-        //         $type = 'new';
-        //     }
-        // } else {
-        //     $user =  User::create([
-        //         'email' => $email,
-        //         'device_id' => $request->device_id,
-        //         'firebase_uid' => $uid,
-        //     ]);
-        //     $type = 'new';
-        // }
-        $type = 'old';
+      
         if (!empty($user)) {
+            if($user->name != null){
             $user->update([
                 'device_id' => $request->device_id,
-              
             ]);
+            $token = $user->createToken("user-google-login")->plainTextToken;
+                
+            return response([
+                "message" => "User Authenticated Successfully",
+                "token" => $token,
+                "type" => "old",
+                "status" => true
+                ],200);
+            
+            }
+            else{
+               $user->update([
+                   "device_id" => $request->device_id
+                   ]);
+                   
+                $token = $user->createToken("user-google-login")->plainTextToken;
+                
+                return response([
+                    "message" => "User Authenticated",
+                    "status" => true,
+                    "type" => "new",
+                    "token" => $token
+                    ],200);
+            }
         } else {
-            $user =  User::create([
-                'email' => $email,
-                'device_id' => $request->device_id,
-              
-                "type" => "user"
-            ]);
-            $type = 'new';
+            $user = new User();
+                $user->email = $email;
+                $user->device_id = $request->device_id;
+                $user->type = "user";
+                $user->save();
+                
+                $token = $user->createToken("user-google-login")->plainTextToken;
+                
+                return response([
+                    "message" => "User Authenticated",
+                    "status" => true,
+                    "type" => "new",
+                    "token" => $token
+                    ],200);
         }
-        return response([
-            'type' => $type,
-            'user_data' => $user,
-            'token' => $user->createToken('user')->plainTextToken,
-        ]);
+       
     }
 
     public function logOut()
@@ -310,42 +224,5 @@ class AuthController extends Controller
         ], 200);
     }
 
-    // public function login(Request $request)
-    // {
-    //     // return $request->all();
-    //     $t = $request->validate([
-    //         'token' => 'required|string',
-    //         'device_id' => 'required|string',
-    //     ]);
-    //     return $t;
-    //     $auth = app('firebase.auth');
-    //     try {
-    //         $verifiedIdToken = $auth->verifyIdToken($request->token);
-    //     } catch (FailedToVerifyToken $e) {
-    //         return response()->json([
-    //             'message' => 'The token is invalid: ' . $e->getMessage(),
-    //         ], 401);
-    //     }
-    //     $uid = $verifiedIdToken->claims()->get('sub');
-    //     $firebase_user = $auth->getUser($uid);
-    //     $phone = substr($firebase_user->phoneNumber, 3);
-    //     $user = User::where('fuid', $uid)->first();
-    //     $type = 'old';
-    //     if (!empty($user)) {
-    //         $user->update([
-    //             'device_id' => $request->device_id,
-    //         ]);
-    //     } else {
-    //         $user =  User::create([
-    //             'phone' => $phone,
-    //             'device_id' => $request->device_id,
-    //             'fuid' => $uid,
-    //         ]);
-    //         $type = 'new';
-    //     }
-    //     return response([
-    //         'type' => $type,
-    //         'token' => $user->createToken('user')->plainTextToken,
-    //     ]);
-    // }
+   
 }

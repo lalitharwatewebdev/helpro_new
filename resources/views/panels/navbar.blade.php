@@ -82,12 +82,12 @@
             <a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="javascript:void(0);"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="user-nav d-sm-flex d-none">
-                    <span class="user-name font-weight-bolder">{{ auth('admin')->user()->name }}</span>
+                    <span class="user-name font-weight-bolder">{{ auth('admin')->user()->name ?? '' }}</span>
                     <span class="user-status">Admin</span>
                 </div>
                 <span class="avatar">
-                    <img class="round" src="{{ asset('images/logo/logo-new.png') }}" alt="avatar"
-                        height="40" width="40">
+                    <img class="round" src="{{ asset('images/logo/logo-new.png') }}" alt="avatar" height="40"
+                        width="40">
                     <span class="avatar-status-online"></span>
                 </span>
             </a>

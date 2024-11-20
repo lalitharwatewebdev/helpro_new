@@ -3,20 +3,22 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Checkout;
-use Illuminate\Http\Request;
-use App\Providers\RazorpayServiceProvider;
+use App\Jobs\SendNotificationJob;
 use App\Models\AcceptedBooking;
+use App\Models\Address;
 use App\Models\Areas;
 use App\Models\Booking;
-use Razorpay\Api\Api;
-use App\Models\Wallet;
-use App\Models\Address;
 use App\Models\BusinessSetting;
+use App\Models\Category;
+use App\Models\Checkout;
+use App\Models\LabourBooking;
 use App\Models\Transactions;
-use App\Jobs\SendNotificationJob;
 use App\Models\User;
+use App\Models\UserReview;
+use App\Models\Wallet;
+use App\Providers\RazorpayServiceProvider;
 use DateTime;
+use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
@@ -35,40 +37,42 @@ class CheckoutController extends Controller
 
         return $random;
     }
-    
-   public function formatTimeWithAMPM($time) {
-    $dateTime = new DateTime($time);
-    return $dateTime->format('h:i A');
-}
 
-public function formatDateWithSuffix($date) {
-    $dateTime = new DateTime($date);
-    $day = $dateTime->format('j'); // Day of the month without leading zeros
-    $month = $dateTime->format('M'); // Short month name (Jan, Feb, Mar, etc.)
-    $year = $dateTime->format('Y'); // Full year
-
-    // Determine the appropriate ordinal suffix
-    if ($day % 10 == 1 && $day != 11) {
-        $suffix = 'st';
-    } elseif ($day % 10 == 2 && $day != 12) {
-        $suffix = 'nd';
-    } elseif ($day % 10 == 3 && $day != 13) {
-        $suffix = 'rd';
-    } else {
-        $suffix = 'th';
+    public function formatTimeWithAMPM($time)
+    {
+        $dateTime = new DateTime($time);
+        return $dateTime->format('h:i A');
     }
 
-    // Handle special cases for 11th, 12th, and 13th
-    if (in_array($day, [11, 12, 13])) {
-        $suffix = 'th';
-    }
+    public function formatDateWithSuffix($date)
+    {
+        $dateTime = new DateTime($date);
+        $day = $dateTime->format('j'); // Day of the month without leading zeros
+        $month = $dateTime->format('M'); // Short month name (Jan, Feb, Mar, etc.)
+        $year = $dateTime->format('Y'); // Full year
 
-    return $day . $suffix . ' ' . $month . ' ' . $year;
-}
+        // Determine the appropriate ordinal suffix
+        if ($day % 10 == 1 && $day != 11) {
+            $suffix = 'st';
+        } elseif ($day % 10 == 2 && $day != 12) {
+            $suffix = 'nd';
+        } elseif ($day % 10 == 3 && $day != 13) {
+            $suffix = 'rd';
+        } else {
+            $suffix = 'th';
+        }
+
+        // Handle special cases for 11th, 12th, and 13th
+        if (in_array($day, [11, 12, 13])) {
+            $suffix = 'th';
+        }
+
+        return $day . $suffix . ' ' . $month . ' ' . $year;
+    }
 
     public function store(Request $request)
     {
-
+        \Log::info("Store");
 
         \Log::info($request->all());
         $is_razorpay = true;
@@ -78,13 +82,11 @@ public function formatDateWithSuffix($date) {
             "start_date" => "required",
             "end_date" => "required",
             "start_time" => "required",
-            "end_time" => "required"
+            "end_time" => "required",
         ]);
 
-
-
         $area = Areas::find($request->area_id);
-
+        $category_data = Category::find($request->category_id);
 
         $labour_arr = [];
         $diff = (strtotime($request->end_date) - strtotime($request->start_date));
@@ -105,95 +107,271 @@ public function formatDateWithSuffix($date) {
         $data->labour_quantity = $request->quantity;
         $data->alternate_number = $request->alternate_number;
         $data->note = $request->note;
+        $data->transaction_type = $request->transaction_type;
+        $data->labour_booking_id = $request->labour_booking_id;
+        $data->lat_long = $request->lat_long;
+
         $data->save();
 
-        if ($request->use_wallet == "yes") {
-            $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
+        if ($request->transaction_type == 'pre_paid') {
+            if ($request->use_wallet == "yes") {
+                $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
 
+                if ($user_wallet->amount == 0) {
 
-            if ($user_wallet->amount == 0) {
+                    $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+                    $is_razorpay = true;
+                }
 
-                $order = $this->razorpay->createOrder($amount, "INR", $data->id);
-                $is_razorpay = true;
-            }
+                if ($user_wallet->amount < $amount) {
+                    $partial_amount = $amount - $user_wallet->amount;
+                    $user_wallet->decrement("amount", $user_wallet->amount);
+                    \Log::info("partial_amount");
+                    \Log::info($partial_amount);
+                    $order = $this->razorpay->createOrder($partial_amount, "INR", $data->id);
+                    $is_razorpay = true;
+                } else {
+                    $is_razorpay = false;
+                    $user_wallet->decrement("amount", $amount);
+                }
 
-            if ($user_wallet->amount < $amount) {
-                $partial_amount = $amount - $user_wallet->amount;
-                $user_wallet->decrement("amount", $user_wallet->amount);
-                $order = $this->razorpay->createOrder($partial_amount, "INR", $data->id);
-                $is_razorpay = true;
+                Transactions::create([
+                    "user_id" => auth()->user()->id,
+                    "amount" => $amount,
+                    "remark" => "Labours Purchased",
+                    "transaction_type" => "debited",
+                ]);
             } else {
-                $is_razorpay = false;
-                $user_wallet->decrement("amount", $amount);
+                $order = $this->razorpay->createOrder($amount, "INR", $data->id);
             }
-
-            Transactions::create([
-                "user_id" => auth()->user()->id,
-                "amount" => $amount,
-                "remark" => "Labours Purchased",
-                "transaction_type" => "debited"
-            ]);
         } else {
-            $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+            $is_razorpay = false;
         }
-       
+
         $booking = new Booking();
         $booking->user_id = auth()->user()->id;
         $booking->total_amount = $amount;
         $booking->service_charges = $services_charges;
         if ($request->use_wallet == 'yes') {
             $booking->payment_status = 'captured';
+        } else {
+            $booking->payment_status = 'failed';
         }
         $booking->checkout_id = $data->id;
         $booking->quantity_required = $request->quantity;
         $booking->otp = mt_rand(111111, 999999);
+        $booking->transaction_type = $request->transaction_type;
+        $booking->labour_amount = $request->labour_amount;
+        $booking->commission_amount = $request->commission_amount;
+        $booking->total_labour_charges = $request->total_labour_charges;
+        $booking->labour_booking_id = $request->labour_booking_id;
+
+        if ($request->transaction_type == 'pre_paid') {
+            $booking->razorpay_status = "created";
+        } else {
+            $booking->razorpay_status = "pending";
+            $booking->razorpay_type = "offline";
+
+        }
+
         $booking->save();
 
+        $category_id = $data->category_id;
+        $user = User::find(auth()->user()->id);
+        // $user->update(["lat_long" => $request->lat_long]);
+        $earthRadius = 6371; // Earth radius in kilometers
+        $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+        $radius = $business_settings['radius'];
+        list($latitude, $longitude) = explode(',', $data->lat_long);
 
-        $user_name = auth()->user()->firstname . " " . auth()->user()->lastname;
+        $latFrom = deg2rad($latitude);
+        $lonFrom = deg2rad($longitude);
 
-        $labour_get_data = User::where("type", "labour")->pluck("device_id");
-        // \Log::info("labour's device_id ===>", $labour_get_data);
+        // Calculate bounding box
+        $latDelta = $radius / $earthRadius;
+        $lonDelta = $radius / ($earthRadius * cos($latFrom));
+
+        $latMin = rad2deg($latFrom - $latDelta);
+        $latMax = rad2deg($latFrom + $latDelta);
+        $lonMin = rad2deg($lonFrom - $lonDelta);
+        $lonMax = rad2deg($lonFrom + $lonDelta);
+
+        // get area first nearest to user's co-ordinate
+        $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+            ->where('category_id', $data->category_id)
+            ->whereBetween('latitude', [$latMin, $latMax])
+            ->whereBetween('longitude', [$lonMin, $lonMax])
+            ->with("category:id,title,image")->take(1)
+            ->get();
+
+        $labours = '';
+
+        if (!empty($areas)) {
+
+            \Log::info("inside area");
+            \Log::info($areas);
+            $labours = User::where('type', 'labour')
+                ->whereHas('category', function ($query) use ($category_id) {
+                    $query->where('category_id', $category_id);
+                })
+                ->get()
+                ->filter(function ($labour) use ($latitude, $longitude, $radius, $request, $data) {
+                    [$labourLatitude, $labourLongitude] = explode(',', $data->lat_long);
+                    $distance = $this->haversineGreatCircleDistance(
+                        $latitude,
+                        $longitude,
+                        $labourLatitude,
+                        $labourLongitude
+                    );
+                    return $distance <= $radius;
+                })
+                ->map(function ($labour) {
+                    $labour->type = 'labour';
+                    return $labour;
+                })->whereNotNull('device_id')->pluck("device_id")->toArray();
+        }
+
         $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
-        $title = "New Job Available";
+
+        if (!$user_address) {
+            return response([
+                "message" => "Address is required",
+                "status" => true,
+            ], 400);
+        }
+        $labour_booking_data = LabourBooking::where('id', $data->labour_booking_id)->first();
+        // \Log::info("labour's device_id ===>", $labour_get_data);
+        $user_address = Address::where("user_id", auth()->user()->id)->first();
+        $title = "New Job Available2";
         $message = "You have a new job available.";
-        $device_ids = $labour_get_data->toArray();
-        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user_name];
+        $device_ids = $labours;
+        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
 
-        $firebaseService = new SendNotificationJob();
-        $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        if ($request->transaction_type == "post_paid") {
+            $firebaseService = new SendNotificationJob();
+            $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        }
 
-
+        // \Log::info($order);
 
         return response()->json([
             "message" => "Booking created successfully",
-            "order_id" => $order['id'] ?? null,
+            "order_id" => $order->id ?? $order['id'] ?? null,
             "checkout_id" => $data->id,
             "is_razorpay" => $is_razorpay,
-            "status" => true
+            "status" => true,
         ], 200);
     }
-
 
     public function fetchOrder(Request $request)
     {
         $request->validate([
-            "order_id" => "required"
+            "order_id" => "required",
         ]);
 
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
 
         if ($fetchOrder['status'] == true) {
-            Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
-                "payment_status" => "captured",
-                "otp" => mt_rand(111111, 999999),
-            ]);
+
+            $booking_data = Booking::where('checkout_id', $fetchOrder["checkout_id"])->first();
+
+            if ($booking_data->transaction_type == "pre_paid") {
+                Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
+                    "payment_status" => "captured",
+                    "otp" => mt_rand(111111, 999999),
+                ]);
+            } else {
+                Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
+                    "payment_status" => "captured",
+                    "is_work_done" => "1",
+                    "otp" => mt_rand(111111, 999999),
+                ]);
+            }
+
+            $checkout_data = Checkout::where('id', $fetchOrder["checkout_id"])->first();
+            $labour_booking_data = LabourBooking::where('id', $checkout_data->labour_booking_id)->first();
+
+            $category_id = $checkout_data->category_id;
+            $user = User::find(auth()->user()->id);
+            // $user->update(["lat_long" => $request->lat_long]);
+            $earthRadius = 6371; // Earth radius in kilometers
+            $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+            $radius = $business_settings['radius'];
+            list($latitude, $longitude) = explode(',', $checkout_data->lat_long);
+
+            $latFrom = deg2rad($latitude);
+            $lonFrom = deg2rad($longitude);
+
+            // Calculate bounding box
+            $latDelta = $radius / $earthRadius;
+            $lonDelta = $radius / ($earthRadius * cos($latFrom));
+
+            $latMin = rad2deg($latFrom - $latDelta);
+            $latMax = rad2deg($latFrom + $latDelta);
+            $lonMin = rad2deg($lonFrom - $lonDelta);
+            $lonMax = rad2deg($lonFrom + $lonDelta);
+
+            // get area first nearest to user's co-ordinate
+            $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+                ->where('category_id', $checkout_data->category_id)
+                ->whereBetween('latitude', [$latMin, $latMax])
+                ->whereBetween('longitude', [$lonMin, $lonMax])
+                ->with("category:id,title,image")->take(1)
+                ->get();
+
+            $labours = '';
+
+            if (!empty($areas)) {
+
+                \Log::info("inside area");
+                \Log::info($areas);
+                $labours = User::where('type', 'labour')
+                    ->whereHas('category', function ($query) use ($category_id) {
+                        $query->where('category_id', $category_id);
+                    })
+                    ->get()
+                    ->filter(function ($labour) use ($latitude, $longitude, $radius, $request, $checkout_data) {
+                        [$labourLatitude, $labourLongitude] = explode(',', $checkout_data->lat_long);
+                        $distance = $this->haversineGreatCircleDistance(
+                            $latitude,
+                            $longitude,
+                            $labourLatitude,
+                            $labourLongitude
+                        );
+                        return $distance <= $radius;
+                    })
+                    ->map(function ($labour) {
+                        $labour->type = 'labour';
+                        return $labour;
+                    })->pluck("device_id")->toArray();
+            }
+
+            $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
+
+            if (!$user_address) {
+                return response([
+                    "message" => "Address is required",
+                    "status" => true,
+                ], 400);
+            }
+
+            $diff = (strtotime($checkout_data->end_date) - strtotime($checkout_data->start_date));
+            $date_result = abs(round($diff) / 86400) + 1;
+            \Log::info("labours deatils");
+            \Log::info($labours);
+            $title = "New Job Available";
+            $message = "You have a new job available.";
+            $device_ids = $labours;
+            $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking_data->id, "start_time" => $this->formatTimeWithAMPM($checkout_data->start_time), "end_time" => $this->formatTimeWithAMPM($checkout_data->end_time), "price" => $booking_data->total_amount, "start_date" => $this->formatDateWithSuffix($checkout_data->start_date), "end_date" => $this->formatDateWithSuffix($checkout_data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
+
+            $firebaseService = new SendNotificationJob();
+            $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
             return response([
-                "message" => "Booking Done Successfully"
+                "message" => "Booking Done Successfully",
             ], 200);
         } else {
             return response([
-                "message" => "Transaction Failure"
+                "message" => "Transaction Failure",
             ], 200);
         }
     }
@@ -201,12 +379,11 @@ public function formatDateWithSuffix($date) {
     public function bookingData()
     {
         // Fetch booking data with related models
-        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout.address.states:id,name', 'checkout.address.cities:id,name'])
+        $data = Booking::with(['checkout.category', 'checkout.area', 'checkout', 'checkout.address.states:id,name', 'checkout.address.cities:id,name'])
             ->where('payment_status', 'captured')
             ->where('user_id', auth()->user()->id)
             ->latest()
             ->get();
-
 
         $processedData = $data->map(function ($booking) {
             if ($booking->current_quantity > 0) {
@@ -214,32 +391,22 @@ public function formatDateWithSuffix($date) {
                 $booking->booking_status = "accepted";
             }
 
-
             $labours = AcceptedBooking::with('labour:id,name,email,phone,profile_pic,otp')
                 ->where("booking_id", $booking->id)
                 ->get();
-
-
-
-
-
 
             // $processedCategory = $labours->map(function($labours){
             //     $booking->labours->category = Category::where("id",$labours->id)->first();
             // });
 
-
-
             $booking->labours = $labours;
-
 
             return $booking;
         });
 
-
         return response([
             "data" => $data,
-            "status" => true
+            "status" => true,
         ], 200);
     }
 
@@ -251,11 +418,104 @@ public function formatDateWithSuffix($date) {
         $dLon = deg2rad($lon2 - $lon1);
 
         $a = sin($dLat / 2) * sin($dLat / 2) +
-            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-            sin($dLon / 2) * sin($dLon / 2);
+        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+        sin($dLon / 2) * sin($dLon / 2);
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return $earthRadius * $c;
+    }
+
+    public function sendReview(Request $request)
+    {
+        $request->validate([
+            "booking_id" => "required",
+            "rating" => "required",
+            "review" => "required",
+        ]);
+
+        $data = new UserReview();
+        $data->review = $request->review;
+        $data->rating = $request->rating;
+        $data->user_id = auth()->user()->id;
+        $data->booking_id = $request->booking_id;
+        $data->save();
+
+        return response([
+            "message" => "Review Added Successfully",
+            "status" => true,
+        ], 200);
+
+    }
+
+    public function postPaidPayment(Request $request)
+    {
+        $request->validate([
+            "booking_id" => "required",
+            "razorpay_type" => "required",
+            "amount" => "required",
+
+        ]);
+
+        $amount = $request->amount;
+        $booking = Booking::where('id', $request->booking_id)->first();
+
+        if ($request->razorpay_type == "online") {
+
+            if ($request->use_wallet == "yes") {
+                $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
+
+                if ($user_wallet->amount == 0) {
+
+                    $order = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
+                    $is_razorpay = true;
+                }
+
+                if ($user_wallet->amount < $amount) {
+                    $partial_amount = $amount - $user_wallet->amount;
+                    $user_wallet->decrement("amount", $user_wallet->amount);
+                    $order = $this->razorpay->createOrder($partial_amount, "INR", $booking->checkout_id);
+                    $is_razorpay = true;
+                } else {
+                    $is_razorpay = false;
+                    $user_wallet->decrement("amount", $amount);
+                    $booking->is_work_done = 1;
+                    $booking->razorpay_type = $request->razorpay_type;
+
+                    $booking->save();
+                }
+
+                Transactions::create([
+                    "user_id" => auth()->user()->id,
+                    "amount" => $amount,
+                    "remark" => "Labours Purchased",
+                    "transaction_type" => "debited",
+                ]);
+            } else {
+                $order = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
+                $is_razorpay = 1;
+            }
+
+            return response()->json([
+                "message" => "Booking created successfully",
+                "order_id" => $order['id'] ?? null,
+                "checkout_id" => $booking->checkout_id,
+                "is_razorpay" => $is_razorpay,
+                "status" => true,
+            ], 200);
+
+        } else if ($request->razorpay_type == "offline") {
+            $booking = Booking::where('id', $request->booking_id)->first();
+            $booking->razorpay_type = "offline";
+            $booking->save();
+            $is_razorpay = false;
+            return response()->json([
+                "message" => "Booking created successfully",
+                "order_id" => null,
+                "checkout_id" => $booking->checkout_id,
+                "is_razorpay" => $is_razorpay,
+                "status" => true,
+            ], 200);
+        }
     }
 }

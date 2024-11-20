@@ -1,17 +1,14 @@
 <?php
 namespace App\Http\Livewire;
 
-use Excel;
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Exports\CustomExport;
+use App\Models\User;
+use Excel;
 use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\Views\Column;
+use Illuminate\Http\Request;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
-use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
+use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
-    
-
 
 class LabourTable extends DataTableComponent
 {
@@ -39,7 +36,7 @@ class LabourTable extends DataTableComponent
             ->setDefaultSort('id', 'desc')
             ->setEmptyMessage('No Result Found')
             ->setTableAttributes([
-            'id' => 'source-table',
+                'id' => 'source-table',
             ])
             ->setBulkActions([
                 'exportSelected' => 'Export',
@@ -54,7 +51,6 @@ class LabourTable extends DataTableComponent
             ]);
     }
 
-
     public function columns(): array
     {
         return [
@@ -63,34 +59,32 @@ class LabourTable extends DataTableComponent
                     return (($this->page - 1) * $this->getPerPage()) + ($this->counter++);
                 })
 
-
                 ->html(),
 
             Column::make("Name", "name")
                 ->format(function ($value) {
                     return $value ?? "";
-                }),
-
+                })->searchable(),
 
             Column::make("Mobile No", "phone")
                 ->format(function ($value) {
                     return $value ?? "";
-                }),
+                })->searchable(),
 
             Column::make("State", "state")
                 ->format(function ($value, $row) {
                     return $row->states->name ?? "";
-                }),
+                })->searchable(),
 
             Column::make("City", "city")
                 ->format(function ($value, $row) {
                     return $row->cities->name ?? "";
-                }),
+                })->searchable(),
 
             Column::make("Rate per Day", "rate_per_day")
                 ->format(function ($value) {
                     return round($value) ?? "";
-                }),
+                })->searchable(),
 
             Column::make('profile_pic')
                 ->format(function ($row) {
@@ -101,7 +95,6 @@ class LabourTable extends DataTableComponent
                     }
                 })
                 ->html(),
-
 
             Column::make("View", "id")
                 ->format(function ($value, $row) {
@@ -123,7 +116,6 @@ class LabourTable extends DataTableComponent
                     $route = route('admin.labours.status');
                     return view('content.table-component.switch', compact('data', 'route'));
                 }),
-
 
             // Column::make('image')
             // ->format(function ($row) {
@@ -198,6 +190,8 @@ class LabourTable extends DataTableComponent
     public function exportSelected()
     {
         $modelData = new User;
+        $type = $this->type;
+        // dd($type);   
         return Excel::download(new CustomExport($this->getSelected(), $modelData), 'labours.xlsx');
     }
 }

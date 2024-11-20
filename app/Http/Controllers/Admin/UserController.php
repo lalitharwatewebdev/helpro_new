@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\DataTables\UsersDataTable;
+use App\Exports\LabourExport;
+use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Admin;
 use App\Models\Booking;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-
 
         return view("content.tables.users");
     }
@@ -35,14 +36,14 @@ class UserController extends Controller
 
         $data->name = $request->name;
         $data->email = $request->email;
-        $data->phone = $request->mobile_no;
+        $data->phone = $request->phone;
 
         $data->save();
 
         return response([
             'message' => 'user updated successfully',
             'table' => 'users-table',
-            "reload" => true
+            "reload" => true,
         ]);
     }
 
@@ -71,12 +72,63 @@ class UserController extends Controller
         ]);
     }
 
-
     public function details(Request $request)
     {
         $data = User::with("addresses")->find($request->query("id"));
         $user_booking = Booking::with('labour', "checkout")->where("user_id", $request->query("id"))->where("payment_status", "captured")->get();
         // return $user_booking;
         return view("content.tables.details-users", compact("data"));
+    }
+
+    public function export(Request $request)
+    {
+        [$start_date, $end_date] = explode(" to ", $request->month);
+        return Excel::download(new UsersExport($start_date, $end_date), 'users.xlsx');
+    }
+
+    public function labourExport(Request $request)
+    {
+        \Log::info($request->all());
+        [$start_date, $end_date] = explode(" to ", $request->month);
+        return Excel::download(new LabourExport($start_date, $end_date, $request->type), "labours.xlsx");
+    }
+
+    public function exportpassword()
+    {
+        return view("content.tables.export-password");
+    }
+
+    public function saveExportPassword(Request $request)
+    {
+
+        Admin::where('name', 'admin')->update(['export_password' => $request->new_password]);
+
+        return response([
+            'header' => 'Updated!',
+            'message' => 'Updated successfully',
+            'table' => 'users-table',
+        ]);
+
+    }
+
+    public function verifyPassword(Request $request)
+    {
+        // dd($request->all());
+
+        $is_match = Admin::where('name', 'admin')->where('export_password', $request->password)->first();
+        // dd($is_match);
+        if (!empty($is_match)) {
+
+            return response([
+                'success' => true,
+                'message' => 'Match Password',
+            ]);
+        } else {
+            return response([
+                'success' => false,
+                'message' => 'Wrong Password',
+            ]);
+        }
+
     }
 }

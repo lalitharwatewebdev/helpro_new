@@ -24,29 +24,7 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                    {{-- <form action="{{ route('admin.users.labour-export') }}" method="GET"> --}}
-                    <div class="d-flex justify-content-end align-items-center mb-1">
-                        <input type="hidden" name="type" value="{{ $type }}" />
-                        <div class="col-md-3">
-                            <div class="form-group  text-left">
-                                <label for="month">Date </label>
-                                <input value="" type="text" class="form-control flatpickr flatpickr-input"
-                                    required="" name="month" id="month" placeholder=" Enter Date"
-                                    readonly="readonly">
-                                <div class="invalid-tooltip">Please provide a valid Month</div>
-
-
-                            </div>
-
-
-
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-primary" onclick="exportData()">Export</button>
-                        </div>
-                    </div>
-                    {{-- </form> --}}
-                    <livewire:labour-table type="{{ $type }}" />
+                    <livewire:user-booking-table type="{{ $type }}" />
                 </x-card>
             </div>
         </div>
@@ -79,24 +57,42 @@
 
         </x-form>
     </x-side-modal>
-    <x-modal title="Export Password" footer="false" id="export-password">
-        <x-slot name="body">
-            <x-form successCallback="test" id="add-password" method="POST" class="" :route="route('admin.users.verifyPassword')">
-                <x-input name="password"></x-input>
-            </x-form>
-        </x-slot>
-    </x-modal>
 @endsection
 @section('page-script')
     <script>
-        function exportData() {
-            $('#export-password').modal('show');
-        }
         $(document).ready(function() {
             $(document).on('click', '[data-show]', function() {
                 const modal = $(this).data('show');
                 // $(`#${modal}`).modal('show');
                 window.location.href = "{{ route('admin.labours.add') }}"
+            });
+
+            $(document).on('change', '#booking_status', function() {
+                var status = $(this).val();
+                var id = $(this).data('id');
+
+                console.log("status");
+                console.log(status);
+                console.log(id);
+                $.ajaxSetup({
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                    }
+                });
+
+
+                $.ajax({
+                    type: 'post',
+                    url: "{{ route('admin.userbookings.changeStatus') }}",
+                    data: {
+                        status: status,
+                        id: id,
+
+                    },
+                    success: function(response) {
+                        window.location.href = "{{ route('admin.userbookings.pending') }}"
+                    }
+                });
             });
         });
 
@@ -111,26 +107,6 @@
             // $(`${modal} #image`).val(data.image);
 
             $(modal).modal('show');
-        }
-
-        $(".flatpickr").flatpickr({
-            mode: "range"
-        });
-
-
-        function test(response) {
-
-
-            if (response.success === true) {
-
-                var month = $('#month').val();
-                // alert("hi");
-
-
-                window.location.href = "{{ url('admin/users/labour-export?month=') }}" + month
-
-            }
-
         }
     </script>
 @endsection

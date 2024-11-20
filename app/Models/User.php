@@ -16,8 +16,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $guarded = [];
 
-
-
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -72,7 +70,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function category()
     {
-        return $this->belongsToMany(Category::class,"category_user","user_id");
+        return $this->belongsToMany(Category::class, "category_user", "user_id");
+    }
+
+    public function categorys()
+    {
+        return $this->hasMany(Category::class, "id");
     }
 
     public function labourAttach()
@@ -85,22 +88,21 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Address::class, "user_id");
     }
 
-    public function tickets(){
+    public function tickets()
+    {
         return $this->hasMany(Ticket::class);
     }
 
-
     // labour booking relationship
-    public function labourBooking(){
+    public function labourBooking()
+    {
         return $this->hasMany(LabourBooking::class);
     }
 
     // labour accepted Booking
-    public function labourAcceptedBooking(){
+    public function labourAcceptedBooking()
+    {
         return $this->hasMany(LabourAcceptedBooking::class);
     }
-
-
-
 
 }

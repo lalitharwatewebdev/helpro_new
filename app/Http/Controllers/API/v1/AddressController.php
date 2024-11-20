@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Address;
+use Illuminate\Http\Request;
 
 class AddressController extends Controller
 {
@@ -13,7 +13,7 @@ class AddressController extends Controller
         $id = auth()->user()->id;
 
         if ($request->update == 'yes') {
-            $address_id  = $request->id;
+            $address_id = $request->id;
 
             if ($request->isPrimary == "yes") {
                 Address::where("user_id", auth()->user()->id)->update(['is_primary' => "no"]);
@@ -25,16 +25,16 @@ class AddressController extends Controller
             $data->state_id = $request->state_id;
             $data->city_id = $request->city_id;
             $data->is_primary = $request->isPrimary;
+            $data->latitude = $request->latitude;
+            $data->longitude = $request->longitude;
 
             $data->save();
 
             return response([
                 "message" => "Address Updated Successfully",
-                "status" => true
+                "status" => true,
             ], 200);
         } else {
-
-
 
             if ($request->isPrimary == "yes") {
                 Address::where("user_id", auth()->user()->id)->update(['is_primary' => "no"]);
@@ -46,12 +46,14 @@ class AddressController extends Controller
             $data->state_id = $request->state_id;
             $data->city_id = $request->city_id;
             $data->is_primary = $request->isPrimary;
+            $data->latitude = $request->latitude;
+            $data->longitude = $request->longitude;
 
             $data->save();
 
             return response([
                 "message" => "Address Added Successfully",
-                "status" => true
+                "status" => true,
             ], 200);
         }
     }
@@ -59,27 +61,23 @@ class AddressController extends Controller
     public function setAddressPrimary(Request $request)
     {
         $user_address = Address::where("user_id", auth()->user()->id)->update([
-            "is_primary" => "no"
+            "is_primary" => "no",
         ]);
-
-
-
 
         $set_primary = Address::where("user_id", auth()->user()->id)
             ->where("id", $request->id)->first();
 
         $set_primary->update([
-            "is_primary" => "yes"
+            "is_primary" => "yes",
         ]);
 
         $set_primary->save();
 
         return response([
             "message" => "Address set as primary",
-            "status" => true
+            "status" => true,
         ], 200);
     }
-
 
     public function edit(Request $request)
     {
@@ -101,7 +99,7 @@ class AddressController extends Controller
 
         return response([
             "message" => "Address Deleted Successfully",
-            "status" => true
+            "status" => true,
         ], 200);
     }
 
@@ -109,11 +107,9 @@ class AddressController extends Controller
     {
         $data = Address::with(['states:id,name', "cities:id,name"])->where("user_id", auth()->user()->id)->latest()->get();
 
-
-
         return response([
             "data" => $data,
-            "status" => true
+            "status" => true,
         ], 200);
     }
 
@@ -126,7 +122,7 @@ class AddressController extends Controller
 
         return response([
             "data" => $user_address,
-            "status" => true
+            "status" => true,
         ], 200);
     }
 }

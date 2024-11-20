@@ -1,16 +1,13 @@
 <?php
 namespace App\Http\Livewire;
 
+use App\Exports\CustomExport;
 use App\Models\Booking;
-use App\Models\Category;
+use Excel;
 use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Excel;
-use App\Exports\CustomExport;
-use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
-
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class UserBookingTable extends DataTableComponent
 {
@@ -18,9 +15,12 @@ class UserBookingTable extends DataTableComponent
     protected $model = Booking::class;
     public $counter = 1;
     public $user_id;
-    public function mount($user_id)
+    public $type;
+    public function mount($type)
     {
-        $this->user_id = $user_id;
+        // $this->user_id = $user_id;
+        $this->type = $type;
+
         $this->dispatchBrowserEvent('table-refreshed');
     }
 
@@ -63,14 +63,30 @@ class UserBookingTable extends DataTableComponent
                     return (($this->page - 1) * $this->getPerPage()) + ($this->counter++);
                 })
                 ->html(),
-
-            Column::make("Labour Name", 'labour_id')
+            Column::make('Status')
+                ->label(function ($row, Column $column) {
+                    return "<select class='form-control' data-id='" . $row->id . "' name='booking_status' id='booking_status'>
+                    <option value=''>Select Status</option>
+                    <option value='accepted'>Accepted</option>
+                    <option value='rejected'>Rejected</option>
+                    </select>";
+                })->html(),
+            // Column::make("Labour Name", 'labour_id')
+            //     ->format(function ($value, $row, Column $column) {
+            //         return $row->labour->name ?? "";
+            //     })
+            //     ->html(),
+            Column::make("User", 'user_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->labour->name;
+                    return $row->user->name ?? "";
                 })
                 ->html(),
-
             Column::make("Total Amount", 'total_amount')
+                ->format(function ($value, $row, Column $column) {
+                    return $value;
+                })
+                ->html(),
+            Column::make("Quantity", 'quantity_required')
                 ->format(function ($value, $row, Column $column) {
                     return $value;
                 })
@@ -96,35 +112,34 @@ class UserBookingTable extends DataTableComponent
 
             Column::make("End Time", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->end_time ??  "";
+                    return $row->checkout->end_time ?? "";
                 })
                 ->html(),
 
-                Column::make("Address", 'checkout_id')
+            Column::make("Address", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->address->address ??  "";
+                    return $row->checkout->address->address ?? "";
                 })
                 ->html(),
 
-                Column::make("State", 'checkout_id')
+            Column::make("State", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->address->states->name ??  "";
+                    return $row->checkout->address->states->name ?? "";
                 })
                 ->html(),
 
-                Column::make("City", 'checkout_id')
+            Column::make("City", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->address->cities->name ??  "";
+                    return $row->checkout->address->cities->name ?? "";
                 })
                 ->html(),
 
-                Column::make("Notes", 'checkout_id')
+            Column::make("Notes", 'checkout_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->checkout->note ??  "";
+                    return $row->checkout->note ?? "";
                 })
                 ->html(),
 
-          
         ];
     }
 
@@ -147,7 +162,8 @@ class UserBookingTable extends DataTableComponent
     public function builder(): Builder
     {
         $modal = Booking::query();
-        $modal->with("checkout:", "labour");
+        $modal->with("checkout", "labour");
+        $modal->where("booking_status", $this->type);
         return $modal;
     }
 
