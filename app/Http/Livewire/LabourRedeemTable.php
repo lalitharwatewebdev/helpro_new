@@ -61,7 +61,7 @@ class LabourRedeemTable extends DataTableComponent
 
             Column::make('Name', 'labour_id')
                 ->format(function ($value, $row, Column $column) {
-                    return $row->labour->name;
+                    return $row->labour->name ?? '';
                 })
                 ->html(),
 
@@ -141,6 +141,15 @@ class LabourRedeemTable extends DataTableComponent
                 ->filter(function (Builder $builder, string $value) {
                     $builder->where('status', $value);
                 }),
+            // SelectFilter::make('Status')
+            //     ->options([
+            //         '' => 'All',
+            //         'active' => 'Active',
+            //         'blocked' => 'Blocked',
+            //     ])
+            //     ->filter(function (Builder $builder, string $value) {
+            //         $builder->where('status', $value);
+            //     }),
 
             // TextFilter::make('Name')
             //     ->config([
@@ -155,7 +164,12 @@ class LabourRedeemTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        $modal = LabourRedeem::query()->where("payment_status", "pending");
+        if (!empty(Request()->payment_status)) {
+            $modal = LabourRedeem::query()->where("payment_status", Request()->payment_status);
+        } else {
+            $modal = LabourRedeem::query()->where("payment_status", "pending");
+        }
+
         $modal->with("labour");
         return $modal;
     }

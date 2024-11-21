@@ -95,6 +95,32 @@
       ]
     },
     {
+      "name": "Labour Reedem Management",
+      "icon": "<i data-feather='user'></i>",
+      "isAdmin": true,
+      "slug": "",
+      "submenu": [
+        {
+          "url": "admin/redeem/pending?payment_status=pending",
+          "name": "Pending Labour Reedem",
+          "icon": "eye",
+          "slug": "admin.redeem.pending"
+        },
+        {
+          "url": "admin/redeem/accepted?payment_status=accepted",
+          "name": "Accepted Labour Reedem",
+          "icon": "circle",
+          "slug": "admin.redeem.accepted"
+        },
+        {
+          "url": "admin/redeem/rejected?payment_status=rejected",
+          "name": "Rejected Labour Reedem",
+          "icon": "circle",
+          "slug": "admin.redeem.rejected"
+        }
+      ]
+    },
+    {
       "url": "admin/areas",
       "name": "Area Service Management",
       "icon": "<i data-feather='user'></i>",
@@ -113,13 +139,6 @@
       "name": "Transaction Management",
       "icon": "<i data-feather='user'></i>",
       "slug": "admin.transactions.index",
-      "isAdmin": false
-    },
-    {
-      "url": "admin/redeem",
-      "name": "Labour Redeem Management",
-      "icon": "<i data-feather='user'></i>",
-      "slug": "admin.redeems.index",
       "isAdmin": false
     },
     {

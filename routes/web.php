@@ -244,6 +244,9 @@ Route::prefix("admin")->name("admin.")->group(function () {
         Route::get("add-services", "addAreas")->name("add-areas");
         Route::get("details", "details")->name("details");
         Route::get('blocked', 'index')->name('blocked');
+        Route::get('pending', 'index')->name('pending');
+        Route::get('accepted', 'index')->name('accepted');
+        Route::get('rejected', 'index')->name('rejected');
         Route::get('deleted', 'index')->name('deleted');
         Route::post('store', 'store')->name('store');
         Route::get('{id}/edit', "edit")->name('edit');
@@ -303,7 +306,6 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::put('status', 'status')->name('status');
         Route::get("export", "export")->name("export");
         Route::get("labour-export", "labourExport")->name("labour-export");
-
 
     });
 
