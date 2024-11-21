@@ -67,7 +67,7 @@
 @endsection
 @section('page-script')
     <script>
-         function exportData() {
+        function exportData() {
             $('#export-password').modal('show');
         }
         $(document).ready(function() {
@@ -76,7 +76,7 @@
                 $(`#${modal}`).modal('show');
             });
         });
-        
+
         function test(response) {
             console.log(response.success);
             console.log(response.success === true);
@@ -89,8 +89,8 @@
                 // alert("hi");
 
 
-                window.location.href = "{{ url('admin/users/export?month=') }}" + month
-                
+                window.location.href = "{{ url('admin/category/export') }}";
+
             }
 
         }

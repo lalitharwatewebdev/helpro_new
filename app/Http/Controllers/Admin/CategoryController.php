@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\CategoryExport;
 use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use Excel;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -107,7 +109,6 @@ class CategoryController extends Controller
         $data->percentage_for_less_than = $request->percentage_for_less_than;
         $data->percentage_for_more_than = $request->percentage_for_more_than;
 
-
         if ($request->hasFile("image")) {
             $data->image = FileUploader::uploadFile($request->file("image"), "images/category_images");
         }
@@ -150,7 +151,8 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function export(){
-        return Excel::download(new UsersExport($start_date, $end_date), 'users.xlsx');
+    public function export()
+    {
+        return Excel::download(new CategoryExport, 'categorys.xlsx');
     }
 }
