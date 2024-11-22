@@ -501,6 +501,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         ->prefix('redeem')
         ->controller(LabourRedeemController::class)->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get("export", "export")->name("export");
         Route::post("accept-redeem", 'acceptLabourRedeem')->name("accept-redeem");
         Route::get("add-services", "addAreas")->name("add-areas");
         Route::get("details", "details")->name("details");

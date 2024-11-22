@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\LabourRedeemExport;
 use App\Http\Controllers\Controller;
 use App\Models\LabourRedeem;
 use App\Models\Wallet;
+use Excel;
 use Illuminate\Http\Request;
 
 class LabourRedeemController extends Controller
@@ -37,5 +39,11 @@ class LabourRedeemController extends Controller
             "message" => "Status Updated Successfully",
             "reload" => true,
         ], 200);
+    }
+
+    public function export(Request $request)
+    {
+        $type = $request->type ?? '';
+        return Excel::download(new LabourRedeemExport($type), 'labourredeem.xlsx');
     }
 }
