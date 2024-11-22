@@ -20,6 +20,10 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
+                    <div class="col-md-3 mb-2">
+                        <!--<button class="btn mb-1 btn-primary text-end" href={{ route('admin.users.export') }}>Export</a>-->
+                        <button class="btn  btn-primary text-end" onclick="exportData()">Export</a>
+                    </div>
                     <livewire:transactions-table />
                 </x-card>
             </div>
@@ -47,6 +51,13 @@
 
         </x-form>
     </x-side-modal>
+    <x-modal title="Export Password" footer="false" id="export-password">
+        <x-slot name="body">
+            <x-form successCallback="test" id="add-password" method="POST" class="" :route="route('admin.users.verifyPassword')">
+                <x-input name="password"></x-input>
+            </x-form>
+        </x-slot>
+    </x-modal>
 @endsection
 @section('page-script')
     <script>
@@ -61,6 +72,17 @@
         // $(document).on('click', function(){
         //     $('.drop-menuToggle').removeClass('active');
         // })
+
+        function exportData() {
+            $('#export-password').modal('show');
+        }
+
+        function test(response) {
+            if (response.success === true) {
+                window.location.href = "{{ url('admin/transactions/export') }}";
+            }
+
+        }
 
         function setValue(data, modal) {
             $(`${modal} #id`).val(data.id);

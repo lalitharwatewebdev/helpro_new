@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\TransactionExport;
 use App\Http\Controllers\Controller;
+use Excel;
 
 class TransactionController extends Controller
 {
@@ -13,7 +15,7 @@ class TransactionController extends Controller
 
     public function export()
     {
-        return Excel::download(new AreaExport, 'areaexport.xlsx');
+        return Excel::download(new TransactionExport, 'transactionexport.xlsx');
 
     }
 }
