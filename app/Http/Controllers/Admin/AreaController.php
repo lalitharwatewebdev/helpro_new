@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\AreaExport;
 use App\Http\Controllers\Controller;
 use App\Models\Areas;
 use App\Models\Category;
+use Excel;
 use Illuminate\Http\Request;
 
 class AreaController extends Controller
@@ -28,7 +30,7 @@ class AreaController extends Controller
             'category' => 'required',
             "radius" => "required",
             "area_name" => "required",
-            "price" => "required|numeric"
+            "price" => "required|numeric",
         ]);
 
         $data = new Areas();
@@ -51,7 +53,7 @@ class AreaController extends Controller
 
         return response([
             "message" => "Area Deleted Successfully",
-            "reload" => true
+            "reload" => true,
         ]);
     }
 
@@ -60,5 +62,11 @@ class AreaController extends Controller
         $data = Areas::find($id);
         // dd($data);
         return view("content.tables.edit-area-service", compact("data"));
+    }
+
+    public function export()
+    {
+        return Excel::download(new AreaExport, 'areaexport.xlsx');
+
     }
 }

@@ -152,6 +152,7 @@ Route::prefix("admin")->name("admin.")->group(function () {
     Route::name('transactions.')
         ->prefix('transactions')
         ->controller(TransactionController::class)->group(function () {
+        Route::get("export", "export")->name("export");
         Route::get("/", "index")->name("index");
         Route::get("add", "create")->name("add");
         Route::get('destroy', 'destroy')->name('destroy');
@@ -225,6 +226,7 @@ Route::prefix("admin")->name("admin.")->group(function () {
         ->prefix('areas')
         ->controller(AreaController::class)->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get("export", "export")->name("export");
         Route::get("add-services", "addAreas")->name("add-areas");
         Route::get("details", "details")->name("details");
         Route::get('blocked', 'index')->name('blocked');
