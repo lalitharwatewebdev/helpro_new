@@ -131,7 +131,7 @@ Route::prefix("admin")->name("admin.")->group(function () {
     Route::name('userbookings.')
         ->prefix('userbookings')
         ->controller(UserBookingController::class)->group(function () {
-
+        Route::get("export", "export")->name("export");
         Route::get('pending', 'index')->name('pending');
         Route::get("accepted", "index")->name("accepted");
         Route::get("rejected", "index")->name("rejected");

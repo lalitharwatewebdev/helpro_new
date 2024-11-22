@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\UserBookingExport;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\User;
+use Excel;
 use Illuminate\Http\Request;
 
 class UserBookingController extends Controller
@@ -103,5 +105,11 @@ class UserBookingController extends Controller
             'table' => 'labour-table',
         ]);
 
+    }
+
+    public function export(Request $request)
+    {
+        $type = $request->type ?? '';
+        return Excel::download(new UserBookingExport($type), 'userbookings.xlsx');
     }
 }
