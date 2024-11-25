@@ -81,7 +81,7 @@
                 // $(`#${modal}`).modal('show');
                 window.location.href = "{{ route('admin.labours.add') }}"
             });
-
+         
             $(document).on('change', '#booking_status', function() {
                 var status = $(this).val();
                 var id = $(this).data('id');

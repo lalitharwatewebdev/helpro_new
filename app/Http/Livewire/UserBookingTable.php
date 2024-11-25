@@ -84,9 +84,9 @@ class UserBookingTable extends DataTableComponent
             Column::make('Labour Accepted Count')
                 ->label(function ($row, Column $column) {
                     $labour_accepted_booking = LabourAcceptedBooking::where('booking_id', $row->labour_booking_id)->count();
-
-                    return $labour_accepted_booking;
-                }),
+                    $edit_route = route('admin.userbookings.labourlist', ['labour_booking_id' => $row->labour_booking_id]);
+                    return '<a class="btn btn-primary" id="accepted_labour_list"  href=' . $edit_route . '>' . $labour_accepted_booking . '</a>';
+                })->html(),
             Column::make("User", 'user_id')
                 ->format(function ($value, $row, Column $column) {
                     return $row->user->name ?? "";

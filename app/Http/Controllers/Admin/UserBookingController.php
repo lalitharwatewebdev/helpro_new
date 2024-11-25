@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\UserBookingExport;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Labour;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\User;
@@ -134,5 +135,12 @@ class UserBookingController extends Controller
     {
         $type = $request->type ?? '';
         return Excel::download(new UserBookingExport($type), 'userbookings.xlsx');
+    }
+
+    public function labourlist(Request $request)
+    {
+        $labour_accepted = LabourAcceptedBooking::where('booking_id', $request->labour_booking_id)->pluck('labour_id');
+        $labour_data = User::whereIn('id', $labour_accepted)->get();
+        return view('content.tables.labourlist', compact("labour_data"));
     }
 }

@@ -404,6 +404,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::get('blocked', 'index')->name('blocked');
         Route::get("add", "create")->name("add");
         Route::get('destroy', 'destroy')->name('destroy');
+        Route::get('labourlist', 'labourlist')->name('labourlist');
         Route::post('store', 'store')->name('store');
         Route::get('{id}/edit', "edit")->name('edit');
         Route::delete('/{id}', 'destroy')->name('destroy');
