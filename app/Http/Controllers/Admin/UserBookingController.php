@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\UserBookingExport;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\LabourAcceptedBooking;
+use App\Models\LabourBooking;
 use App\Models\User;
+use App\Models\Wallet;
 use Excel;
 use Illuminate\Http\Request;
 
@@ -97,6 +100,26 @@ class UserBookingController extends Controller
     {
 
         $booking = Booking::where('id', $request->id)->first();
+
+        $labour_booking = LabourBooking::where('id', $booking->labour_booking_id)->first();
+        $accepted_labour_count = LabourAcceptedBooking::where('booking_id', $booking->labour_booking_id)->count();
+        $remaining_labour = (int) $labour_booking->labour_quantity - ((int) $accepted_labour_count ?? 0);
+
+        if ($remaining_labour > 0) {
+            $is_user_wallet_exist = Wallet::where('user_id', $booking->user_id)->first();
+            $amount_return = $remaining_labour * $labour_booking->labour_amount;
+            if (!empty($is_user_wallet_exist)) {
+                $total_wallet_amount = ((float) $is_user_wallet_exist->amount ?? 0) + $amount_return;
+                $is_user_wallet_exist->amount = $total_wallet_amount;
+                $is_user_wallet_exist->save();
+            } else {
+                $wallet = new Wallet();
+                $wallet->user_id = $booking->user_id;
+                $wallet->amount = $amount_return;
+                $wallet->save();
+            }
+        }
+
         $booking->booking_status = $request->status;
         $booking->save();
 

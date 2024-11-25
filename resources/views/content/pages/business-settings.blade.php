@@ -72,6 +72,17 @@
                 </div>
             </div>
 
+
+            <div class="col-md-4 my-auto">
+                <div class="custom-control custom-control-success custom-switch">
+                    <input value="0" type="hidden" name="ios_production">
+                    <input value="1" name="ios_production" type="checkbox"
+                        @if ($data['ios_production'] ?? '' == 1) checked @endif class="custom-control-input"
+                        id="switch-ios-production">
+                    <label class="custom-control-label" for="switch-ios-production">IOS Production</label>
+                </div>
+            </div>
+
             <div class="col-md-4">
                 <x-input value="{{ $data['ios_app_download'] ?? '' }}" name="ios_app_download"
                     label="IOS App Download Link" />
