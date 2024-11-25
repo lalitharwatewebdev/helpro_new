@@ -187,6 +187,8 @@ class UserController extends Controller
         $booking->booking_status = "cancelled";
         $booking->save();
 
+        $labour_accepted_booking = LabourAcceptedBooking::where('booking_id', $booking->labour_booking_id)->update(['status' => 'blocked']);
+
         return response([
             "success" => true,
             "message" => "Cancel Booking Successfully",

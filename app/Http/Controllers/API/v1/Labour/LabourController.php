@@ -175,7 +175,7 @@ class LabourController extends Controller
         $bookings = BookingRequest::with("checkout", "checkout.user:id,name", "checkout.address.states:id,name", "checkout.address.cities:id,name", "checkout.area")->where("user_id", auth()->user()->id)
             ->where("category_id", $category_id)->first();
 
-        $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->where('current_status', '!=', '2')->first();
+        $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->where('current_status', '!=', '2')->where('status', 'active')->first();
 
         if (!empty($bookings)) {
 
@@ -204,11 +204,16 @@ class LabourController extends Controller
 
         // getting total amount of money from wallet
         $total_wallet_amount = Wallet::where("user_id", auth()->user()->id)->first();
-        \Log::info("Wallet ::->" . $total_wallet_amount->amount??0);
+        // \Log::info("Wallet ::->" . $total_wallet_amount->amount??0);
+        if (!empty($total_wallet_amount)) {
+            $wallet_amount = $total_wallet_amount->amount ?? 0;
+        } else {
+            $wallet_amount = 0;
+        }
 
         return response([
             "bookings" => $bookings ?? [],
-            "total_wallet_amount" => $total_wallet_amount->amount ?? 0,
+            "total_wallet_amount" => $wallet_amount ?? 0,
             "total_booking_accepted" => $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,
             'razorpay_status' => $razorpay_type ?? '',
@@ -403,7 +408,7 @@ class LabourController extends Controller
             // and check if quantity required and current are same
             if ($check_booking->quantity_required == $check_booking->current_quantity) {
                 // BookingRequest::where("booking_id", $booking_id)->delete();
-                
+
                 BookingRequest::where("user_id", auth()->user()->id)->where("booking_id", $booking_id)->delete();
             }
 
