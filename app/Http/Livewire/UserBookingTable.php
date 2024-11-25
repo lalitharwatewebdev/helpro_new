@@ -3,6 +3,7 @@ namespace App\Http\Livewire;
 
 use App\Exports\CustomExport;
 use App\Models\Booking;
+use App\Models\LabourAcceptedBooking;
 use Excel;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
@@ -71,11 +72,21 @@ class UserBookingTable extends DataTableComponent
                     <option value='rejected'>Rejected</option>
                     </select>";
                 })->html(),
+            Column::make("labour_booking_id")
+                ->collapseOnTablet()
+                ->searchable()
+                ->sortable(),
             // Column::make("Labour Name", 'labour_id')
             //     ->format(function ($value, $row, Column $column) {
             //         return $row->labour->name ?? "";
             //     })
             //     ->html(),
+            Column::make('Labour Accepted Count')
+                ->label(function ($row, Column $column) {
+                    $labour_accepted_booking = LabourAcceptedBooking::where('booking_id', $row->labour_booking_id)->count();
+
+                    return $labour_accepted_booking;
+                }),
             Column::make("User", 'user_id')
                 ->format(function ($value, $row, Column $column) {
                     return $row->user->name ?? "";
