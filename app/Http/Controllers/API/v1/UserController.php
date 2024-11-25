@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\City;
+use App\Models\LabourAcceptedBooking;
 use App\Models\ReferralMaster;
 use App\Models\State;
 use App\Models\Transactions;
@@ -184,5 +185,24 @@ class UserController extends Controller
 
         $booking->booking_status = "cancelled";
         $booking->save();
+
+        return response([
+            "success" => true,
+            "message" => "Cancel Booking Successfully",
+        ], 200);
+    }
+
+    public function getAcceptedLabourDetails(Request $request)
+    {
+        $booking_data = Booking::where('id', $request->booking_id)->first();
+
+        $labour_booking_data = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->pluck('labour_id');
+
+        $labour_data = User::whereIn('id', $labour_booking_data)->get();
+
+        return response([
+            "success" => true,
+            "data" => $labour_data,
+        ], 200);
     }
 }
