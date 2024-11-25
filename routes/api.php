@@ -71,7 +71,7 @@ Route::prefix('v1')->group(function () {
             Route::get("/", "profile");
             Route::post("logout", "logOut");
             Route::post("cancel-booking", "cancelBooking");
-            Route::post("add-labour-feeback", "addLabourFeeback");
+            Route::post("add-labour-feedback", "addLabourFeedback");
             Route::post("get-accepted-labour-details", "getAcceptedLabourDetails");
 
         });
