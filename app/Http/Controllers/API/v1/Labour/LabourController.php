@@ -403,6 +403,7 @@ class LabourController extends Controller
             // and check if quantity required and current are same
             if ($check_booking->quantity_required == $check_booking->current_quantity) {
                 // BookingRequest::where("booking_id", $booking_id)->delete();
+                
                 BookingRequest::where("user_id", auth()->user()->id)->where("booking_id", $booking_id)->delete();
             }
 

@@ -34,7 +34,10 @@ class LabourAcceptBookingController extends Controller
                 // ->where("labour_id",auth()->user()->id)->first();
 
                 $booking_count = LabourAcceptedBooking::where("booking_id", $labour_booking_code->id)->count();
-
+                \Log::info("booking_countttttttttttttttttttttt");
+                \Log::info($booking_count);
+                \Log::info($labour_booking_code->labour_quantity);
+              
                 if ($labour_booking_code->labour_quantity == $booking_count) {
                     $bookings = Booking::where('labour_booking_id', $booking_id->labour_booking_id)->first();
                     $bookings->booking_status = "accepted";
