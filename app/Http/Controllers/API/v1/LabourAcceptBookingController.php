@@ -32,23 +32,23 @@ class LabourAcceptBookingController extends Controller
 
                 // $labourAccept = LabourAcceptedBooking::where("booking_id",$labour_booking_code->id)
                 // ->where("labour_id",auth()->user()->id)->first();
-
                 $booking_count = LabourAcceptedBooking::where("booking_id", $labour_booking_code->id)->count();
-                \Log::info("booking_countttttttttttttttttttttt");
-                \Log::info($booking_count);
-                \Log::info($labour_booking_code->labour_quantity);
-              
-                if ($labour_booking_code->labour_quantity == $booking_count) {
-                    $bookings = Booking::where('labour_booking_id', $booking_id->labour_booking_id)->first();
-                    $bookings->booking_status = "accepted";
-                    $bookings->save();
-                }
 
                 if ($labour_booking_code->labour_quantity != $booking_count) {
                     $labourAccept = new LabourAcceptedBooking();
                     $labourAccept->labour_id = auth()->user()->id;
                     $labourAccept->booking_id = $labour_booking_code->id;
                     $labourAccept->save();
+
+                    $booking_countsss = LabourAcceptedBooking::where("booking_id", $labour_booking_code->id)->count();
+                    \Log::info("booking_countttttttttttttttttttttt");
+                    \Log::info($booking_countsss);
+                    \Log::info($labour_booking_code->labour_quantity);
+                    if ($labour_booking_code->labour_quantity == $booking_countsss) {
+                        $bookings = Booking::where('labour_booking_id', $booking_id->labour_booking_id)->first();
+                        $bookings->booking_status = "accepted";
+                        $bookings->save();
+                    }
 
                     return response([
                         "message" => "Booking Accepted Successfully",
