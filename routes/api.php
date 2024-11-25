@@ -70,6 +70,8 @@ Route::prefix('v1')->group(function () {
             Route::post("sign-up", "store");
             Route::get("/", "profile");
             Route::post("logout", "logOut");
+            Route::post("cancel-booking", "cancelBooking");
+
         });
 
         Route::controller(PromoCodeController::class)->prefix("promo-code")->group(function () {

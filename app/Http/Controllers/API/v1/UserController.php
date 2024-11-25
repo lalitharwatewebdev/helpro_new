@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\City;
 use App\Models\ReferralMaster;
@@ -162,5 +163,26 @@ class UserController extends Controller
             "status" => true,
         ], 200);
 
+    }
+
+    public function cancelBooking(Request $request)
+    {
+        $booking = Booking::where('id', $request->booking_id)->first();
+
+        $is_wallet_exist = Wallet::where('user_id', $booking->user_id)->first();
+
+        if (!empty($is_wallet_exist)) {
+            $total = $is_wallet_exist->amount + $booking->total_amount;
+            $is_wallet_exist->amount = $total;
+            $is_wallet_exist->save();
+        } else {
+            $wallet = new Wallet();
+            $wallet->user_id = $booking->user_id;
+            $wallet->amount = $booking->total_amount;
+            $wallet->save();
+        }
+
+        $booking->booking_status = "cancelled";
+        $booking->save();
     }
 }
