@@ -23,7 +23,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-       
+
         $user_referral = '';
         $data = User::where("id", auth()->user()->id)->first();
 
@@ -139,6 +139,7 @@ class UserController extends Controller
 
         return response([
             "data" => $data,
+            "user_wallet" => $user_wallet,
             "status" => true,
         ], 200);
     }
