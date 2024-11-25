@@ -41,6 +41,10 @@ class LabourAcceptBookingController extends Controller
                     $labourAccept->booking_id = $labour_booking_code->id;
                     $labourAccept->save();
 
+                    $bookings = Booking::where('labour_booking_id', $booking_id->labour_booking_id)->first();
+                    $bookings->booking_status = "accepted";
+                    $bookings->save();
+
                     return response([
                         "message" => "Booking Accepted Successfully",
                         "status" => true,
