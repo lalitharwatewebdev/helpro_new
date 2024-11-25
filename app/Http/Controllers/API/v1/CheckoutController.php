@@ -121,6 +121,8 @@ class CheckoutController extends Controller
 
                     $order = $this->razorpay->createOrder($amount, "INR", $data->id);
                     $is_razorpay = true;
+                    $wallet_use = false;
+
                 }
 
                 if ($user_wallet->amount < $amount) {
@@ -130,8 +132,11 @@ class CheckoutController extends Controller
                     \Log::info($partial_amount);
                     $order = $this->razorpay->createOrder($partial_amount, "INR", $data->id);
                     $is_razorpay = true;
+                    $wallet_use = false;
                 } else {
                     $is_razorpay = false;
+                    $wallet_use = true;
+
                     $user_wallet->decrement("amount", $amount);
                 }
 
@@ -247,7 +252,11 @@ class CheckoutController extends Controller
         $device_ids = $labours;
         $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
 
+        \Log::info($wallet_use);
         if ($request->transaction_type == "post_paid") {
+            $firebaseService = new SendNotificationJob();
+            $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        } else if ($wallet_use == true) {
             $firebaseService = new SendNotificationJob();
             $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
         }
