@@ -151,6 +151,7 @@ class CheckoutController extends Controller
             }
         } else {
             $is_razorpay = false;
+            $wallet_use = false;
         }
 
         $booking = new Booking();
