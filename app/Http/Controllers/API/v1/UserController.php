@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\City;
 use App\Models\LabourAcceptedBooking;
+use App\Models\LabourBooking;
 use App\Models\ReferralMaster;
 use App\Models\State;
 use App\Models\Transactions;
@@ -204,5 +205,23 @@ class UserController extends Controller
             "success" => true,
             "data" => $labour_data,
         ], 200);
+    }
+
+    public function addLabourFeedback(Request $request)
+    {
+        $booking_data = Booking::where('id', $request->booking_id)->first();
+
+        // $labour_booking = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
+
+        $labour_accepted_booking = LabourBooking::where('labour_id', $request->labour_id)->where('booking_id', $booking_data->labour_booking_id)->first();
+
+        $labour_accepted_booking->labour_feedback = $request->feedback;
+        $labour_accepted_booking->save();
+
+        return response([
+            "success" => true,
+            "message" => "Feedback Send Successfully",
+        ], 200);
+
     }
 }
