@@ -236,10 +236,10 @@ class UserController extends Controller
         $user->device_id = null;
         $user->save();
 
-        auth('sanctum')->user()->id->tokens()->delete();
+        // auth('sanctum')->user()->id->tokens()->delete();
 
         return response([
-            "message" => "Labour Logout Successfully",
+            "message" => $user->type . " Logout Successfully",
             "status" => true,
         ], 200);
     }
