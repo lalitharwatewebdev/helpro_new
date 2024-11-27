@@ -19,8 +19,8 @@ class DashboardController extends Controller
     public function home()
     {
 
-        $firebaseService = new SendNotificationJob();
-        $firebaseService->sendNotification(['dSFarbBWTS2qlud5WVFfIS:APA91bGEOJ4eojyeQOXw46anNV3hlrjEVkMDvZhHSMo1vzo4k7yslohYFDVkdQVOfgy7AxBq0AW4C866iaA3GlVYxb7kxe2wiqETFc9bSsT48F10JbwtEa0'], "hiii", "message");
+        // $firebaseService = new SendNotificationJob();
+        // $firebaseService->sendNotification(['dSFarbBWTS2qlud5WVFfIS:APA91bGEOJ4eojyeQOXw46anNV3hlrjEVkMDvZhHSMo1vzo4k7yslohYFDVkdQVOfgy7AxBq0AW4C866iaA3GlVYxb7kxe2wiqETFc9bSsT48F10JbwtEa0'], "hiii", "message");
         
 
 
