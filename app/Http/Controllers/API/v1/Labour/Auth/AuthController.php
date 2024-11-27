@@ -299,6 +299,9 @@ class AuthController extends Controller
 
     public function logOut(Request $request)
     {
+        $user = User::where('id', $request->user()->id)->first();
+        $user->device_id = null;
+        $user->save();
         auth('sanctum')->user()->id->tokens()->delete();
 
         return response([

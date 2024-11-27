@@ -171,17 +171,19 @@ class UserController extends Controller
     {
         $booking = Booking::where('id', $request->booking_id)->first();
 
-        $is_wallet_exist = Wallet::where('user_id', $booking->user_id)->first();
+        if ($booking->transaction_type == "pre_paid") {
+            $is_wallet_exist = Wallet::where('user_id', $booking->user_id)->first();
 
-        if (!empty($is_wallet_exist)) {
-            $total = $is_wallet_exist->amount + $booking->total_amount;
-            $is_wallet_exist->amount = $total;
-            $is_wallet_exist->save();
-        } else {
-            $wallet = new Wallet();
-            $wallet->user_id = $booking->user_id;
-            $wallet->amount = $booking->total_amount;
-            $wallet->save();
+            if (!empty($is_wallet_exist)) {
+                $total = $is_wallet_exist->amount + $booking->total_amount;
+                $is_wallet_exist->amount = $total;
+                $is_wallet_exist->save();
+            } else {
+                $wallet = new Wallet();
+                $wallet->user_id = $booking->user_id;
+                $wallet->amount = $booking->total_amount;
+                $wallet->save();
+            }
         }
 
         $booking->booking_status = "cancelled";
@@ -211,6 +213,7 @@ class UserController extends Controller
 
     public function addLabourFeedback(Request $request)
     {
+        \Log::info($request->all());
         $booking_data = Booking::where('id', $request->booking_id)->first();
 
         // $labour_booking = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
@@ -225,5 +228,19 @@ class UserController extends Controller
             "message" => "Feedback Send Successfully",
         ], 200);
 
+    }
+
+    public function logOut(Request $request)
+    {
+        $user = User::where('id', $request->user()->id)->first();
+        $user->device_id = null;
+        $user->save();
+
+        auth('sanctum')->user()->id->tokens()->delete();
+
+        return response([
+            "message" => "Labour Logout Successfully",
+            "status" => true,
+        ], 200);
     }
 }
