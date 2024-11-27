@@ -236,7 +236,9 @@ class CheckoutController extends Controller
                     return $labour;
                 })->whereNotNull('device_id')->pluck("device_id")->toArray();
         }
+        \Log::info("labourssdevice_id");
 
+        \Log::info($labours);
         $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
 
         if (!$user_address) {
@@ -253,6 +255,10 @@ class CheckoutController extends Controller
         $device_ids = $labours;
         $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
 
+    
+        \Log::info("additional_data");
+
+        \Log::info($additional_data);
         \Log::info($wallet_use);
         if ($request->transaction_type == "post_paid") {
             $firebaseService = new SendNotificationJob();

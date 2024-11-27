@@ -308,6 +308,8 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::put('status', 'status')->name('status');
         Route::get("export", "export")->name("export");
         Route::get("labour-export", "labourExport")->name("labour-export");
+        Route::get("invoice-pdf", "invoicePdf")->name("invoice-pdf");
+
 
     });
 
