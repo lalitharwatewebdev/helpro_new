@@ -60,7 +60,10 @@ class LabourTable extends DataTableComponent
                 })
 
                 ->html(),
-
+            Column::make('Category')
+                ->label(function ($row, Column $column) {
+                    return $row->category[0]->title ?? "";
+                }),
             Column::make("Name", "name")
                 ->format(function ($value) {
                     return $value ?? "";
@@ -191,7 +194,7 @@ class LabourTable extends DataTableComponent
     {
         $modelData = new User;
         $type = $this->type;
-        // dd($type);   
+        // dd($type);
         return Excel::download(new CustomExport($this->getSelected(), $modelData), 'labours.xlsx');
     }
 }
