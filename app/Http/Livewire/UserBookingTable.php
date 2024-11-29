@@ -87,6 +87,16 @@ class UserBookingTable extends DataTableComponent
                     $edit_route = route('admin.userbookings.labourlist', ['labour_booking_id' => $row->labour_booking_id]);
                     return '<a class="btn btn-primary" id="accepted_labour_list"  href=' . $edit_route . '>' . $labour_accepted_booking . '</a>';
                 })->html(),
+            Column::make("User Details", 'user_id')
+                ->format(function ($value, $row, Column $column) {
+                    $edit = route('admin.tickets.profile', ['id' => $row->user_id]);
+                    return '<a class="text-end labour-profile"
+                                href="'.$edit.'">
+                                <span class="material-symbols-outlined">person</span>
+                            </a>';
+                    // return $row->user->name ?? "";
+                })
+                ->html(),
             Column::make("User", 'user_id')
                 ->format(function ($value, $row, Column $column) {
                     return $row->user->name ?? "";

@@ -55,7 +55,15 @@
                 <x-input value="{{ $data['minimum_withdrawal_amount'] ?? '' }}" name="minimum_withdrawal_amount"
                     label="Minimum Withdrawal Amount" />
             </div>
-
+            <div class="col-md-4 my-auto">
+                <div class="custom-control custom-control-success custom-switch">
+                    <input value="0" type="hidden" name="labour_ios_production">
+                    <input value="1" name="labour_ios_production" type="checkbox"
+                        @if ($data['labour_ios_production'] ?? '' == 1) checked @endif class="custom-control-input"
+                        id="switch-labour-ios-production">
+                    <label class="custom-control-label" for="switch-labour-ios-production">Labour IOS Production</label>
+                </div>
+            </div>
             {{-- <div class="col-md-6 mt-3">
            
                 <x-input name="razor_pay_key" value="{{ $data['razor_pay_key'] ?? '' }}" :required="false" label="Razor Pay Key  " />
@@ -76,11 +84,11 @@
             </div>
             <div class="col-md-12 mt-3">
 
-                <x-editor name="privacy_policy"  label="Privacy Policy" />
+                <x-editor name="privacy_policy" label="Privacy Policy" />
             </div>
 
             <div class="col-md-12 mt-3">
-                <x-editor name="terms_and_conditions"  label="Terms and Condition" />
+                <x-editor name="terms_and_conditions" label="Terms and Condition" />
 
 
             </div>
