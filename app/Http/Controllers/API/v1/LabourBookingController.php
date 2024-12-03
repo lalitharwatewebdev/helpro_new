@@ -231,7 +231,12 @@ class LabourBookingController extends Controller
 
         $booking = Booking::where('id', $request->booking_id)->first();
 
-        $labour_booking_data = LabourAcceptedBooking::where('')->get();
+        if($booking->transaction_type == "pre_paid")
+        {
+            
+        }
+
+        // $labour_booking_data = LabourAcceptedBooking::where('')->get();
         $booking->is_user_work_done = 1;
 
         $booking->save();

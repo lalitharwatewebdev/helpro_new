@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Providers\RazorpayServiceProvider;
-use App\Models\Wallet;
 use App\Models\Transactions;
+use App\Providers\RazorpayServiceProvider;
+use Illuminate\Http\Request;
 
 class WalletController extends Controller
 {
@@ -15,46 +14,48 @@ class WalletController extends Controller
     {
         $this->razorpay = $razorpay;
     }
-    public function createAmount(Request $request){
+    public function createAmount(Request $request)
+    {
+        \Log::info($request->all());
+
         $amount = $request->amount;
         $wallet_order = $this->razorpay->createWalletOrder($amount);
+        // \Log::info($wallet_order);
 
         return response([
-            "data" => $wallet_order['id']
-        ],200);
+            "data" => $wallet_order['id'] ?? '',
+        ], 200);
 
     }
 
-    public function fetchAmount(Request $request){
+    public function fetchAmount(Request $request)
+    {
         $order_id = $request->order_id;
 
-        $fetch_wallet_order  = $this->razorpay->fetchWalletOrder($order_id);
+        $fetch_wallet_order = $this->razorpay->fetchWalletOrder($order_id);
 
-    
-        if($fetch_wallet_order){
+        if ($fetch_wallet_order) {
             return response([
                 "message" => "Amount Added to the wallet",
-                "status" => true
-            ],200);
+                "status" => true,
+            ], 200);
         }
-        
 
         return response([
             "message" => "Transaction Failure",
-            "status" => false
-        ],400);
+            "status" => false,
+        ], 400);
     }
 
-
-    public function walletTransaction(Request $request){
+    public function walletTransaction(Request $request)
+    {
         $user = auth()->user()->id;
-        $user_transactions  = Transactions::where("user_id",$user)->latest()->get();
-        
+        $user_transactions = Transactions::where("user_id", $user)->latest()->get();
+
         return response([
             "data" => $user_transactions,
-            "status" => true
-        ],200);
+            "status" => true,
+        ], 200);
     }
 
-    
 }
