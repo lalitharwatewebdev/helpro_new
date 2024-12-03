@@ -35,7 +35,6 @@ class LabourController extends Controller
             "data" => $data,
             "status" => true,
         ], 200);
-
     }
 
 
