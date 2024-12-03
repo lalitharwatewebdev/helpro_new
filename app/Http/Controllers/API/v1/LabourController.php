@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+use Rmunate\Utilities\SpellNumber;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Models\Booking;
@@ -38,9 +40,10 @@ class LabourController extends Controller
 
 
     public function invoice(Request $request){
-        $data = Booking::with(["user","checkout.address"])->find($request->booking_id);
-        return $data;
-        $pdf = Pdf::loadView("site.pdf.index", ['booking' => $data]);
+        $data = Booking::with(["user","checkout.address",'checkout.category'])->find($request->booking_id);
+        $total_amount  = (float) $data['service_charges'] + (float) $data['total_amount'];
+        $total_amount_in_words = SpellNumber::value($total_amount)->locale('en')->toLetters();
+        $pdf = Pdf::loadView("site.pdf.index", ['booking' => $data,'total_amount_in_words' => $total_amount_in_words]);
         return $pdf->stream();
     }
 

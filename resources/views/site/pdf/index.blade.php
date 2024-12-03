@@ -46,7 +46,7 @@
         .tax-rates td {
             /* border: 1px solid black; */
 
-            padding: 5px 20px;
+            padding: 2px 20px;
         }
 
         .invoice-in-words td {
@@ -186,40 +186,40 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Helper/Loading</td>
-                    <td>1</td>
-                    <td>9</td>
-                    <td>100.00</td>
+                    <td>{{$booking['checkout']['category']['title']}}</td>
+                    <td>{{$booking['checkout']['labour_quantity']}}</td>
                     <td>800.00</td>
+                    <td>{{$booking['total_amount']}}</td>
+                    <td>{{$booking['total_amount']}}</td>
                     <td>00</td>
-                    <td>900.00</td>
+                    <td>{{$booking['total_amount']}}</td>
                 </tr>
                 <tr>
                     <td><b>Subtotal</b></td>
                     <td><b>-</b></td>
                     <td><b>-</b></td>
-                    <td><b>0.00</b></td>
-                    <td><b>900.00</b></td>
+                    <td>{{$booking['total_amount']}}</td>
+                    <td>{{$booking['total_amount']}}</td>
                     <td><b>00</b></td>
-                    <td><b>900.00</b></td>
+                    <td>{{$booking['total_amount']}}</td>
                 </tr>
                 <tr>
                     <td>Service/Charges</td>
-                    <td>1</td>
+                    <td>{{$booking['checkout']['labour_quantity']}}</td>
                     <td>9</td>
-                    <td>100.00</td>
-                    <td>800.00</td>
+                    <td>-</td>
+                    <td>{{$booking['service_charges']}}</td>
                     <td>00</td>
-                    <td>900.00</td>
+                    <td>{{$booking['service_charges']}}</td>
                 </tr>
                 <tr>
                     <td><b>Subtotal With Service Charges</b></td>
                     <td><b>-</b></td>
                     <td><b>-</b></td>
                     <td><b>0.00</b></td>
-                    <td><b>900.00</b></td>
+                    <td><b>{{(float)$booking['service_charges'] + (float)$booking['total_amount']}}</b></td>
                     <td><b>00</b></td>
-                    <td><b>900.00</b></td>
+                    <td><b>{{(float)$booking['service_charges'] + (float)$booking['total_amount']}}</b></td>
                 </tr>
             </tbody>
         </table>
@@ -250,14 +250,14 @@
                     <td>21.43</td>
                 </tr>
                 <tr>
-                    <td>Total Taxes</td>
+                    <td>Service Charges</td>
                     <td></td>
-                    <td>42.86</td>
+                    <td>{{$booking['service_charges']}}</td>
                 </tr>
                 <tr>
                     <td><b>Invoice Total</b></td>
                     <td></td>
-                    <td>923.00</td>
+                    <td>{{(float)$booking['service_charges'] + (float)$booking['total_amount']}}</td>
                 </tr>
             </tbody>
         </table>
@@ -270,7 +270,7 @@
             <tbody>
                 <tr>
                     <td width="50%">Invoice total in words</td>
-                    <td width="50%"><b>Nine Hundred Twenty Three Only</b></td>
+                    <td width="50%"><b>{{ucwords($total_amount_in_words)}}</b></td>
                 </tr>
             </tbody>
         </table>
