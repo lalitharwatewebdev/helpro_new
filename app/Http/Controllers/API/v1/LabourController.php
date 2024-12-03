@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
+use App\Models\Booking;
+
 class LabourController extends Controller
 {
     public function get(Request $request)
@@ -30,6 +34,13 @@ class LabourController extends Controller
             "status" => true,
         ], 200);
 
+    }
+
+
+    public function invoice(Request $request){
+        $data = Booking::find($request->booking_id);
+        $pdf = Pdf::loadView("site.pdf.index",$data);
+        return $pdf->stream();
     }
 
 }
