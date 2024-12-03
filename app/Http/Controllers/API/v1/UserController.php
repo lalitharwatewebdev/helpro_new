@@ -213,14 +213,18 @@ class UserController extends Controller
 
     public function addLabourFeedback(Request $request)
     {
-        \Log::info($request->all());
-        $booking_data = Booking::where('id', $request->booking_id)->first();
+        // \Log::info("addLabourFeedback");
+
+        // \Log::info($request->all());
+        // $booking_data = Booking::where('id', $request->booking_id)->first();
 
         // $labour_booking = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
 
-        $labour_accepted_booking = LabourBooking::where('labour_id', $request->labour_id)->where('booking_id', $booking_data->labour_booking_id)->first();
+        $labour_accepted_booking = LabourBooking::where('id', $request->booking_id)->first();
 
         $labour_accepted_booking->labour_feedback = $request->feedback;
+        $labour_accepted_booking->labour_rating = $request->rating;
+
         $labour_accepted_booking->save();
 
         return response([
