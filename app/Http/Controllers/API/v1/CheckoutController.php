@@ -11,6 +11,7 @@ use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\Checkout;
+use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\Transactions;
 use App\Models\User;
@@ -478,6 +479,9 @@ class CheckoutController extends Controller
 
         if ($request->razorpay_type == "online") {
 
+
+
+
             if ($request->use_wallet == "yes") {
                 $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
 
@@ -510,6 +514,39 @@ class CheckoutController extends Controller
             } else {
                 $order = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
                 $is_razorpay = 1;
+            }
+
+
+
+            $one_labour_amount = $booking->labour_amount / $booking->quantity_required;
+            $labour_booking_data = LabourBooking::where('id', $booking->labour_booking_id)->first();
+
+            $fdate = $labour_booking_data->start_date;
+            $tdate = $labour_booking_data->end_date;
+            $datetime1 = new DateTime($fdate);
+            $datetime2 = new DateTime($tdate);
+            $interval = $datetime1->diff($datetime2);
+            $days = $interval->format('%a') + 1;
+
+            // \Log::info($days);
+
+            $labour_payable_amount = $one_labour_amount * $days;
+
+            $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
+            foreach ($labours as $key => $value) {
+                $wallet = Wallet::where('user_id', $value['labour_id'])->first();
+
+                if (!empty($wallet)) {
+                    $amount = $wallet->amount + $labour_payable_amount;
+                    $wallet->amount = $amount;
+                    $wallet->save();
+                } else {
+                    $wallets = new Wallet();
+                    $wallets->user_id = $value['labour_id'];
+                    $wallets->amount = $labour_payable_amount;
+                    $wallets->save();
+                }
+
             }
 
             return response()->json([
