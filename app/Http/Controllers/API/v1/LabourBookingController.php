@@ -16,6 +16,8 @@ use App\Models\Category;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\User;
+use App\Models\Wallet;
+use DateTime;
 use Illuminate\Http\Request;
 
 // notification
@@ -231,9 +233,38 @@ class LabourBookingController extends Controller
 
         $booking = Booking::where('id', $request->booking_id)->first();
 
-        if($booking->transaction_type == "pre_paid")
-        {
-            
+        if ($booking->transaction_type == "pre_paid") {
+            $one_labour_amount = $booking->labour_amount / $booking->quantity_required;
+            $labour_booking_data = LabourBooking::where('id', $booking->labour_booking_id)->first();
+
+            $fdate = $labour_booking_data->start_date;
+            $tdate = $labour_booking_data->end_date;
+            $datetime1 = new DateTime($fdate);
+            $datetime2 = new DateTime($tdate);
+            $interval = $datetime1->diff($datetime2);
+            $days = $interval->format('%a') + 1;
+
+            // \Log::info($days);
+
+            $labour_payable_amount = $one_labour_amount * $days;
+
+            $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
+            foreach ($labours as $key => $value) {
+                $wallet = Wallet::where('user_id', $value['labour_id'])->first();
+
+                if (!empty($wallet)) {
+                    $amount = $wallet->amount + $labour_payable_amount;
+                    $wallet->amount = $amount;
+                    $wallet->save();
+                } else {
+                    $wallets = new Wallet();
+                    $wallets->user_id = $value['labour_id'];
+                    $wallets->amount = $labour_payable_amount;
+                    $wallets->save();
+                }
+
+            }
+
         }
 
         // $labour_booking_data = LabourAcceptedBooking::where('')->get();
