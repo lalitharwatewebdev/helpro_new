@@ -38,8 +38,9 @@ class LabourController extends Controller
 
 
     public function invoice(Request $request){
-        $data = Booking::find($request->booking_id);
-        $pdf = Pdf::loadView("site.pdf.index",$data);
+        $data = Booking::with(["user","checkout.address"])->find($request->booking_id);
+        return $data;
+        $pdf = Pdf::loadView("site.pdf.index", ['booking' => $data]);
         return $pdf->stream();
     }
 

@@ -100,28 +100,26 @@
                                     <tr>
                                         <th scope="row" style="width: 50%"><strong>Invoice To: </strong></th>
                                         <td>
-                                            Sanny Deuji
+                                            {{$booking['user']['name']}}
                                         </td>
 
                                     </tr>
                                     <tr>
                                         <th scope="row"><strong>Customer Address: </strong></th>
                                         <td>
-                                            Plot NO R-488 Sector 8, Rabale,
-
-                                            Navi Mumbai
+                                            {{$booking['checkout']['address']['address']}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><strong>Contact Number:</strong></th>
                                         <td>
-                                            8000083869
+                                           {{$booking['user']['phone']}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row"><strong>Email ID:</strong></th>
                                         <td>
-                                            sannysolanki555@gmail.com
+                                            {{$booking['user']['email']}}
                                         </td>
                                     </tr>
                                 </tbody>
