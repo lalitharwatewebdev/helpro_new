@@ -188,8 +188,8 @@
                 <tr>
                     <td>{{$booking['checkout']['category']['title']}}</td>
                     <td>{{$booking['checkout']['labour_quantity']}}</td>
-                    <td>800.00</td>
-                    <td>{{$booking['total_amount']}}</td>
+                    <td>{{$hours}}</td>
+                    <td>{{$per_hour_price}}</td>
                     <td>{{$booking['total_amount']}}</td>
                     <td>00</td>
                     <td>{{$booking['total_amount']}}</td>
@@ -198,21 +198,21 @@
                     <td><b>Subtotal</b></td>
                     <td><b>-</b></td>
                     <td><b>-</b></td>
-                    <td>{{$booking['total_amount']}}</td>
+                    <td>{{$per_hour_price}}</td>
                     <td>{{$booking['total_amount']}}</td>
                     <td><b>00</b></td>
                     <td>{{$booking['total_amount']}}</td>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td>Service/Charges</td>
                     <td>{{$booking['checkout']['labour_quantity']}}</td>
-                    <td>9</td>
+                    <td>{{$hours}}</td>
                     <td>-</td>
                     <td>{{$booking['service_charges']}}</td>
                     <td>00</td>
                     <td>{{$booking['service_charges']}}</td>
-                </tr>
-                <tr>
+                </tr> --}}
+                {{-- <tr>
                     <td><b>Subtotal With Service Charges</b></td>
                     <td><b>-</b></td>
                     <td><b>-</b></td>
@@ -220,7 +220,7 @@
                     <td><b>{{(float)$booking['service_charges'] + (float)$booking['total_amount']}}</b></td>
                     <td><b>00</b></td>
                     <td><b>{{(float)$booking['service_charges'] + (float)$booking['total_amount']}}</b></td>
-                </tr>
+                </tr> --}}
             </tbody>
         </table>
     </div>
