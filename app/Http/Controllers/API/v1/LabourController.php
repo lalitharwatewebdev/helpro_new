@@ -42,10 +42,8 @@ class LabourController extends Controller
 
     public function invoice(Request $request)
     {
-        $request->validate([
-            "booking_id" => "required|exists:bookings,id"
-        ]);
-        $data = Booking::with(["user", "checkout.address", 'checkout.category'])->find($request->booking_id);
+        
+        $data = Booking::with(["user", "checkout.address", 'checkout.category'])->find($request->query("booking_id"));
 
         // getting gst from business settings
         $gst = BusinessSetting::where("key","gst")->first();
