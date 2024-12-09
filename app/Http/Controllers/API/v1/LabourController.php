@@ -78,6 +78,6 @@ class LabourController extends Controller
 
         $total_amount_in_words = SpellNumber::value($total_amount)->locale('en')->toLetters();
         $pdf = Pdf::loadView("site.pdf.index", ['booking' => $data, 'total_amount_in_words' => $total_amount_in_words, "hours" => $interval->h,"per_hour_price" => $per_hour_price, "gst" => $gst]);
-        return $pdf->download();
+        return $pdf->stream();
     }
 }
