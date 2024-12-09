@@ -11,7 +11,7 @@ use Rmunate\Utilities\SpellNumber;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Models\Booking;
-
+use App\Models\BusinessSetting;
 use DateTime;
 
 class LabourController extends Controller
@@ -42,7 +42,15 @@ class LabourController extends Controller
 
     public function invoice(Request $request)
     {
+        $request->validate([
+            "booking_id" => "required|exists:bookings,id"
+        ]);
         $data = Booking::with(["user", "checkout.address", 'checkout.category'])->find($request->booking_id);
+
+        // getting gst from business settings
+        $gst = BusinessSetting::where("key","gst")->first();
+
+        // $igst = $gst
         // return $data;
 
         $start_date = $data['checkout']['start_date']; 
@@ -59,6 +67,8 @@ class LabourController extends Controller
         
         $interval = $start->diff($end);
 
+
+
         //per hour price
         
         $total_amount  = (float) $data['service_charges'] + (float) $data['total_amount'];
@@ -67,7 +77,7 @@ class LabourController extends Controller
         
 
         $total_amount_in_words = SpellNumber::value($total_amount)->locale('en')->toLetters();
-        $pdf = Pdf::loadView("site.pdf.index", ['booking' => $data, 'total_amount_in_words' => $total_amount_in_words, "hours" => $interval->h,"per_hour_price" => $per_hour_price]);
-        return $pdf->stream();
+        $pdf = Pdf::loadView("site.pdf.index", ['booking' => $data, 'total_amount_in_words' => $total_amount_in_words, "hours" => $interval->h,"per_hour_price" => $per_hour_price, "gst" => $gst]);
+        return $pdf->download();
     }
 }
