@@ -15,6 +15,7 @@ use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
+use App\Models\LabourRedeem;
 use App\Models\User;
 use App\Models\Wallet;
 use DateTime;
@@ -262,6 +263,13 @@ class LabourBookingController extends Controller
                     $wallets->amount = $labour_payable_amount;
                     $wallets->save();
                 }
+
+                $transaction = new LabourRedeem();
+                $transaction->amount = $labour_payable_amount;
+                $transaction->payment_status = "received";
+                $transaction->remark = "added money";
+                $transaction->labour_id = $value['labour_id'];
+                $transaction->save();
 
             }
 

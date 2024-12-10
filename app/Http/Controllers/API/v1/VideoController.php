@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class VideoController extends Controller
 {
     public function get(){
-        $video = Video::where("video_type","user")->get();
+        $video = Video::get();
 
         return response([
             "data" => $video,
