@@ -121,6 +121,8 @@ class CheckoutController extends Controller
                 if ($user_wallet->amount == 0) {
 
                     $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+                    \Log::info(json_encode($order));
+
                     $is_razorpay = true;
                     $wallet_use = false;
 
@@ -128,12 +130,14 @@ class CheckoutController extends Controller
 
                 if ($user_wallet->amount < $amount) {
                     $partial_amount = $amount - $user_wallet->amount;
-                    $user_wallet->decrement("amount", $user_wallet->amount);
-                    \Log::info("partial_amount");
-                    \Log::info($partial_amount);
+                    // $user_wallet->decrement("amount", $user_wallet->amount);
+                    // \Log::info("partial_amount");
+                    // \Log::info($partial_amount);
                     $order = $this->razorpay->createOrder($partial_amount, "INR", $data->id);
+                    // \Log::info(json_encode($order));
+
                     $is_razorpay = true;
-                    $wallet_use = false;
+                    $wallet_use = "partial_use";
                 } else {
                     $is_razorpay = false;
                     $wallet_use = true;
@@ -149,40 +153,42 @@ class CheckoutController extends Controller
                 ]);
             } else {
                 $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+                \Log::info(json_encode($order));
+
             }
         } else {
             $is_razorpay = false;
             $wallet_use = false;
         }
+        if ($request->transaction_type == "post_paid" || $is_razorpay == false) {
+            $booking = new Booking();
+            $booking->user_id = auth()->user()->id;
+            $booking->total_amount = $amount;
+            $booking->service_charges = $services_charges;
+            if ($request->use_wallet == 'yes') {
+                $booking->payment_status = 'captured';
+            } else {
+                $booking->payment_status = 'failed';
+            }
+            $booking->checkout_id = $data->id;
+            $booking->quantity_required = $request->quantity;
+            $booking->otp = mt_rand(111111, 999999);
+            $booking->transaction_type = $request->transaction_type;
+            $booking->labour_amount = $request->labour_amount;
+            $booking->commission_amount = $request->commission_amount;
+            $booking->total_labour_charges = $request->total_labour_charges;
+            $booking->labour_booking_id = $request->labour_booking_id;
 
-        $booking = new Booking();
-        $booking->user_id = auth()->user()->id;
-        $booking->total_amount = $amount;
-        $booking->service_charges = $services_charges;
-        if ($request->use_wallet == 'yes') {
-            $booking->payment_status = 'captured';
-        } else {
-            $booking->payment_status = 'failed';
+            if ($request->transaction_type == 'pre_paid') {
+                $booking->razorpay_status = "created";
+            } else {
+                $booking->razorpay_status = "pending";
+                $booking->razorpay_type = "offline";
+
+            }
+
+            $booking->save();
         }
-        $booking->checkout_id = $data->id;
-        $booking->quantity_required = $request->quantity;
-        $booking->otp = mt_rand(111111, 999999);
-        $booking->transaction_type = $request->transaction_type;
-        $booking->labour_amount = $request->labour_amount;
-        $booking->commission_amount = $request->commission_amount;
-        $booking->total_labour_charges = $request->total_labour_charges;
-        $booking->labour_booking_id = $request->labour_booking_id;
-
-        if ($request->transaction_type == 'pre_paid') {
-            $booking->razorpay_status = "created";
-        } else {
-            $booking->razorpay_status = "pending";
-            $booking->razorpay_type = "offline";
-
-        }
-
-        $booking->save();
-
         $category_id = $data->category_id;
         $user = User::find(auth()->user()->id);
         // $user->update(["lat_long" => $request->lat_long]);
@@ -248,23 +254,27 @@ class CheckoutController extends Controller
                 "status" => true,
             ], 400);
         }
+
         $labour_booking_data = LabourBooking::where('id', $data->labour_booking_id)->first();
         // \Log::info("labour's device_id ===>", $labour_get_data);
         $user_address = Address::where("user_id", auth()->user()->id)->first();
         $title = "New Job Available2";
         $message = "You have a new job available.";
         $device_ids = $labours;
-        $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
+        if ($request->transaction_type == "post_paid" || $is_razorpay == false) {
+            $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
+        }
 
-    
-        \Log::info("additional_data");
+        // \Log::info("additional_data");
 
-        \Log::info($additional_data);
+        // \Log::info($additional_data);
+        \Log::info("waleeeeettttt");
+
         \Log::info($wallet_use);
         if ($request->transaction_type == "post_paid") {
             $firebaseService = new SendNotificationJob();
             $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
-        } else if ($wallet_use == true) {
+        } else if ($wallet_use === true) {
             $firebaseService = new SendNotificationJob();
             $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
         }
@@ -276,6 +286,7 @@ class CheckoutController extends Controller
             "order_id" => $order->id ?? $order['id'] ?? null,
             "checkout_id" => $data->id,
             "is_razorpay" => $is_razorpay,
+            "is_wallet" => $wallet_use,
             "status" => true,
         ], 200);
     }
@@ -287,8 +298,63 @@ class CheckoutController extends Controller
         ]);
 
         $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
-
+        $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+        $services_charges = $business_settings['service_charges'];
         if ($fetchOrder['status'] == true) {
+            if ($request->is_wallet == "partial_use") {
+
+                $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
+                $user_wallet->amount = 0;
+                $user_wallet->save();
+            }
+
+            $amount = $request->amount;
+
+            $data = new Checkout();
+            $data->start_date = $request->start_date;
+            $data->end_date = $request->end_date;
+            $data->start_time = $request->start_time;
+            $data->end_time = $request->end_time;
+            $data->address_id = $request->address_id;
+            $data->user_id = auth()->user()->id;
+            $data->category_id = $request->category_id;
+            $data->area_id = $request->area_id;
+            $data->labour_quantity = $request->quantity;
+            $data->alternate_number = $request->alternate_number;
+            $data->note = $request->note;
+            $data->transaction_type = $request->transaction_type;
+            $data->labour_booking_id = $request->labour_booking_id;
+            $data->lat_long = $request->lat_long;
+
+            $data->save();
+
+            $booking = new Booking();
+            $booking->user_id = auth()->user()->id;
+            $booking->total_amount = $amount;
+            $booking->service_charges = $services_charges;
+            if ($request->use_wallet == 'yes') {
+                $booking->payment_status = 'captured';
+            } else {
+                $booking->payment_status = 'failed';
+            }
+            $booking->checkout_id = $data->id;
+            $booking->quantity_required = $request->quantity;
+            $booking->otp = mt_rand(111111, 999999);
+            $booking->transaction_type = $request->transaction_type;
+            $booking->labour_amount = $request->labour_amount;
+            $booking->commission_amount = $request->commission_amount;
+            $booking->total_labour_charges = $request->total_labour_charges;
+            $booking->labour_booking_id = $request->labour_booking_id;
+
+            if ($request->transaction_type == 'pre_paid') {
+                $booking->razorpay_status = "created";
+            } else {
+                $booking->razorpay_status = "pending";
+                $booking->razorpay_type = "offline";
+
+            }
+
+            $booking->save();
 
             $booking_data = Booking::where('checkout_id', $fetchOrder["checkout_id"])->first();
 
@@ -479,9 +545,6 @@ class CheckoutController extends Controller
 
         if ($request->razorpay_type == "online") {
 
-
-
-
             if ($request->use_wallet == "yes") {
                 $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
 
@@ -515,8 +578,6 @@ class CheckoutController extends Controller
                 $order = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
                 $is_razorpay = 1;
             }
-
-
 
             $one_labour_amount = $booking->labour_amount / $booking->quantity_required;
             $labour_booking_data = LabourBooking::where('id', $booking->labour_booking_id)->first();

@@ -23,6 +23,7 @@ class RazorpayServiceProvider
         $amountInRupees = (float) $amount; // Assuming amount is sent in rupees
         $amounts = intval($amountInRupees * 100);
         \Log::info($amounts);
+        \Log::info("ordersssss1111111111");
 
         $note = [
             "user" => auth()->user()->id,
@@ -38,20 +39,29 @@ class RazorpayServiceProvider
                 "payment_capture" => 1,
                 "notes" => $note,
             ]);
+            // \Log::info($order);
+            // \Log::info(json_encode($order));
 
             return $order;
         } catch (\Exception $e) {
+            \Log::info($e);
             return response([
                 "message" => "Something went wrong " . $e,
                 "status" => false,
             ], 400);
+
         }
+
     }
 
     public function fetchOrder($order_id)
     {
         try {
             $order = $this->api->order->fetch($order_id)->toArray();
+            // \Log::info("fetchOrderfetchOrder");
+
+            // \Log::info(json_encode($order));
+
             $status = ['paid', "captured", "created"];
 
             if (in_array($order['status'], $status)) {
