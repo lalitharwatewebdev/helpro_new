@@ -30,6 +30,7 @@
     "rappasoft/laravel-livewire-tables": "^2.11",
     "razorpay/razorpay": "^2.9",
     "rezaamini-ir/migrator": "^1.5",
+    "rmunate/spell-number": "^4.2",
     "staudenmeir/belongs-to-through": "^2.5",
     "stevebauman/location": "^7.0"
   },
