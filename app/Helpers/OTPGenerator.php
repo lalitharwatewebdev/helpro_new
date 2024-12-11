@@ -2,36 +2,60 @@
 
 namespace App\Helpers;
 
-class OTPGenerator{
-    public static function generate(){
+use Illuminate\Support\Facades\Http;
+use Log;
+
+class OTPGenerator
+{
+    public static function generate()
+    {
         $otp = '';
 
-        for($i=0;$i<6;$i++){
-            $otp .= rand(0,9);
+        for ($i = 0; $i < 6; $i++) {
+            $otp .= rand(0, 9);
         }
-        return $otp;   
+        return $otp;
     }
 
-    public static function sendMessage($otp,$phone){
-        $apiKey = urlencode(env('MESSAGE_API_KEY'));
-        // Message details
-        $numbers = array($phone);
-        $sender = urlencode(env('MESSAGE_SENDER_ID'));
-        $message = rawurlencode($otp . ' is your OTP (One Time Password) for logging into the App. For security reasons, do not share the OTP. Regards Team Appdid Infotech LLP.');
+    public static function sendMessage($otp, $number, $projectName = 'Helpro')
+    {
+        $data = array(
+            'api_id' => env('MESSAGE_API_KEY'),
+            'api_password' => env('MESSAGE_API_PASSWORD'),
+            'sms_type' => "Appdid Universal OTP",
+            'sms_encoding' => "1",
+            'sender' => env('MESSAGE_API_SENDER_ID'),
+            'number' => $number,
+            'message' => $otp . " is your OTP (One Time Password) for logging into the App. For security reasons, do not share the OTP. Regards Team Appdid Infotech LLP.",
+            'template_id' => "170770",
+        );
 
-        $numbers = implode(',', $numbers);
+        $data_string = json_encode($data);
 
-        // Prepare data for POST request
-        $data = array('apikey' => $apiKey, 'numbers' => $numbers, "sender" => $sender, "message" => $message);
-        // Send the POST request with cURL
-        $ch = curl_init('https://api.textlocal.in/send/');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        // Process your response here
+        $response = HTTP::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post('http://sms.appdidsms.in/api/send_sms', json_decode($data_string, true));
+
+        self::trackOtp($response, env('MESSAGE_API_SENDER_ID'));
+
         return $response;
-    
     }
+    private static function trackOtp($response, $senderId)
+    {
+        try {
+            $response = json_decode($response);
+            $balance = $response->balance ?? 0;
+            $sender = $senderId;
+            $projectName = "Hira Trading";
+            $trackingUrl = "https://otp-tracking.appdid.com/api/v1/track";
+            Http::post($trackingUrl, [
+                'project_name' => $projectName,
+                'pending_balance' => $balance,
+                'sender' => $sender,
+            ]);
+        } catch (\Throwable $th) {
+            Log::info($th);
+        }
+    }
+
 }
