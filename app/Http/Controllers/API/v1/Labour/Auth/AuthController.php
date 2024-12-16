@@ -169,15 +169,20 @@ class AuthController extends Controller
                 ], 400);
             }
         } else {
-            User::create([
+            $user = User::create([
                 "device_id" => $request->device_id,
                 "phone" => $request->phone,
                 "type" => "labour",
             ]);
 
+            $token = $user->createToken("labour_otp_login")->plainTextToken;
+            $type = "new";
+
             return response([
                 "message" => 'Account Created Successfully',
                 "status" => true,
+                "token" => $token,
+                "type" => $type,
             ]);
         }
     }
