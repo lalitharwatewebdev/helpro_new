@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\v1;
 
+use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendNotificationJob;
 use App\Models\AcceptedBooking;
@@ -13,6 +14,7 @@ use App\Models\Category;
 use App\Models\Checkout;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
+use App\Models\ReviewImage;
 use App\Models\Transactions;
 use App\Models\User;
 use App\Models\UserReview;
@@ -73,9 +75,9 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info("Store");
+        // \Log::info("Store");
 
-        \Log::info($request->all());
+        // \Log::info($request->all());
         $is_razorpay = true;
         $business_settings = BusinessSetting::pluck("value", "key")->toArray();
         $services_charges = $business_settings['service_charges'];
@@ -221,8 +223,8 @@ class CheckoutController extends Controller
 
         if (!empty($areas)) {
 
-            \Log::info("inside area");
-            \Log::info($areas);
+            // \Log::info("inside area");
+            // \Log::info($areas);
             $labours = User::where('type', 'labour')
                 ->whereHas('category', function ($query) use ($category_id) {
                     $query->where('category_id', $category_id);
@@ -243,9 +245,9 @@ class CheckoutController extends Controller
                     return $labour;
                 })->whereNotNull('device_id')->pluck("device_id")->toArray();
         }
-        \Log::info("labourssdevice_id");
+        // \Log::info("labourssdevice_id");
 
-        \Log::info($labours);
+        // \Log::info($labours);
         $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
 
         if (!$user_address) {
@@ -258,7 +260,7 @@ class CheckoutController extends Controller
         $labour_booking_data = LabourBooking::where('id', $data->labour_booking_id)->first();
         // \Log::info("labour's device_id ===>", $labour_get_data);
         $user_address = Address::where("user_id", auth()->user()->id)->first();
-        $title = "New Job Available22";
+        $title = "New Job Available";
         $message = "You have a new job available.";
         $device_ids = $labours;
         if ($request->transaction_type == "post_paid" || $is_razorpay == false) {
@@ -268,16 +270,17 @@ class CheckoutController extends Controller
         // \Log::info("additional_data");
 
         // \Log::info($additional_data);
-        \Log::info("waleeeeettttt");
+        // \Log::info("waleeeeettttt");
 
-        \Log::info($wallet_use);
-        if ($request->transaction_type == "post_paid") {
-            $firebaseService = new SendNotificationJob();
-            $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
-        } else if ($wallet_use === true) {
+        // \Log::info($wallet_use);
+        if ($request->transaction_type == "post_paid" || $wallet_use === true) {
             $firebaseService = new SendNotificationJob();
             $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
         }
+        // else if ($wallet_use === true) {
+        //     $firebaseService = new SendNotificationJob();
+        //     $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+        // }
 
         // \Log::info($order);
 
@@ -406,8 +409,8 @@ class CheckoutController extends Controller
 
             if (!empty($areas)) {
 
-                \Log::info("inside area");
-                \Log::info($areas);
+                // \Log::info("inside area");
+                // \Log::info($areas);
                 $labours = User::where('type', 'labour')
                     ->whereHas('category', function ($query) use ($category_id) {
                         $query->where('category_id', $category_id);
@@ -440,8 +443,8 @@ class CheckoutController extends Controller
 
             $diff = (strtotime($checkout_data->end_date) - strtotime($checkout_data->start_date));
             $date_result = abs(round($diff) / 86400) + 1;
-            \Log::info("labours deatils");
-            \Log::info($labours);
+            // \Log::info("labours deatils");
+            // \Log::info($labours);
             $title = "New Job Available11";
             $message = "You have a new job available.";
             $device_ids = $labours;
@@ -523,6 +526,17 @@ class CheckoutController extends Controller
         $data->user_id = auth()->user()->id;
         $data->booking_id = $request->booking_id;
         $data->save();
+
+        if (!empty($request->images)) {
+            foreach ($request->images as $key => $value) {
+                $datas = new ReviewImage();
+                $datas->review_id = $data->id;
+                if ($value) {
+                    $datas->image = FileUploader::uploadFile($value, 'images/review_images');
+                }
+                $datas->save();
+            }
+        }
 
         return response([
             "message" => "Review Added Successfully",

@@ -9,6 +9,7 @@ use App\Models\BusinessSetting;
 use App\Models\City;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
+use App\Models\LabourFeedbackImage;
 use App\Models\ReferralMaster;
 use App\Models\State;
 use App\Models\Transactions;
@@ -203,7 +204,7 @@ class UserController extends Controller
 
         $labour_booking_data = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->pluck('labour_id');
 
-        $labour_data = User::whereIn('id', $labour_booking_data)->get();
+        $labour_data = User::with(['labourAcceptedBooking'])->whereIn('id', $labour_booking_data)->get();
 
         return response([
             "success" => true,
@@ -226,6 +227,17 @@ class UserController extends Controller
         $labour_accepted_booking->labour_rating = $request->rating;
 
         $labour_accepted_booking->save();
+
+        if (!empty($request->images)) {
+            foreach ($request->images as $key => $value) {
+                $datas = new LabourFeedbackImage();
+                $datas->labour_booking_id = $labour_accepted_booking->id;
+                if ($value) {
+                    $datas->image = FileUploader::uploadFile($value, 'images/labour_feedback_images');
+                }
+                $datas->save();
+            }
+        }
 
         return response([
             "success" => true,

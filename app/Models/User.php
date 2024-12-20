@@ -102,7 +102,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // labour accepted Booking
     public function labourAcceptedBooking()
     {
-        return $this->hasMany(LabourAcceptedBooking::class);
+        return $this->hasMany(LabourAcceptedBooking::class,'labour_id');
     }
 
 }

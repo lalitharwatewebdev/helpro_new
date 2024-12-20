@@ -33,8 +33,13 @@ class SendNotificationJob
             $notificationPayload['image'] = $image;
         }
         $notification = Notification::fromArray($notificationPayload);
+        \Log::info("token");
 
-        foreach ($token as $t) {
+        \Log::info($token);
+        foreach ($token as $key => $t) {
+            \Log::info("token111");
+            \Log::info($key);
+
             $message = CloudMessage::withTarget("token", $t)
                 ->withNotification($notification)
                 ->withHighestPossiblePriority('high');
@@ -45,7 +50,7 @@ class SendNotificationJob
 
             try {
                 $messaging->send($message);
-                \Log::info($messaging->send($message));
+                // \Log::info($messaging->send($message));
             } catch (NotFound $e) {
                 \Log::info($e);
                 // Skip the token if it's not registered or found
