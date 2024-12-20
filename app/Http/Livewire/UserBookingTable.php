@@ -72,6 +72,7 @@ class UserBookingTable extends DataTableComponent
                     <option value='rejected'>Rejected</option>
                     </select>";
                 })->html(),
+
             Column::make("labour_booking_id")
                 ->collapseOnTablet()
                 ->searchable()
@@ -91,7 +92,7 @@ class UserBookingTable extends DataTableComponent
                 ->format(function ($value, $row, Column $column) {
                     $edit = route('admin.tickets.profile', ['id' => $row->user_id]);
                     return '<a class="text-end labour-profile"
-                                href="'.$edit.'">
+                                href="' . $edit . '">
                                 <span class="material-symbols-outlined">person</span>
                             </a>';
                     // return $row->user->name ?? "";
@@ -102,6 +103,11 @@ class UserBookingTable extends DataTableComponent
                     return $row->user->name ?? "";
                 })
                 ->html(),
+            Column::make('Category')
+                ->label(function ($row, Column $column) {
+                    $data = Booking::with(['checkout' => ['category']])->where('id', $row->id)->first();
+                    return $data->checkout->category->title ?? '';
+                }),
             Column::make("Total Amount", 'total_amount')
                 ->format(function ($value, $row, Column $column) {
                     return $value;
