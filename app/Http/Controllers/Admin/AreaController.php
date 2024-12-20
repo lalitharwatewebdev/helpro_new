@@ -22,6 +22,31 @@ class AreaController extends Controller
         return view("content.tables.add-area-service", compact("categories"));
     }
 
+    public function update(Request $request)
+    {
+        $request->validate([
+            "latitude" => "required",
+            "longitude" => "required",
+            'category' => 'required',
+            "radius" => "required",
+            "area_name" => "required",
+            "price" => "required|numeric",
+        ]);
+
+        $data = Areas::where('id', $request->id)->first();
+        // dd($request->all());
+        $data->price = $request->price;
+        $data->radius = $request->radius;
+        $data->latitude = $request->latitude;
+        $data->longitude = $request->longitude;
+        $data->category_id = $request->category;
+        $data->area_name = $request->area_name;
+
+        $data->save();
+
+        return redirect()->route("admin.areas.index");
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -60,8 +85,9 @@ class AreaController extends Controller
     public function edit($id)
     {
         $data = Areas::find($id);
-        // dd($data);
-        return view("content.tables.edit-area-service", compact("data"));
+        //  dd($data);
+        $categories = Category::active()->get();
+        return view("content.tables.edit-area-service", compact(["categories", "data"]));
     }
 
     public function export()

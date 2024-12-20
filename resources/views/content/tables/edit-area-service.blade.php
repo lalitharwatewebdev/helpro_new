@@ -25,24 +25,27 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                    <x-form id="add-slider" method="POST" class="" :route="route('admin.areas.update')">
+                    <x-form successCallback="test" id="add-slider" method="POST" class="" :route="route('admin.areas.update')">
                         @csrf
+                        {{-- @dd($data->id) --}}
+                        <div class="col-lg-4 col-md-6">
+                            <x-input name="latitude" value="{{ $data->latitude ?? '' }}" />
+                        </div>
+                        <input type="hidden" name="id" value="{{ $data->id ?? '' }}">
 
                         <div class="col-lg-4 col-md-6">
-                            <x-input name="latitude" value="{{$data->latitude}}"  />
-                        </div>
-
-                        <div class="col-lg-4 col-md-6">
-                            <x-input name="longitude" />
+                            <x-input name="longitude" value="{{ $data->longitude ?? '' }}" />
                         </div>
                         <div class="col-lg-4 col-md-6">
-                            <x-input name="radius" />
+                            <x-input name="radius" value="{{ $data->radius ?? '' }}" />
                         </div>
-                        <div class="col-lg-4 col-md-6"> 
-                            <x-input name="price" type="number" value="{{$data->latitude}}" />
-                        </div>
-
                         <div class="col-lg-4 col-md-6">
+                            <x-input name="price" type="number" value="{{ $data->price ?? '' }}" />
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <x-input name="area_name" value="{{ $data->area_name ?? '' }}" />
+                        </div>
+                        {{-- <div class="col-lg-4 col-md-6">
                             <label for="">Category</label>
                             {{-- <select name="category" id="" class="form-control select2">
                                 <option value="" selected>Select Category</option>
@@ -50,6 +53,18 @@
                                     <option value="{{$category->id}}">{{$category->title}}</option>
                                 @endforeach
                             </select> --}}
+                        {{-- </div> --}}
+
+
+                        <div class="col-lg-4 col-md-6">
+                            <label for="">Category</label>
+                            <select name="category" id="" class="form-control select2">
+                                <option value="" selected>Select Category</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}" @if (!empty($data->category_id) && $data->category_id == $category->id) selected @endif>
+                                        {{ $category->title }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="col-12 mt-4">
@@ -150,6 +165,10 @@
             // $(modal + ' #address').val(data.address);
             // $(modal + ' [name=gender][value=' + data.gender + ']').prop('checked', true).trigger('change');
             // $(modal).modal('show');
+        }
+
+        function test() {
+            window.location.href = "{{ url('admin/areas/') }}";
         }
     </script>
 

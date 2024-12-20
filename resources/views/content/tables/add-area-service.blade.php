@@ -25,7 +25,7 @@
         <div class="row match-height">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <x-card>
-                    <x-form id="add-slider" method="POST" class="" :route="route('admin.areas.store')">
+                    <x-form  successCallback="test" id="add-slider" method="POST" class="" :route="route('admin.areas.store')">
                         @csrf
 
                         <div class="col-lg-4 col-md-6">
@@ -116,7 +116,7 @@
 
                 console.log($('#radius').val());
                 console.log($('#radius').val() == '');
-                
+
                 if ($('#radius').val() == 'NaN' || $('#radius').val() == '') {
                     var radius = 5000; // Example: 1000 meters
 
@@ -178,6 +178,10 @@
             // $(modal + ' #address').val(data.address);
             // $(modal + ' [name=gender][value=' + data.gender + ']').prop('checked', true).trigger('change');
             // $(modal).modal('show');
+        }
+
+        function test() {
+            window.location.href = "{{ url('admin/areas/') }}";
         }
     </script>
 

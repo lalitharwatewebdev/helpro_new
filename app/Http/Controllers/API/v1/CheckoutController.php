@@ -258,7 +258,7 @@ class CheckoutController extends Controller
         $labour_booking_data = LabourBooking::where('id', $data->labour_booking_id)->first();
         // \Log::info("labour's device_id ===>", $labour_get_data);
         $user_address = Address::where("user_id", auth()->user()->id)->first();
-        $title = "New Job Available2";
+        $title = "New Job Available22";
         $message = "You have a new job available.";
         $device_ids = $labours;
         if ($request->transaction_type == "post_paid" || $is_razorpay == false) {
@@ -442,7 +442,7 @@ class CheckoutController extends Controller
             $date_result = abs(round($diff) / 86400) + 1;
             \Log::info("labours deatils");
             \Log::info($labours);
-            $title = "New Job Available";
+            $title = "New Job Available11";
             $message = "You have a new job available.";
             $device_ids = $labours;
             $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking_data->id, "start_time" => $this->formatTimeWithAMPM($checkout_data->start_time), "end_time" => $this->formatTimeWithAMPM($checkout_data->end_time), "price" => $booking_data->total_amount, "start_date" => $this->formatDateWithSuffix($checkout_data->start_date), "end_date" => $this->formatDateWithSuffix($checkout_data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
