@@ -204,7 +204,9 @@ class UserController extends Controller
 
         $labour_booking_data = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->pluck('labour_id');
 
-        $labour_data = User::with(['labourAcceptedBooking'])->whereIn('id', $labour_booking_data)->get();
+        $labour_data = User::with(['labourAcceptedBooking'=>function($q) use($booking_data){
+            $q->where('booking_id',$booking_data->labour_booking_id);
+        }])->whereIn('id', $labour_booking_data)->get();
 
         return response([
             "success" => true,
