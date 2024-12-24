@@ -603,11 +603,12 @@ class CheckoutController extends Controller
             $interval = $datetime1->diff($datetime2);
             $days = $interval->format('%a') + 1;
 
-            // \Log::info($days);
-
             $labour_payable_amount = $one_labour_amount * $days;
 
             $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
+            \Log::info("labourssss");
+            \Log::info($labours);
+
             foreach ($labours as $key => $value) {
                 $wallet = Wallet::where('user_id', $value['labour_id'])->first();
 
