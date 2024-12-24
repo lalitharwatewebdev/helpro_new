@@ -633,10 +633,44 @@ class CheckoutController extends Controller
             ], 200);
 
         } else if ($request->razorpay_type == "offline") {
+
             $booking = Booking::where('id', $request->booking_id)->first();
             $booking->razorpay_type = "offline";
             $booking->is_work_done = 1;
             $booking->save();
+
+            $one_labour_commission_amount = $booking->commision_amount / $booking->quantity_required;
+            $labour_booking_data = LabourBooking::where('id', $booking->labour_booking_id)->first();
+
+            $fdate = $labour_booking_data->start_date;
+            $tdate = $labour_booking_data->end_date;
+            $datetime1 = new DateTime($fdate);
+            $datetime2 = new DateTime($tdate);
+            $interval = $datetime1->diff($datetime2);
+            $days = $interval->format('%a') + 1;
+
+            // \Log::info($days);
+
+            $labour_payable_commision_amount = $one_labour_commission_amount * $days;
+
+            $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
+
+            foreach ($labours as $key => $value) {
+                $wallet = Wallet::where('user_id', $value['labour_id'])->first();
+
+                if (!empty($wallet)) {
+                    $amounts = ($wallet->amount) - $labour_payable_commision_amount;
+                    $wallet->amount = $amounts;
+                    $wallet->save();
+                } else {
+                    $wallets = new Wallet();
+                    $wallets->user_id = $value['labour_id'];
+                    $wallets->amount = '-' . $labour_payable_commision_amount;
+                    $wallets->save();
+                }
+
+            }
+
             $is_razorpay = false;
             return response()->json([
                 "message" => "Booking created successfully",

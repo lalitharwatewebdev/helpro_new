@@ -67,7 +67,7 @@ class LabourController extends Controller
         ], 200);
     }
 
-    public function get()
+    public function get(Request $request)
     {
         $earthRadius = 6371;
         $latitude = 19.1985893;
@@ -203,7 +203,7 @@ class LabourController extends Controller
         $total_amount = AcceptedBooking::where("labour_id", auth()->user()->id)->sum("amount");
 
         // getting total amount of money from wallet
-        $total_wallet_amount = Wallet::where("user_id", auth()->user()->id)->first();
+        $total_wallet_amount = Wallet::where("user_id", $request->user()->id)->first();
         // \Log::info("Wallet ::->" . $total_wallet_amount->amount??0);
         if (!empty($total_wallet_amount)) {
             $wallet_amount = $total_wallet_amount->amount ?? 0;
