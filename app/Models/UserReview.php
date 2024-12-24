@@ -14,4 +14,14 @@ class UserReview extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
 }
