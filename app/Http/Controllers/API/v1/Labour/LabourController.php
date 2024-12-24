@@ -499,7 +499,7 @@ class LabourController extends Controller
         // \Log::info(auth()->user()->id);
         // $labour_booking_data = LabourBooking::where('id', $booking_data->labour_booking_id)->first();
 
-        $is_accept_booking = LabourAcceptedBooking::where('id', $request->booking_id)->where('labour_id', auth()->user()->id)->get();
+        $is_accept_booking = LabourAcceptedBooking::where('id', $request->booking_id)->where('labour_id', $request->user()->id)->get();
 
         $is_accept_booking->is_work_done = 1;
         $is_accept_booking->save();
