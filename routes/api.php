@@ -82,7 +82,7 @@ Route::prefix('v1')->group(function () {
 
         Route::controller(LabourController::class)->prefix("labours")->group(function () {
             Route::get("/", "get");
-            Route::get("invoice","invoice")->withoutMiddleware("auth:sanctum");
+            Route::get("invoice", "invoice")->withoutMiddleware("auth:sanctum");
 
         });
 
@@ -154,6 +154,7 @@ Route::prefix('v1')->group(function () {
         Route::controller(LabourBookingController::class)->prefix("labour-booking")->group(function () {
             Route::post("/", "bookNew");
             Route::post("work-done", "workDone");
+            Route::get("get-nearby-labour", "getNearbyLabour");
 
         });
 
@@ -188,6 +189,7 @@ Route::prefix('v1')->group(function () {
                 Route::get("labour-profile", "Profile");
                 Route::post("start-work", "startWork");
                 Route::post("end-work", "endWork");
+                Route::get("get-labour-booking-history", "getLabourBookingHistory");
 
             });
 

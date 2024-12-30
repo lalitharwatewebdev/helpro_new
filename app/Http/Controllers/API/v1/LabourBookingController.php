@@ -277,7 +277,6 @@ class LabourBookingController extends Controller
 
         // $labour_booking_data = LabourAcceptedBooking::where('')->get();
         $booking->is_user_work_done = 1;
-        
 
         $booking->save();
 
@@ -285,6 +284,11 @@ class LabourBookingController extends Controller
             "message" => "Work Done Successfully",
             "status" => true,
         ], 200);
+
+    }
+
+    public function getNearbyLabour(Request $request)
+    {
 
     }
 }
