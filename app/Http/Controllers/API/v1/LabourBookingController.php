@@ -289,6 +289,38 @@ class LabourBookingController extends Controller
 
     public function getNearbyLabour(Request $request)
     {
+        $user = User::where('id', $request->user()->id)->first();
+        $category_id = 13;
+        // return $user;
+        $lat_long = $user->lat_long;
+        list($latitude, $longitude) = explode(',', $lat_long);
+        $business_settings = BusinessSetting::pluck("value", "key")->toArray();
+        $radius = $business_settings['radius'];
+        if (!is_numeric($latitude) || !is_numeric($longitude) || !is_numeric($radius)) {
+            return response()->json(['error' => 'Invalid parameters'], 400);
+        }
 
+        $earthRadius = 6371; // Earth radius in kilometers
+
+        // Convert latitude and longitude from degrees to radians
+        $latFrom = deg2rad($latitude);
+        $lonFrom = deg2rad($longitude);
+
+        // Calculate bounding box
+        $latDelta = $radius / $earthRadius;
+        $lonDelta = $radius / ($earthRadius * cos($latFrom));
+
+        $latMin = rad2deg($latFrom - $latDelta);
+        $latMax = rad2deg($latFrom + $latDelta);
+        $lonMin = rad2deg($lonFrom - $lonDelta);
+        $lonMax = rad2deg($lonFrom + $lonDelta);
+
+        // get area first nearest to user's co-ordinate
+        return $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+            ->where('category_id', $category_id)
+            ->whereBetween('latitude', [$latMin, $latMax])
+            ->whereBetween('longitude', [$lonMin, $lonMax])
+            ->with("category:id,title,image")->take(1)
+            ->get();
     }
 }

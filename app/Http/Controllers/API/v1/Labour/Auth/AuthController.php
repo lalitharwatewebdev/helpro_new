@@ -360,9 +360,10 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function getLabourBookingHistory()
+    public function getLabourBookingHistory(Request $request)
     {
-        $labour_booking = LabourAcceptedBooking::with(['booking'])->where('labour_id', auth()->user()->id)->where('is_work_done', '0')->get();
+        // return $request->user()->id;
+        $labour_booking = LabourAcceptedBooking::with(['booking'=>['user']])->where('labour_id', auth()->user()->id)->where('is_work_done', '1')->get();
 
         return response([
             "data" => $labour_booking,
