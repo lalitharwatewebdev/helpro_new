@@ -19,6 +19,7 @@ use App\Models\LabourRedeem;
 use App\Models\User;
 use App\Models\Wallet;
 use DateTime;
+use DB;
 use Illuminate\Http\Request;
 
 // notification
@@ -33,7 +34,7 @@ class LabourBookingController extends Controller
         $request->validate([
             "category_id" => "required|exists:categories,id",
             "labour_quantity" => "required|integer",
-            "address_id" => "required|exists:addresses,id",
+            // "address_id" => "required|exists:addresses,id",
             "lat_long" => "required",
             "start_time" => "required",
             "end_time" => "required",
@@ -82,6 +83,19 @@ class LabourBookingController extends Controller
         $lonMin = rad2deg($lonFrom - $lonDelta);
         $lonMax = rad2deg($lonFrom + $lonDelta);
 
+        $areas = DB::table('areas')->select('areas.*', DB::raw("
+        (6371 * acos(
+            cos(radians($latitude)) *
+            cos(radians(latitude)) *
+            cos(radians(longitude) - radians($longitude)) +
+            sin(radians($latitude)) *
+            sin(radians(latitude))
+        )) AS distance
+    "))
+            ->having('distance', '<', $radius)
+            ->orderBy('distance')
+            ->take(1)->get();
+
         // get area first nearest to user's co-ordinate
         $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
             ->where('category_id', $category_id)
@@ -89,17 +103,24 @@ class LabourBookingController extends Controller
             ->whereBetween('longitude', [$lonMin, $lonMax])
             ->with("category:id,title,image")->take(1)
             ->get();
+        \Log::info($areas);
+
+        if (!empty($area_data)) {
+            $area_data = Areas::with(["category:id,title,image"])->where('id', $areas[0]->id)->first();
+        }else{
+            $area_data =[];
+        }
 
         \Log::info("areas");
-        \Log::info($areas);
-        \Log::info(!empty($areas));
+        \Log::info($area_data);
+        \Log::info(!empty($area_data));
 
         $labours = '';
 
-        if (!empty($areas)) {
+        if (!empty($area_data)) {
 
             \Log::info("inside area");
-            \Log::info($areas);
+            \Log::info($area_data);
             $labours = User::where('type', 'labour')
                 ->whereHas('category', function ($query) use ($category_id) {
                     $query->where('category_id', $category_id);
@@ -233,9 +254,7 @@ class LabourBookingController extends Controller
         ]);
 
         $booking = Booking::where('id', $request->booking_id)->first();
-
         if ($booking->transaction_type == "pre_paid") {
-            $one_labour_amount = $booking->labour_amount / $booking->quantity_required;
             $labour_booking_data = LabourBooking::where('id', $booking->labour_booking_id)->first();
 
             $fdate = $labour_booking_data->start_date;
@@ -245,11 +264,17 @@ class LabourBookingController extends Controller
             $interval = $datetime1->diff($datetime2);
             $days = $interval->format('%a') + 1;
 
+            $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
+
+            $one_labour_amount = $booking->labour_amount / $booking->quantity_required;
+            // $one_labour_amount = $booking->labour_amount;
+
             // \Log::info($days);
 
             $labour_payable_amount = $one_labour_amount * $days;
+            // $labour_payable_amount = $one_labour_amount;
 
-            $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
+            // $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
             foreach ($labours as $key => $value) {
                 $wallet = Wallet::where('user_id', $value['labour_id'])->first();
 
@@ -296,31 +321,42 @@ class LabourBookingController extends Controller
         list($latitude, $longitude) = explode(',', $lat_long);
         $business_settings = BusinessSetting::pluck("value", "key")->toArray();
         $radius = $business_settings['radius'];
-        if (!is_numeric($latitude) || !is_numeric($longitude) || !is_numeric($radius)) {
-            return response()->json(['error' => 'Invalid parameters'], 400);
-        }
 
-        $earthRadius = 6371; // Earth radius in kilometers
+        $areas = DB::table('areas')->select('areas.*', DB::raw("
+        (6371 * acos(
+            cos(radians($latitude)) *
+            cos(radians(latitude)) *
+            cos(radians(longitude) - radians($longitude)) +
+            sin(radians($latitude)) *
+            sin(radians(latitude))
+        )) AS distance
+    "))
+            ->having('distance', '<', $radius)
+            ->orderBy('distance')
+            ->take(1)->get();
 
-        // Convert latitude and longitude from degrees to radians
-        $latFrom = deg2rad($latitude);
-        $lonFrom = deg2rad($longitude);
+        $area_data = Areas::with(["category:id,title,image"])->where('id', $areas[0]->id)->first();
 
-        // Calculate bounding box
-        $latDelta = $radius / $earthRadius;
-        $lonDelta = $radius / ($earthRadius * cos($latFrom));
+        $labours = User::where('type', 'labour')
+            ->whereHas('category', function ($query) use ($category_id) {
+                $query->where('category_id', $category_id);
+            })
+            ->get()
+            ->filter(function ($labour) use ($latitude, $longitude, $radius, $user) {
+                [$labourLatitude, $labourLongitude] = explode(',', $user->lat_long);
+                $distance = $this->haversineGreatCircleDistance(
+                    $latitude,
+                    $longitude,
+                    $labourLatitude,
+                    $labourLongitude
+                );
+                return $distance <= $radius;
+            })
+            ->map(function ($labour) {
+                $labour->type = 'labour';
+                return $labour;
+            })->pluck("device_id")->toArray();
 
-        $latMin = rad2deg($latFrom - $latDelta);
-        $latMax = rad2deg($latFrom + $latDelta);
-        $lonMin = rad2deg($lonFrom - $lonDelta);
-        $lonMax = rad2deg($lonFrom + $lonDelta);
-
-        // get area first nearest to user's co-ordinate
-        return $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
-            ->where('category_id', $category_id)
-            ->whereBetween('latitude', [$latMin, $latMax])
-            ->whereBetween('longitude', [$lonMin, $lonMax])
-            ->with("category:id,title,image")->take(1)
-            ->get();
+        return $labours;
     }
 }

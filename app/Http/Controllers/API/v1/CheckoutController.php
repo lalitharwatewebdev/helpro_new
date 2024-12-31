@@ -21,6 +21,7 @@ use App\Models\UserReview;
 use App\Models\Wallet;
 use App\Providers\RazorpayServiceProvider;
 use DateTime;
+use DB;
 use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
@@ -212,16 +213,31 @@ class CheckoutController extends Controller
         $lonMax = rad2deg($lonFrom + $lonDelta);
 
         // get area first nearest to user's co-ordinate
-        $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
-            ->where('category_id', $data->category_id)
-            ->whereBetween('latitude', [$latMin, $latMax])
-            ->whereBetween('longitude', [$lonMin, $lonMax])
-            ->with("category:id,title,image")->take(1)
-            ->get();
+        // $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+        //     ->where('category_id', $data->category_id)
+        //     ->whereBetween('latitude', [$latMin, $latMax])
+        //     ->whereBetween('longitude', [$lonMin, $lonMax])
+        //     ->with("category:id,title,image")->take(1)
+        //     ->get();
+
+        $areas = DB::table('areas')->select('areas.*', DB::raw("
+            (6371 * acos(
+                cos(radians($latitude)) *
+                cos(radians(latitude)) *
+                cos(radians(longitude) - radians($longitude)) +
+                sin(radians($latitude)) *
+                sin(radians(latitude))
+            )) AS distance
+        "))
+            ->having('distance', '<', $radius)
+            ->orderBy('distance')
+            ->take(1)->get();
+
+        $area_data = Areas::with(["category:id,title,image"])->where('id', $areas[0]->id)->first();
 
         $labours = '';
 
-        if (!empty($areas)) {
+        if (!empty($area_data)) {
 
             // \Log::info("inside area");
             // \Log::info($areas);
@@ -264,7 +280,7 @@ class CheckoutController extends Controller
         $message = "You have a new job available.";
         $device_ids = $labours;
         if ($request->transaction_type == "post_paid" || $is_razorpay == false) {
-            $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
+            $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity, 'total_price' => $booking->total_amount / $labour_booking_data->labour_quantity];
         }
 
         // \Log::info("additional_data");
@@ -638,7 +654,6 @@ class CheckoutController extends Controller
             $booking->is_work_done = 1;
             $booking->save();
 
-            $one_labour_commission_amount = $booking->commission_amount / $booking->quantity_required;
             $labour_booking_data = LabourBooking::where('id', $booking->labour_booking_id)->first();
 
             $fdate = $labour_booking_data->start_date;
@@ -648,9 +663,17 @@ class CheckoutController extends Controller
             $interval = $datetime1->diff($datetime2);
             $days = $interval->format('%a') + 1;
 
-            // \Log::info($days);
+            $one = $booking->labour_amount * $days;
 
-            $labour_payable_commision_amount = $one_labour_commission_amount * $days;
+            $second = $booking->total_amount - $one;
+
+            $labour_payable_commision_amount = $second / $booking->quantity_required;
+
+            // $one_labour_commission_amount = $booking->commission_amount / $booking->quantity_required;
+
+            // // \Log::info($days);
+
+            // $labour_payable_commision_amount = $one_labour_commission_amount * $days;
 
             $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
             \Log::info("labourssss");

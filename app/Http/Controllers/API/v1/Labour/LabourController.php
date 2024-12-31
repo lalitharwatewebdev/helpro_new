@@ -434,7 +434,7 @@ class LabourController extends Controller
 
         if ($booking_status == "accepted") {
 
-            $data = LabourAcceptedBooking::with(['booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
+            $data = LabourAcceptedBooking::with(['booking'=>['labour_bookings'], 'booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
 
             foreach ($data as $key => $value) {
                 $book_data = Booking::where('labour_booking_id', $value->booking_id)->first();
@@ -449,7 +449,7 @@ class LabourController extends Controller
                 "success" => true,
             ], 200);
         } else {
-            $data = LabourRejectedBooking::with(['booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
+            $data = LabourRejectedBooking::with(['booking.labour_bookings', 'booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
             \Log::info("Rejected Labour Booking" . $data);
 
             foreach ($data as $key => $value) {

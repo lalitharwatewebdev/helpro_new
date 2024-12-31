@@ -7,6 +7,7 @@ use App\Models\Areas;
 use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\User;
+use DB;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -70,12 +71,27 @@ class CategoryController extends Controller
         $lonMax = rad2deg($lonFrom + $lonDelta);
 
         // Get areas in bounding box
-        $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
-            ->where('category_id', $category_id)
-        // ->whereBetween('latitude', [$latMin, $latMax])
-        // ->whereBetween('longitude', [$lonMin, $lonMax])
-            ->with("category:id,title,image")->take(1)
-            ->get();
+        // $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+        //     ->where('category_id', $category_id)
+        // // ->whereBetween('latitude', [$latMin, $latMax])
+        // // ->whereBetween('longitude', [$lonMin, $lonMax])
+        //     ->with("category:id,title,image")->take(1)
+        //     ->get();
+
+        $areas = DB::table('areas')->select('areas.*', DB::raw("
+            (6371 * acos(
+                cos(radians($latitude)) *
+                cos(radians(latitude)) *
+                cos(radians(longitude) - radians($longitude)) +
+                sin(radians($latitude)) *
+                sin(radians(latitude))
+            )) AS distance
+        "))
+            ->having('distance', '<', $radius)
+            ->orderBy('distance')
+            ->take(1)->get();
+
+        $area_data = Areas::with(["category:id,title,image"])->where('id', $areas[0]->id)->first();
 
         $labours_device_id = User::where('type', 'labour')
             ->where("is_online", "yes")
@@ -104,7 +120,7 @@ class CategoryController extends Controller
                 $query->where('category_id', $category_id);
             })
             ->get()
-            ->filter(function ($labour) use ($latitude, $longitude, $radius,$request) {
+            ->filter(function ($labour) use ($latitude, $longitude, $radius, $request) {
                 [$labourLatitude, $labourLongitude] = explode(',', $request->lat_long);
                 $distance = $this->haversineGreatCircleDistance(
                     $latitude,
@@ -134,7 +150,7 @@ class CategoryController extends Controller
         // }
 
         $responseData = [
-            'areas' => $areas,
+            'areas' => $area_data,
             'labour' => $labours,
         ];
 
