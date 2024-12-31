@@ -141,7 +141,7 @@ class CategoryController extends Controller
         //         return $labour;
         //     })->toArray();
 
-        $labours = DB::table('users')
+        $labours_data = DB::table('users')
             ->select('*')
             ->selectRaw("
         (6371 * acos(
@@ -154,10 +154,18 @@ class CategoryController extends Controller
     ", [$latitude, $longitude, $latitude])
             ->where('type', 'labour')->having('distance', '<', $radius)
             ->orderBy('distance')
-            ->get();
+            ->get()->pluck('id');
         \Log::info("message");
 
-        \Log::info($labours);
+        \Log::info($labours_data);
+
+        if (!empty($labours_data)) {
+            $labours = User::whereIn('id', $labours_data)->whereHas('category', function ($query) use ($category_id) {
+                $query->where('category_id', $category_id);
+            })->get();
+        } else {
+            $labours = [];
+        }
         // $labours = User::where("type","labour")->get();
         // \Log::info("labour device id ==> ",$labours_device_id);
         // if(!empty($labours)){

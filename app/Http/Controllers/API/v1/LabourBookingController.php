@@ -97,15 +97,18 @@ class LabourBookingController extends Controller
             ->take(1)->get();
 
         // get area first nearest to user's co-ordinate
-        $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
-            ->where('category_id', $category_id)
-            ->whereBetween('latitude', [$latMin, $latMax])
-            ->whereBetween('longitude', [$lonMin, $lonMax])
-            ->with("category:id,title,image")->take(1)
-            ->get();
+        // $areas = Areas::selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$latitude, $longitude, $latitude])
+        //     ->where('category_id', $category_id)
+        //     ->whereBetween('latitude', [$latMin, $latMax])
+        //     ->whereBetween('longitude', [$lonMin, $lonMax])
+        //     ->with("category:id,title,image")->take(1)
+        //     ->get();
+        \Log::info("areaaaaaaaaaaaaaaaa");
         \Log::info($areas);
+        // \Log::info($areas[0]);
+        // \Log::info($areas[0]);
 
-        if (!empty($area_data)) {
+        if (!empty($areas[0])) {
             $area_data = Areas::with(["category:id,title,image"])->where('id', $areas[0]->id)->first();
         } else {
             $area_data = [];
@@ -155,19 +158,23 @@ class LabourBookingController extends Controller
     ", [$latitude, $longitude, $latitude])
                 ->where('type', 'labour')->having('distance', '<', $radius)
                 ->orderBy('distance')
-                ->get()->pluck('id');
+                ->pluck('id');
         }
 
-        $labours = User::whereHas('category', function ($query) use ($category_id) {
-            $query->where('category_id', $category_id);
-        })->whereIn('id', $labours_data)->pluck("device_id")->toArray();
+        if (!empty($labours_data)) {
+            $labours = User::whereIn('id', $labours_data)->whereHas('category', function ($query) use ($category_id) {
+                $query->where('category_id', $category_id);
+            })->pluck("device_id")->toArray();
+        } else {
+            $labours = [];
+        }
         // return response([
         //     "message" => "Booked Successfully",
         //     "status" => true,
         // ], 200);
 
-        // \Log::info("labours");
-        // \Log::info($labours);
+        \Log::info("labours");
+        \Log::info($labours);
         // try {
         if (!empty($labours)) {
             \Log::info("inside labour");
@@ -194,7 +201,8 @@ class LabourBookingController extends Controller
                 \Log::info("userDatataa");
                 \Log::info(auth()->user()->id);
 
-                $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
+                // $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
+                $user_address = Address::where("user_id", auth()->user()->id)->where("id", $request->address_id)->first();
 
                 if (!$user_address) {
                     return response([
