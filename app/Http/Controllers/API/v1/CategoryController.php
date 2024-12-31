@@ -87,11 +87,17 @@ class CategoryController extends Controller
                 sin(radians(latitude))
             )) AS distance
         "))
-            ->having('distance', '<', $radius)
+            ->where('category_id', $category_id)->having('distance', '<', $radius)
             ->orderBy('distance')
             ->take(1)->get();
 
-        $area_data = Areas::with(["category:id,title,image"])->where('id', $areas[0]->id)->first();
+        // return $areas;
+
+        if (!empty($areas[0])) {
+            $area_data = Areas::with(["category:id,title,image"])->where('id', $areas[0]->id)->get();
+        } else {
+            $area_data = [];
+        }
 
         $labours_device_id = User::where('type', 'labour')
             ->where("is_online", "yes")
@@ -114,27 +120,44 @@ class CategoryController extends Controller
                 return $labour;
             })->pluck("device_id")->toArray();
 
-        $labours = User::where('type', 'labour')
-            ->where("is_online", "yes")
-            ->whereHas('category', function ($query) use ($category_id) {
-                $query->where('category_id', $category_id);
-            })
-            ->get()
-            ->filter(function ($labour) use ($latitude, $longitude, $radius, $request) {
-                [$labourLatitude, $labourLongitude] = explode(',', $request->lat_long);
-                $distance = $this->haversineGreatCircleDistance(
-                    $latitude,
-                    $longitude,
-                    $labourLatitude,
-                    $labourLongitude
-                );
-                return $distance <= $radius;
-            })
-            ->map(function ($labour) {
-                $labour->type = 'labour';
-                return $labour;
-            })->toArray();
+        // $labours = User::where('type', 'labour')
+        //     ->where("is_online", "yes")
+        //     ->whereHas('category', function ($query) use ($category_id) {
+        //         $query->where('category_id', $category_id);
+        //     })
+        //     ->get()
+        //     ->filter(function ($labour) use ($latitude, $longitude, $radius, $request) {
+        //         [$labourLatitude, $labourLongitude] = explode(',', $request->lat_long);
+        //         $distance = $this->haversineGreatCircleDistance(
+        //             $latitude,
+        //             $longitude,
+        //             $labourLatitude,
+        //             $labourLongitude
+        //         );
+        //         return $distance <= $radius;
+        //     })
+        //     ->map(function ($labour) {
+        //         $labour->type = 'labour';
+        //         return $labour;
+        //     })->toArray();
 
+        $labours = DB::table('users')
+            ->select('*')
+            ->selectRaw("
+        (6371 * acos(
+            cos(radians(?)) *
+            cos(radians(SUBSTRING_INDEX(lat_long, ',', 1))) *
+            cos(radians(SUBSTRING_INDEX(lat_long, ',', -1)) - radians(?)) +
+            sin(radians(?)) *
+            sin(radians(SUBSTRING_INDEX(lat_long, ',', 1)))
+        )) AS distance
+    ", [$latitude, $longitude, $latitude])
+            ->where('type', 'labour')->having('distance', '<', $radius)
+            ->orderBy('distance')
+            ->get();
+        \Log::info("message");
+
+        \Log::info($labours);
         // $labours = User::where("type","labour")->get();
         // \Log::info("labour device id ==> ",$labours_device_id);
         // if(!empty($labours)){

@@ -107,8 +107,8 @@ class LabourBookingController extends Controller
 
         if (!empty($area_data)) {
             $area_data = Areas::with(["category:id,title,image"])->where('id', $areas[0]->id)->first();
-        }else{
-            $area_data =[];
+        } else {
+            $area_data = [];
         }
 
         \Log::info("areas");
@@ -121,33 +121,53 @@ class LabourBookingController extends Controller
 
             \Log::info("inside area");
             \Log::info($area_data);
-            $labours = User::where('type', 'labour')
-                ->whereHas('category', function ($query) use ($category_id) {
-                    $query->where('category_id', $category_id);
-                })
-                ->get()
-                ->filter(function ($labour) use ($latitude, $longitude, $radius, $request) {
-                    [$labourLatitude, $labourLongitude] = explode(',', $request->lat_long);
-                    $distance = $this->haversineGreatCircleDistance(
-                        $latitude,
-                        $longitude,
-                        $labourLatitude,
-                        $labourLongitude
-                    );
-                    return $distance <= $radius;
-                })
-                ->map(function ($labour) {
-                    $labour->type = 'labour';
-                    return $labour;
-                })->pluck("device_id")->toArray();
+
+            // $labours = User::where('type', 'labour')
+            //     ->whereHas('category', function ($query) use ($category_id) {
+            //         $query->where('category_id', $category_id);
+            //     })
+            //     ->get()
+            //     ->filter(function ($labour) use ($latitude, $longitude, $radius, $request) {
+            //         [$labourLatitude, $labourLongitude] = explode(',', $request->lat_long);
+            //         $distance = $this->haversineGreatCircleDistance(
+            //             $latitude,
+            //             $longitude,
+            //             $labourLatitude,
+            //             $labourLongitude
+            //         );
+            //         return $distance <= $radius;
+            //     })
+            //     ->map(function ($labour) {
+            //         $labour->type = 'labour';
+            //         return $labour;
+            //     })->pluck("device_id")->toArray();
+
+            $labours_data = DB::table('users')
+                ->select('*')
+                ->selectRaw("
+        (6371 * acos(
+            cos(radians(?)) *
+            cos(radians(SUBSTRING_INDEX(lat_long, ',', 1))) *
+            cos(radians(SUBSTRING_INDEX(lat_long, ',', -1)) - radians(?)) +
+            sin(radians(?)) *
+            sin(radians(SUBSTRING_INDEX(lat_long, ',', 1)))
+        )) AS distance
+    ", [$latitude, $longitude, $latitude])
+                ->where('type', 'labour')->having('distance', '<', $radius)
+                ->orderBy('distance')
+                ->get()->pluck('id');
         }
+
+        $labours = User::whereHas('category', function ($query) use ($category_id) {
+            $query->where('category_id', $category_id);
+        })->whereIn('id', $labours_data)->pluck("device_id")->toArray();
         // return response([
         //     "message" => "Booked Successfully",
         //     "status" => true,
         // ], 200);
 
-        \Log::info("labours");
-        \Log::info($labours);
+        // \Log::info("labours");
+        // \Log::info($labours);
         // try {
         if (!empty($labours)) {
             \Log::info("inside labour");
@@ -211,7 +231,7 @@ class LabourBookingController extends Controller
                 "message" => "Labour Not Found",
                 // "labour_booking_id" => $labourBooking->id,
                 "status" => true,
-            ], 200);
+            ], 201);
         }
 
         return response([
