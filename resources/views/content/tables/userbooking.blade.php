@@ -69,6 +69,14 @@
             </x-form>
         </x-slot>
     </x-modal>
+
+    <x-modal title="Cancel Booking" footer="false" id="cancel-bookings-modal">
+        <x-slot name="body">
+            <x-form successCallback="test" id="cancel-booking" method="POST" class="" :route="route('admin.userbookings.cancelBooking')">
+                <x-input name="password"></x-input>
+            </x-form>
+        </x-slot>
+    </x-modal>
 @endsection
 @section('page-script')
     <script>
@@ -81,14 +89,48 @@
                 // $(`#${modal}`).modal('show');
                 window.location.href = "{{ route('admin.labours.add') }}"
             });
-         
+
+            $(document).on('click', '.cancel_booking', function() {
+                var id = $(this).data('orderid');
+                var day = $(this).data('day');
+                // console.log(id);
+                // console.log(day);
+
+                if (day == "today") {
+                    $.ajaxSetup({
+                        headers: {
+                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                        }
+                    });
+
+
+                    $.ajax({
+                        type: 'post',
+                        url: "{{ route('admin.userbookings.cancelBooking') }}",
+                        data: {
+                            day: day,
+                            id: id,
+
+                        },
+                        success: function(response) {
+                            window.location.href = "{{ route('admin.userbookings.pending') }}"
+                        }
+                    });
+                } else {
+
+                }
+
+
+
+            });
+
             $(document).on('change', '#booking_status', function() {
                 var status = $(this).val();
                 var id = $(this).data('id');
 
-                console.log("status");
-                console.log(status);
-                console.log(id);
+                // console.log("status");
+                // console.log(status);
+                // console.log(id);
                 $.ajaxSetup({
                     headers: {
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")

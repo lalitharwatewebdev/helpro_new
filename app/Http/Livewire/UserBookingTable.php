@@ -73,6 +73,18 @@ class UserBookingTable extends DataTableComponent
                     </select>";
                 })->html(),
 
+            Column::make('Cancel Booking')
+                ->label(function ($row, Column $column) {
+                    // return $row->checkout->start_date;
+
+                    if ($row->checkout->start_date == date('Y-m-d', strtotime(now()))) {
+                        return "<a href='#' data-day='today' data-orderid = '" . $row->id . "' class='btn btn-primary cancel_booking'>Cancel</a>";
+                    } else {
+                        return "<a href='#' data-day='nottoday'  data-orderid = '" . $row->id . "' class='btn btn-primary cancel_booking'>Cancel</a>";
+                    }
+
+                })->html(),
+
             Column::make("labour_booking_id")
                 ->collapseOnTablet()
                 ->searchable()

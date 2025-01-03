@@ -139,6 +139,7 @@ Route::prefix("admin")->name("admin.")->group(function () {
         Route::get("add", "create")->name("add");
         Route::get('destroy', 'destroy')->name('destroy');
         Route::post('store', 'store')->name('store');
+        Route::post('cancelBooking', 'cancelBooking')->name('cancelBooking');
         Route::get('{id}/edit', "edit")->name('edit');
         Route::delete('/{id}', 'destroy')->name('destroy');
         Route::post('update', 'update')->name('update');
@@ -309,7 +310,6 @@ Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function ()
         Route::get("export", "export")->name("export");
         Route::get("labour-export", "labourExport")->name("labour-export");
         Route::get("invoice-pdf", "invoicePdf")->name("invoice-pdf");
-
 
     });
 
