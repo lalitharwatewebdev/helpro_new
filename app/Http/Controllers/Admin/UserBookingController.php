@@ -163,11 +163,17 @@ class UserBookingController extends Controller
             $deducted_amount = $booking_data->total_amount - $booking_data->commission_amount;
 
             $userwallet = Wallet::where('user_id', $booking_data->user_id)->first();
-            $total = $userwallet + $deducted_amount;
+            $total = ($userwallet['amount'] ?? 0) + $deducted_amount;
             $userwallet->amount = $total;
             $userwallet->save();
         } else {
+            $deducted_amount = $request->deducted_amount;
 
+            $userwallet = Wallet::where('user_id', $booking_data->user_id)->first();
+            // dd($userwallet['amount']);
+            $total = ($userwallet['amount'] ?? 0) + $deducted_amount;
+            $userwallet->amount = $total;
+            $userwallet->save();
         }
         return response([
             'message' => 'Status Change successfully',

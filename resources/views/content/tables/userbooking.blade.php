@@ -73,7 +73,12 @@
     <x-modal title="Cancel Booking" footer="false" id="cancel-bookings-modal">
         <x-slot name="body">
             <x-form successCallback="test" id="cancel-booking" method="POST" class="" :route="route('admin.userbookings.cancelBooking')">
-                <x-input name="password"></x-input>
+                <div class="col-lg-12">
+                    <x-input name="deducted_amount"></x-input>
+                    <input name="id" id="booking_id" type="hidden"></input>
+
+
+                </div>
             </x-form>
         </x-slot>
     </x-modal>
@@ -95,7 +100,6 @@
                 var day = $(this).data('day');
                 // console.log(id);
                 // console.log(day);
-
                 if (day == "today") {
                     $.ajaxSetup({
                         headers: {
@@ -117,6 +121,8 @@
                         }
                     });
                 } else {
+                    $('#cancel-bookings-modal').modal('show')
+                    $('#booking_id').val(id)
 
                 }
 
