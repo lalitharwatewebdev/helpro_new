@@ -158,23 +158,28 @@ class UserBookingController extends Controller
         $booking_data = Booking::where('id', $request->id)->first();
         $booking_data->booking_status = "cancelled";
         $booking_data->save();
-
-        if ($request->day == "day") {
-            $deducted_amount = $booking_data->total_amount - $booking_data->commission_amount;
-
+        if ($booking_data->transaction_type == "pre_paid") {
+            if ($request->day == "day") {
+                $deducted_amount = $booking_data->total_amount - $booking_data->commission_amount;
+            } else {
+                $deducted_amount = $booking_data->total_amount - $request->deducted_amount;
+            }
             $userwallet = Wallet::where('user_id', $booking_data->user_id)->first();
             $total = ($userwallet['amount'] ?? 0) + $deducted_amount;
             $userwallet->amount = $total;
             $userwallet->save();
-        } else {
-            $deducted_amount = $request->deducted_amount;
-
+        } elseif ($booking_data->transaction_type == "post_paid") {
+            if ($request->day == "day") {
+                $deducted_amount = $booking_data->commission_amount;
+            } else {
+                $deducted_amount = $request->deducted_amount;
+            }
             $userwallet = Wallet::where('user_id', $booking_data->user_id)->first();
-            // dd($userwallet['amount']);
-            $total = ($userwallet['amount'] ?? 0) + $deducted_amount;
+            $total = ($userwallet['amount'] ?? 0) - $deducted_amount;
             $userwallet->amount = $total;
             $userwallet->save();
         }
+
         return response([
             'message' => 'Status Change successfully',
             'table' => 'labour-table',
