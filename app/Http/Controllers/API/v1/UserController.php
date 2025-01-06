@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\City;
+use App\Models\ExtraTimeWork;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\LabourFeedbackImage;
@@ -15,6 +16,7 @@ use App\Models\State;
 use App\Models\Transactions;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Providers\RazorpayServiceProvider;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -204,8 +206,8 @@ class UserController extends Controller
 
         $labour_booking_data = LabourAcceptedBooking::where('booking_id', $booking_data->labour_booking_id)->pluck('labour_id');
 
-        $labour_data = User::with(['labourAcceptedBooking'=>function($q) use($booking_data){
-            $q->where('booking_id',$booking_data->labour_booking_id);
+        $labour_data = User::with(['labourAcceptedBooking' => function ($q) use ($booking_data) {
+            $q->where('booking_id', $booking_data->labour_booking_id);
         }])->whereIn('id', $labour_booking_data)->get();
 
         return response([
@@ -260,5 +262,119 @@ class UserController extends Controller
             "message" => $user->type . " Logout Successfully",
             "status" => true,
         ], 200);
+    }
+
+    protected $razorpay;
+    public function __construct(RazorpayServiceProvider $razorpay)
+    {
+        $this->razorpay = $razorpay;
+    }
+
+    public function fetchExtraTineWorkOrder(Request $request)
+    {
+        $request->validate([
+            "booking_id" => "required",
+            "total_amount" => "required",
+        ]);
+
+        $booking_data = Booking::where('id', $request->booking_id)->first();
+
+        $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
+
+        $data = new ExtraTimeWork();
+        $data->booking_id = $request->booking_id;
+        $data->labour_booking_id = $booking_data->labour_booking_id;
+        $data->total_amount = $request->total_amount;
+        $data->commission_amount = $request->commission_amount;
+        $data->gst = $request->gst;
+        $data->labour_id = implode(',', $request->labour_id);
+        $data->labour_amount = $request->labour_amount;
+
+        if ($booking_data->transaction_type == 'pre_paid') {
+            if ($request->use_wallet == "yes") {
+                if ($user_wallet->amount == 0) {
+                    $order = $this->razorpay->createOrder($request->total_amount, "INR", $request->booking_id);
+
+                    $is_razorpay = true;
+                    $wallet_use = false;
+
+                    $data->order_status = "pending";
+                    $data->razorpay_order_id = $order->id ?? $order['id'] ?? null;
+
+                }
+
+                if ($user_wallet->amount < $request->total_amount) {
+                    $partial_amount = $request->total_amount - $user_wallet->amount;
+                    // $user_wallet->decrement("amount", $user_wallet->amount);
+                    // \Log::info("partial_amount");
+                    // \Log::info($partial_amount);
+                    $order = $this->razorpay->createOrder($partial_amount, "INR", $request->booking_id);
+                    // \Log::info(json_encode($order));
+
+                    $is_razorpay = true;
+                    $wallet_use = "partial_use";
+
+                    $data->order_status = "pending";
+                    $data->razorpay_order_id = $order->id ?? $order['id'] ?? null;
+
+                } else {
+                    $is_razorpay = false;
+                    $wallet_use = true;
+
+                    $user_wallet->decrement("amount", $request->total_amount);
+
+                    $data->order_status = "paid";
+                    $data->razorpay_order_id = null;
+                }
+            } else {
+                $order = $this->razorpay->createOrder($request->total_amount, "INR", $request->booking_id);
+                $is_razorpay = true;
+                $wallet_use = false;
+
+                $data->order_status = "paid";
+                $data->razorpay_order_id = null;
+
+            }
+
+            $data->save();
+
+            // \Log::info("fetchExtraTineWorkOrder");
+
+            // \Log::info($data);
+
+            return response()->json([
+                "message" => "Add On created successfully",
+                "order_id" => $order->id ?? $order['id'] ?? null,
+                "is_razorpay" => $is_razorpay,
+                "is_wallet" => $wallet_use,
+                "status" => true,
+            ], 200);
+        } else {
+            return response()->json([
+                "message" => "Post Paid Order",
+            ], 200);
+        }
+
+    }
+
+    public function createExtraTineWorkOrder(Request $request)
+    {
+        $request->validate([
+            "order_id" => "required",
+        ]);
+
+        $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
+
+        $data = ExtraTimeWork::where('razorpay_order_id', $request->order_id)->first();
+        if ($fetchOrder['status'] == true) {
+            $data->order_status = "paid";
+            $data->save();
+        }
+
+        return response([
+            "success" => true,
+            "message" => "Booking Done Successfully",
+        ], 200);
+
     }
 }
