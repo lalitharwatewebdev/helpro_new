@@ -313,7 +313,7 @@ class LabourBookingController extends Controller
             // $labour_payable_amount = $one_labour_amount;
 
             // $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
-            foreach ($labours as $key => $value) {
+            foreach ($labours as $key => $value) { 
                 $wallet = Wallet::where('user_id', $value['labour_id'])->first();
                 $add_on_charges = ExtraTimeWork::with(['labour:id,name,email,phone'])->whereHas('labour', function ($q) use ($value) {
                     $q->where('users.id', $value['labour_id']);

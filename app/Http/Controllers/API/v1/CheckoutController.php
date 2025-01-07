@@ -12,6 +12,8 @@ use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\Checkout;
+use App\Models\ExtraTimeWork;
+use App\Models\ExtraTimeWorkLabour;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\ReviewImage;
@@ -570,6 +572,8 @@ class CheckoutController extends Controller
 
         ]);
 
+        \Log::info($request->all());
+
         $amount = $request->amount;
         $booking = Booking::where('id', $request->booking_id)->first();
 
@@ -626,14 +630,26 @@ class CheckoutController extends Controller
             foreach ($labours as $key => $value) {
                 $wallet = Wallet::where('user_id', $value['labour_id'])->first();
 
+                $add_on_charges = ExtraTimeWork::with(['labour:id,name,email,phone'])->whereHas('labour', function ($q) use ($value) {
+                    $q->where('users.id', $value['labour_id']);
+                })->where('booking_id', $request->booking_id)->get();
+                $add_amount = 0;
+                if (!empty($add_on_charges)) {
+                    foreach ($add_on_charges as $key1 => $value1) {
+                        $count_labour = ExtraTimeWorkLabour::where('extra_time_work_id', $value1['id'])->count();
+                        $one_labour_add_amount = $value1['labour_amount'] / $count_labour;
+                        $add_amount = $add_amount + $one_labour_add_amount;
+                    }
+                }
+
                 if (!empty($wallet)) {
-                    $amount = $wallet->amount + $labour_payable_amount;
+                    $amount = $wallet->amount + $labour_payable_amount + $add_amount;
                     $wallet->amount = $amount;
                     $wallet->save();
                 } else {
                     $wallets = new Wallet();
                     $wallets->user_id = $value['labour_id'];
-                    $wallets->amount = $labour_payable_amount;
+                    $wallets->amount = $labour_payable_amount + $add_amount;
                     $wallets->save();
                 }
 
@@ -686,9 +702,20 @@ class CheckoutController extends Controller
                 // \Log::info("labour_payable_commision_amount");
 
                 // \Log::info($labour_payable_commision_amount);
-
+                $add_on_charges = ExtraTimeWork::with(['labour:id,name,email,phone'])->whereHas('labour', function ($q) use ($value) {
+                    $q->where('users.id', $value['labour_id']);
+                })->where('booking_id', $request->booking_id)->get();
+                $add_on_commission_amount = 0;
+                if (!empty($add_on_charges)) {
+                    foreach ($add_on_charges as $key1 => $value1) {
+                        $count_labour = ExtraTimeWorkLabour::where('extra_time_work_id', $value1['id'])->count();
+                        $one_labour_add_amount = $value1['labour_amount'] / $count_labour;
+                        $one_labour_commision = $value1['commission_amount'] / $count_labour;
+                        $add_on_commission_amount = $add_on_commission_amount + $one_labour_commision;
+                    }
+                }
                 if (!empty($wallet)) {
-                    $amounts = (int) ($wallet->amount) - (int) $labour_payable_commision_amount;
+                    $amounts = (int) ($wallet->amount) - ((int) $labour_payable_commision_amount + (int) $add_on_commission_amount);
                     $wallet->amount = $amounts;
                     $wallet->save();
 
@@ -698,7 +725,7 @@ class CheckoutController extends Controller
                 } else {
                     $wallets = new Wallet();
                     $wallets->user_id = $value['labour_id'];
-                    $wallets->amount = '-' . $labour_payable_commision_amount;
+                    $wallets->amount = '-' . ((int)$labour_payable_commision_amount + (int) $add_on_commission_amount);
                     $wallets->save();
 
                     // \Log::info("wallettttttbbbbbbbbbb");
