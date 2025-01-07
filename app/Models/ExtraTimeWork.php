@@ -15,4 +15,9 @@ class ExtraTimeWork extends Model
         return $query->where('status', 'active');
     }
 
+    public function labour()
+    {
+        return $this->belongsToMany(User::class, "extra_time_work_labours", "extra_time_work_id", "labour_id");
+    }
+
 }

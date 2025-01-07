@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\City;
 use App\Models\ExtraTimeWork;
+use App\Models\ExtraTimeWorkLabour;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\LabourFeedbackImage;
@@ -270,7 +271,7 @@ class UserController extends Controller
         $this->razorpay = $razorpay;
     }
 
-    public function fetchExtraTineWorkOrder(Request $request)
+    public function fetchExtraTimeWorkOrder(Request $request)
     {
         $request->validate([
             "booking_id" => "required",
@@ -338,6 +339,15 @@ class UserController extends Controller
 
             $data->save();
 
+            if (!empty($request->labour_id)) {
+                foreach ($request->labour_id as $key => $val) {
+                    $new_data = new ExtraTimeWorkLabour();
+                    $new_data->labour_id = $val;
+                    $new_data->extra_time_work_id = $data->id;
+                    $new_data->save();
+                }
+            }
+
             // \Log::info("fetchExtraTineWorkOrder");
 
             // \Log::info($data);
@@ -363,6 +373,15 @@ class UserController extends Controller
             $data->razorpay_order_id = null;
             $data->save();
 
+            if (!empty($request->labour_id)) {
+                foreach ($request->labour_id as $key => $val) {
+                    $new_data = new ExtraTimeWorkLabour();
+                    $new_data->labour_id = $val;
+                    $new_data->extra_time_work_id = $data->id;
+                    $new_data->save();
+                }
+            }
+
             return response()->json([
                 "status" => true,
                 "message" => "Add On created successfully",
@@ -371,7 +390,7 @@ class UserController extends Controller
 
     }
 
-    public function createExtraTineWorkOrder(Request $request)
+    public function createExtraTimeWorkOrder(Request $request)
     {
         $request->validate([
             "order_id" => "required",

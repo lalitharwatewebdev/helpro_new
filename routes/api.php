@@ -73,8 +73,8 @@ Route::prefix('v1')->group(function () {
             Route::post("cancel-booking", "cancelBooking");
             Route::post("add-labour-feedback", "addLabourFeedback");
             Route::post("get-accepted-labour-details", "getAcceptedLabourDetails");
-            Route::post("fetch-extra-time-work-order", "fetchExtraTineWorkOrder");
-            Route::post("create-extra-time-work-order", "createExtraTineWorkOrder");
+            Route::post("fetch-extra-time-work-order", "fetchExtraTimeWorkOrder");
+            Route::post("create-extra-time-work-order", "createExtraTimeWorkOrder");
             Route::post("get-extra-work-data", "getExtraWorkData");
 
         });

@@ -14,6 +14,7 @@ use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\ExtraTimeWork;
+use App\Models\ExtraTimeWorkLabour;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\LabourRedeem;
@@ -278,6 +279,7 @@ class LabourBookingController extends Controller
 
     public function workDone(Request $request)
     {
+
         $request->validate([
             "booking_id" => "required",
         ]);
@@ -303,28 +305,42 @@ class LabourBookingController extends Controller
             $labour_payable_amount = $one_labour_amount * $days;
 
             //addon amount
-            $add_on_charges = ExtraTimeWork::where('booking_id', $request->booking_id)->sum('labour_amount');
-            $labour_payable_amount = $labour_payable_amount + $add_on_charges;
+            $add_on_charges = ExtraTimeWork::with(['labour:id,name,email,phone'])->whereHas('labour', function ($q) {
+                $q->where('users.id', 344);
+            })->where('booking_id', $request->booking_id)->get();
 
+            // return ($add_on_charges);
             // $labour_payable_amount = $one_labour_amount;
 
             // $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
             foreach ($labours as $key => $value) {
                 $wallet = Wallet::where('user_id', $value['labour_id'])->first();
+                $add_on_charges = ExtraTimeWork::with(['labour:id,name,email,phone'])->whereHas('labour', function ($q) use ($value) {
+                    $q->where('users.id', $value['labour_id']);
+                })->where('booking_id', $request->booking_id)->get();
+                $add_amount = 0;
+                if (!empty($add_on_charges)) {
+                    foreach ($add_on_charges as $key1 => $value1) {
+                        $count_labour = ExtraTimeWorkLabour::where('extra_time_work_id', $value1['id'])->count();
+                        $one_labour_add_amount = $value1['labour_amount'] / $count_labour;
+                        $add_amount = $add_amount + $one_labour_add_amount;
+                    }
+                }
 
+                // return $add_on_charges;
                 if (!empty($wallet)) {
-                    $amount = $wallet->amount + $labour_payable_amount;
+                    $amount = $wallet->amount + $labour_payable_amount + $add_amount;
                     $wallet->amount = $amount;
                     $wallet->save();
                 } else {
                     $wallets = new Wallet();
                     $wallets->user_id = $value['labour_id'];
-                    $wallets->amount = $labour_payable_amount;
+                    $wallets->amount = $labour_payable_amount + $add_amount;
                     $wallets->save();
                 }
 
                 $transaction = new LabourRedeem();
-                $transaction->amount = $labour_payable_amount;
+                $transaction->amount = $labour_payable_amount + $add_amount;
                 $transaction->payment_status = "received";
                 $transaction->remark = "added money";
                 $transaction->labour_id = $value['labour_id'];
