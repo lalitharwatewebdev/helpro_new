@@ -676,34 +676,34 @@ class CheckoutController extends Controller
             // $labour_payable_commision_amount = $one_labour_commission_amount * $days;
 
             $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
-            \Log::info("labourssss");
-            \Log::info($labours);
+            // \Log::info("labourssss");
+            // \Log::info($labours);
             foreach ($labours as $key => $value) {
                 $wallet = Wallet::where('user_id', $value['labour_id'])->first();
-                \Log::info("walletttttt");
+                // \Log::info("walletttttt");
 
-                \Log::info($wallet);
-                \Log::info("labour_payable_commision_amount");
+                // \Log::info($wallet);
+                // \Log::info("labour_payable_commision_amount");
 
-                \Log::info($labour_payable_commision_amount);
+                // \Log::info($labour_payable_commision_amount);
 
                 if (!empty($wallet)) {
                     $amounts = (int) ($wallet->amount) - (int) $labour_payable_commision_amount;
                     $wallet->amount = $amounts;
                     $wallet->save();
 
-                    \Log::info("wallettttttaaaa");
+                    // \Log::info("wallettttttaaaa");
 
-                    \Log::info($wallet);
+                    // \Log::info($wallet);
                 } else {
                     $wallets = new Wallet();
                     $wallets->user_id = $value['labour_id'];
                     $wallets->amount = '-' . $labour_payable_commision_amount;
                     $wallets->save();
 
-                    \Log::info("wallettttttbbbbbbbbbb");
+                    // \Log::info("wallettttttbbbbbbbbbb");
 
-                    \Log::info($wallets);
+                    // \Log::info($wallets);
                 }
 
             }

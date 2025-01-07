@@ -67,7 +67,6 @@ class LabourRazorPayController extends Controller
                 if($booking){
 
                     $labourPayment = new LabourPayment();
-    
                     $labourPayment->booking_id = $booking->id;
                     $labourPayment->service_charges = $service_charges;
                     $labourPayment->save();

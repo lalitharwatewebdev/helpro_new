@@ -350,8 +350,22 @@ class UserController extends Controller
                 "status" => true,
             ], 200);
         } else {
+
+            $data = new ExtraTimeWork();
+            $data->booking_id = $request->booking_id;
+            $data->labour_booking_id = $booking_data->labour_booking_id;
+            $data->total_amount = $request->total_amount;
+            $data->commission_amount = $request->commission_amount;
+            $data->gst = $request->gst;
+            $data->labour_id = implode(',', $request->labour_id);
+            $data->labour_amount = $request->labour_amount;
+            $data->order_status = "pending";
+            $data->razorpay_order_id = null;
+            $data->save();
+
             return response()->json([
-                "message" => "Post Paid Order",
+                "status" => true,
+                "message" => "Add On created successfully",
             ], 200);
         }
 

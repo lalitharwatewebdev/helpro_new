@@ -13,6 +13,7 @@ use App\Models\Areas;
 use App\Models\Booking;
 use App\Models\BusinessSetting;
 use App\Models\Category;
+use App\Models\ExtraTimeWork;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
 use App\Models\LabourRedeem;
@@ -300,6 +301,11 @@ class LabourBookingController extends Controller
             // \Log::info($days);
 
             $labour_payable_amount = $one_labour_amount * $days;
+
+            //addon amount
+            $add_on_charges = ExtraTimeWork::where('booking_id', $request->booking_id)->sum('labour_amount');
+            $labour_payable_amount = $labour_payable_amount + $add_on_charges;
+
             // $labour_payable_amount = $one_labour_amount;
 
             // $labours = LabourAcceptedBooking::where('booking_id', $labour_booking_data->id)->get();
