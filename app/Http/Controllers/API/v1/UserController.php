@@ -391,4 +391,18 @@ class UserController extends Controller
         ], 200);
 
     }
+
+    public function getExtraWorkData(Request $request)
+    {
+        $request->validate([
+            "booking_id" => "required",
+        ]);
+
+        $data = ExtraTimeWork::where('booking_id', $request->booking_id)->get();
+
+        return response([
+            "success" => true,
+            "data" => $data,
+        ], 200);
+    }
 }

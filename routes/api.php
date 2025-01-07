@@ -75,6 +75,7 @@ Route::prefix('v1')->group(function () {
             Route::post("get-accepted-labour-details", "getAcceptedLabourDetails");
             Route::post("fetch-extra-time-work-order", "fetchExtraTineWorkOrder");
             Route::post("create-extra-time-work-order", "createExtraTineWorkOrder");
+            Route::post("get-extra-work-data", "getExtraWorkData");
 
         });
 
