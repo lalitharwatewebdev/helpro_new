@@ -38,6 +38,7 @@ class LabourRedeemController extends Controller
         return response([
             "message" => "Status Updated Successfully",
             "reload" => true,
+            'table' => 'labour-redeem',
         ], 200);
     }
 
