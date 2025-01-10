@@ -116,16 +116,16 @@ class LabourBookingController extends Controller
             $area_data = [];
         }
 
-        \Log::info("areas");
-        \Log::info($area_data);
-        \Log::info(!empty($area_data));
+        // \Log::info("areas");
+        // \Log::info($area_data);
+        // \Log::info(!empty($area_data));
 
         $labours = '';
 
         if (!empty($area_data)) {
 
-            \Log::info("inside area");
-            \Log::info($area_data);
+            // \Log::info("inside area");
+            // \Log::info($area_data);
 
             // $labours = User::where('type', 'labour')
             //     ->whereHas('category', function ($query) use ($category_id) {
@@ -176,12 +176,12 @@ class LabourBookingController extends Controller
         //     "status" => true,
         // ], 200);
 
-        \Log::info("labours");
-        \Log::info($labours);
-        // try {
+        // \Log::info("labours");
+        // \Log::info($labours);
+        // // try {
         if (!empty($labours)) {
-            \Log::info("inside labour");
-            \Log::info($labours);
+            // \Log::info("inside labour");
+            // \Log::info($labours);
             $labourBooking = new LabourBooking();
             $labourBooking->user_id = auth()->user()->id;
             $labourBooking->category_id = $request->category_id;
@@ -196,8 +196,8 @@ class LabourBookingController extends Controller
             $labourBooking->commission_amount = $request->commission_amount;
             $labourBooking->total_labour_charges = $request->total_labour_charges;
             $labourBooking->save();
-            \Log::info($labourBooking);
-            \Log::info("LabourBooking");
+            // \Log::info($labourBooking);
+            // \Log::info("LabourBooking");
 
             // ("Labour Booking Done :: ", $labourBooki\Log::infong);
             if ($labourBooking) {

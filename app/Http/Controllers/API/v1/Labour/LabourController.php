@@ -175,6 +175,8 @@ class LabourController extends Controller
         $bookings = BookingRequest::with("checkout", "checkout.user:id,name", "checkout.address.states:id,name", "checkout.address.cities:id,name", "checkout.area")->where("user_id", auth()->user()->id)
             ->where("category_id", $category_id)->first();
 
+        $booking_amount_data = Booking::where('labour_booking_id', $bookings->booking_id)->first();
+
         $bookings = LabourAcceptedBooking::where("labour_id", auth()->user()->id)->with("booking", "booking.user:id,name", "booking.address.states:id,name", "booking.address.cities:id,name")->orderBy('id', 'desc')->where('current_status', '!=', '2')->where('status', 'active')->first();
 
         if (!empty($bookings)) {
@@ -217,6 +219,7 @@ class LabourController extends Controller
             "total_booking_accepted" => $total_booking_accepted,
             "total_rejected_booking" => $total_rejected_booking,
             'razorpay_status' => $razorpay_type ?? '',
+            'total_amount' => $booking_amount_data->total_amount ?? 0,
             "status" => true,
         ], 200);
     }
@@ -434,7 +437,7 @@ class LabourController extends Controller
 
         if ($booking_status == "accepted") {
 
-            $data = LabourAcceptedBooking::with(['booking'=>['labour_bookings'], 'booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
+            $data = LabourAcceptedBooking::with(['booking' => ['labour_bookings'], 'booking.user', 'booking.address.states:id,name', 'booking.address.cities:id,name'])->where("labour_id", auth()->user()->id)->orderBy('id', 'desc')->get();
 
             foreach ($data as $key => $value) {
                 $book_data = Booking::where('labour_booking_id', $value->booking_id)->first();

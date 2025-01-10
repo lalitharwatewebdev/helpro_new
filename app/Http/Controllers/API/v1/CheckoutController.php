@@ -244,25 +244,50 @@ class CheckoutController extends Controller
 
             // \Log::info("inside area");
             // \Log::info($areas);
-            $labours = User::where('type', 'labour')
-                ->whereHas('category', function ($query) use ($category_id) {
-                    $query->where('category_id', $category_id);
-                })
-                ->get()
-                ->filter(function ($labour) use ($latitude, $longitude, $radius, $request, $data) {
-                    [$labourLatitude, $labourLongitude] = explode(',', $data->lat_long);
-                    $distance = $this->haversineGreatCircleDistance(
-                        $latitude,
-                        $longitude,
-                        $labourLatitude,
-                        $labourLongitude
-                    );
-                    return $distance <= $radius;
-                })
-                ->map(function ($labour) {
-                    $labour->type = 'labour';
-                    return $labour;
-                })->whereNotNull('device_id')->pluck("device_id")->toArray();
+            // $labours = User::where('type', 'labour')
+            //     ->whereHas('category', function ($query) use ($category_id) {
+            //         $query->where('category_id', $category_id);
+            //     })
+            //     ->get()
+            //     ->filter(function ($labour) use ($latitude, $longitude, $radius, $request, $data) {
+            //         [$labourLatitude, $labourLongitude] = explode(',', $data->lat_long);
+            //         $distance = $this->haversineGreatCircleDistance(
+            //             $latitude,
+            //             $longitude,
+            //             $labourLatitude,
+            //             $labourLongitude
+            //         );
+            //         return $distance <= $radius;
+            //     })
+            //     ->map(function ($labour) {
+            //         $labour->type = 'labour';
+            //         return $labour;
+            //     })->whereNotNull('device_id')->pluck("device_id")->toArray();
+
+            $labours_data = DB::table('users')
+                ->select('*')
+                ->selectRaw("
+    (6371 * acos(
+        cos(radians(?)) *
+        cos(radians(SUBSTRING_INDEX(lat_long, ',', 1))) *
+        cos(radians(SUBSTRING_INDEX(lat_long, ',', -1)) - radians(?)) +
+        sin(radians(?)) *
+        sin(radians(SUBSTRING_INDEX(lat_long, ',', 1)))
+    )) AS distance
+", [$latitude, $longitude, $latitude])
+                ->where('type', 'labour')->having('distance', '<', $radius)
+                ->orderBy('distance')
+                ->pluck('id');
+        }
+
+        \Log::info("labours_data");
+        \Log::info($labours_data);
+        if (!empty($labours_data)) {
+            $labours = User::whereIn('id', $labours_data)->whereHas('category', function ($query) use ($category_id) {
+                $query->where('category_id', $category_id);
+            })->pluck("device_id")->toArray();
+        } else {
+            $labours = [];
         }
         // \Log::info("labourssdevice_id");
 
@@ -289,12 +314,20 @@ class CheckoutController extends Controller
         // \Log::info("additional_data");
 
         // \Log::info($additional_data);
-        // \Log::info("waleeeeettttt");
+        \Log::info("waleeeeettttt");
 
-        // \Log::info($wallet_use);
+        \Log::info($wallet_use);
+        \Log::info($request->transaction_type);
+
+        \Log::info($is_razorpay);
+
         if ($request->transaction_type == "post_paid" || $wallet_use === true) {
+            \Log::info("inside send notttttt");
+
             $firebaseService = new SendNotificationJob();
             $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
+            // \Log::info("firebaseService");
+            // \Log::info($firebaseService);
         }
         // else if ($wallet_use === true) {
         //     $firebaseService = new SendNotificationJob();
