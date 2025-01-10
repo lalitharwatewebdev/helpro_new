@@ -16,6 +16,7 @@ use App\Models\ExtraTimeWork;
 use App\Models\ExtraTimeWorkLabour;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourBooking;
+use App\Models\LabourRating;
 use App\Models\ReviewImage;
 use App\Models\Transactions;
 use App\Models\User;
@@ -556,6 +557,19 @@ class CheckoutController extends Controller
             }
         }
 
+        $labour_booking = Booking::where('id', $request->booking_id)->first();
+
+        $labourAccepted = LabourAcceptedBooking::where('booking_id', $labour_booking->labour_booking_id)->get();
+        if (!empty($labourAccepted)) {
+            foreach ($labourAccepted as $key => $value) {
+                $labour_rating = new LabourRating();
+                $labour_rating->labour_id = $value['labour_id'];
+                $labour_rating->booking_id = $request->booking_id;
+                $labour_rating->rating = $request->rating;
+                $labour_rating->save();
+            }
+        }
+
         return response([
             "message" => "Review Added Successfully",
             "status" => true,
@@ -725,7 +739,7 @@ class CheckoutController extends Controller
                 } else {
                     $wallets = new Wallet();
                     $wallets->user_id = $value['labour_id'];
-                    $wallets->amount = '-' . ((int)$labour_payable_commision_amount + (int) $add_on_commission_amount);
+                    $wallets->amount = '-' . ((int) $labour_payable_commision_amount + (int) $add_on_commission_amount);
                     $wallets->save();
 
                     // \Log::info("wallettttttbbbbbbbbbb");

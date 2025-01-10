@@ -6,6 +6,7 @@ use App\Helpers\FileUploader;
 use App\Helpers\OTPGenerator;
 use App\Http\Controllers\Controller;
 use App\Models\LabourAcceptedBooking;
+use App\Models\LabourRating;
 use App\Models\OTP;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -318,6 +319,18 @@ class AuthController extends Controller
     public function Profile()
     {
         $user = User::find(auth()->user()->id);
+
+        $sum_rating = LabourRating::where('labour_id', auth()->user()->id)->sum('rating');
+        $booking_count = LabourRating::where('labour_id', auth()->user()->id)->count();
+
+        if ($booking_count > 0) {
+
+            $avg_rating = $sum_rating / $booking_count;
+        } else {
+            $avg_rating = 0;
+        }
+
+        $user['rating'] = $avg_rating ?? 0;
         $user_category = $user->category()->orderBy('id', 'desc')->get();
         return response([
             "data" => $user,
@@ -363,7 +376,7 @@ class AuthController extends Controller
     public function getLabourBookingHistory(Request $request)
     {
         // return $request->user()->id;
-        $labour_booking = LabourAcceptedBooking::with(['booking'=>['user','labour_bookings']])->where('labour_id', auth()->user()->id)->where('is_work_done', '1')->orderBy('id','desc')->get();
+        $labour_booking = LabourAcceptedBooking::with(['booking' => ['user', 'labour_bookings']])->where('labour_id', auth()->user()->id)->where('is_work_done', '1')->orderBy('id', 'desc')->get();
 
         return response([
             "data" => $labour_booking,
