@@ -160,6 +160,8 @@ class CheckoutController extends Controller
             } else {
                 $order = $this->razorpay->createOrder($amount, "INR", $data->id);
                 \Log::info(json_encode($order));
+                $is_razorpay = true;
+                $wallet_use = false;
 
             }
         } else {

@@ -104,6 +104,18 @@
                                         <div class="col-lg-4 col-md-6 mb-2">
                                             <span> <b>PAN Number:</b> {{ $data->pan_card_number }} </span>
                                         </div>
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Pan Card Image:</b>
+                                                @if (!is_null($data->pan_front))
+                                                    <img src="{{ asset("$data->pan_front") }}"
+                                                        class="view-on-click  rounded-circle" style="width:40px">
+                                                @else
+                                                    <img src="{{ asset('images/placeholder.jpg') }}"
+                                                        class="view-on-click   rounded-circle" style="width:40px">
+                                                @endif
+                                            </span>
+                                        </div>
+
 
                                         <div class="col-lg-4 col-md-6 mb-2">
                                             <span> <b>Aadhaar Card Front:</b>
