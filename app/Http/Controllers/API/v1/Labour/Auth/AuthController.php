@@ -8,9 +8,11 @@ use App\Models\LabourAcceptedBooking;
 use App\Models\LabourRating;
 use App\Models\OTP;
 use App\Models\PayCommission;
+use App\Models\Transactions;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Providers\LabourRazorPayServiceProvider;
+use App\Services\RazorPayIntegration;
 use Illuminate\Http\Request;
 use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
 
@@ -397,11 +399,12 @@ class AuthController extends Controller
         $request->validate([
             "amount" => "required",
         ]);
-        $labourRazorpayment = $this->labourRazorPay->createOrder($request->amount);
-        if (isset($labourRazorpayment['id'])) {
+        $razorPayOrderId = RazorPayIntegration::createOrder($request->amount);
+
+        if (isset($razorPayOrderId['razorpay_order_id'])) {
 
             $labourRazorPay               = new PayCommission();
-            $labourRazorPay->order_id     = $labourRazorpayment['id'];
+            $labourRazorPay->order_id     = $razorPayOrderId['razorpay_order_id'];
             $labourRazorPay->labour_id    = $request->user()->id;
             $labourRazorPay->amount       = $request->amount;
             $labourRazorPay->order_status = "pending";
@@ -425,18 +428,29 @@ class AuthController extends Controller
         $request->validate([
             "order_id" => "required",
         ]);
-        $fetchOrder = $this->labourRazorPay->fetchOrder($request->order_id);
+        // $fetchOrder   = $this->labourRazorPay->fetchOrder($request->order_id);
+        $checkPayment = RazorPayIntegration::fetchOrder($request->order_id);
+        \Log::info("fetchOrder");
+        \Log::info($request->order_id);
 
-        if (isset($fetchOrder['status'])) {
+        \Log::info($checkPayment);
+        if (isset($checkPayment['status'])) {
 
             $data               = PayCommission::where('order_id', $request->order_id)->first();
-            $data->order_status = $fetchOrder['status'];
+            $data->order_status = $checkPayment['status'];
             $data->save();
 
             $user_wallet         = Wallet::where('user_id', $request->user()->id)->first();
             $wallet_amount       = (int) $user_wallet->amount + (int) $data->amount;
             $user_wallet->amount = $wallet_amount;
             $user_wallet->save();
+
+            Transactions::create([
+                "amount"           => $data->amount,
+                "transaction_type" => "credited",
+                "user_id"          => $request->user()->id,
+                "remark"           => "Wallet Credited",
+            ]);
 
             return response([
                 "message" => "Payment done Successfully",

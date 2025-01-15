@@ -1,9 +1,9 @@
 <?php
-namespace App\Providers;
+namespace App\Services;
 
 use Razorpay\Api\Api;
 
-class RazorpayServiceProvider
+class RazorPayIntegration
 {
     public static function createOrder($amount)
     {
