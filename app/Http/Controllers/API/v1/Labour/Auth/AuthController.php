@@ -7,12 +7,20 @@ use App\Http\Controllers\Controller;
 use App\Models\LabourAcceptedBooking;
 use App\Models\LabourRating;
 use App\Models\OTP;
+use App\Models\PayCommission;
 use App\Models\User;
+use App\Providers\LabourRazorPayServiceProvider;
 use Illuminate\Http\Request;
 use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
 
 class AuthController extends Controller
 {
+    protected $labourRazorPay;
+
+    public function __construct(LabourRazorPayServiceProvider $razorpay)
+    {
+        $this->labourRazorPay = $razorpay;
+    }
 
     // public function OtpLogin(Request $request){
     //     \Log::info($request->all());
@@ -381,5 +389,59 @@ class AuthController extends Controller
             "data"   => $labour_booking,
             "status" => true,
         ], 200);
+    }
+
+    public function payCommission(Request $request)
+    {
+        $request->validate([
+            "amount" => "required",
+        ]);
+        $labourRazorpayment = $this->labourRazorPay->createOrder($request->amount);
+        if (isset($labourRazorpayment['id'])) {
+
+            $labourRazorPay               = new PayCommission();
+            $labourRazorPay->order_id     = $labourRazorpayment['id'];
+            $labourRazorPay->labour_id    = $request->user()->id;
+            $labourRazorPay->amount       = $request->amount;
+            $labourRazorPay->order_status = "pending";
+
+            $labourRazorPay->save();
+
+            return response([
+                "order_id" => $labourRazorPay->order_id,
+                "status"   => true,
+            ], 200);
+        }
+        return response([
+            "message" => "Something went wrong",
+            "status"  => false,
+        ], 400);
+
+    }
+
+    public function fetchPayCommission(Request $request)
+    {
+        $request->validate([
+            "order_id" => "required",
+        ]);
+        $fetchOrder = $this->labourRazorPay->fetchOrder($request->order_id);
+
+        if (isset($fetchOrder['status'])) {
+
+            $data               = PayCommission::where('order_id', $request->order_id)->first();
+            $data->order_status = $fetchOrder['status'];
+            $data->save();
+
+            return response([
+                "message" => "Payment done Successfully",
+                "status"  => true,
+            ], 200);
+
+        } else {
+            return response([
+                "message" => "Something went wrong ",
+                "status"  => false,
+            ], 400);
+        }
     }
 }

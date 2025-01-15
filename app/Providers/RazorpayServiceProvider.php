@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Providers;
 
 use App\Models\RazorPayModel;
@@ -18,26 +17,26 @@ class RazorpayServiceProvider
 
     public function createOrder($amount, $currency = "INR", $checkout_id)
     {
-        \Log::info($amount);
-        $receipt = "receipt_id" . time();
+        // \Log::info($amount);
+        $receipt        = "receipt_id" . time();
         $amountInRupees = (float) $amount; // Assuming amount is sent in rupees
-        $amounts = intval($amountInRupees * 100);
-        \Log::info($amounts);
-        \Log::info("ordersssss1111111111");
+        $amounts        = intval($amountInRupees * 100);
+        // \Log::info($amounts);
+        // \Log::info("ordersssss1111111111");
 
         $note = [
-            "user" => auth()->user()->id,
-            "amount" => (float) $amount,
+            "user"        => auth()->user()->id,
+            "amount"      => (float) $amount,
             "checkout_id" => $checkout_id,
         ];
 
         try {
             $order = $this->api->order->create([
-                "amount" => (float) $amounts,
-                "currency" => $currency,
-                "receipt" => $receipt,
+                "amount"          => (float) $amounts,
+                "currency"        => $currency,
+                "receipt"         => $receipt,
                 "payment_capture" => 1,
-                "notes" => $note,
+                "notes"           => $note,
             ]);
             // \Log::info($order);
             // \Log::info(json_encode($order));
@@ -47,7 +46,7 @@ class RazorpayServiceProvider
             \Log::info($e);
             return response([
                 "message" => "Something went wrong " . $e,
-                "status" => false,
+                "status"  => false,
             ], 400);
 
         }
@@ -67,9 +66,9 @@ class RazorpayServiceProvider
             if (in_array($order['status'], $status)) {
 
                 return [
-                    "message" => "Order Placed Successfully",
+                    "message"     => "Order Placed Successfully",
                     "checkout_id" => $order['notes']['checkout_id'],
-                    "status" => true,
+                    "status"      => true,
 
                 ];
 
@@ -77,13 +76,13 @@ class RazorpayServiceProvider
             } else {
                 return response([
                     "message" => "Tranasction Failure",
-                    "status" => false,
+                    "status"  => false,
                 ], 400);
             }
         } catch (\Exception $e) {
             return response([
                 "message" => "Something went wrong " . $e,
-                "status" => false,
+                "status"  => false,
             ], 400);
         }
     }
@@ -94,17 +93,17 @@ class RazorpayServiceProvider
 
         try {
             $order = $this->api->order->create([
-                "amount" => $amount * 100,
+                "amount"   => $amount * 100,
                 "currency" => "INR",
-                "receipt" => $receipt,
+                "receipt"  => $receipt,
 
             ]);
 
             RazorPayModel::create([
-                "user_id" => auth()->user()->id,
+                "user_id"         => auth()->user()->id,
                 "payment_gateway" => "razorpay",
-                "order_id" => $order['id'],
-                "amount" => $amount,
+                "order_id"        => $order['id'],
+                "amount"          => $amount,
 
             ]);
 
@@ -112,7 +111,7 @@ class RazorpayServiceProvider
         } catch (\Exception $e) {
             return response([
                 "message" => "Something went wrong " . $e,
-                "status" => false,
+                "status"  => false,
             ], 400);
         }
     }
@@ -126,12 +125,12 @@ class RazorpayServiceProvider
         if (in_array($fetch_order['status'], $status)) {
 
             // adding to transactions table
-            $amount = $fetch_order['amount'] / 100;
+            $amount       = $fetch_order['amount'] / 100;
             $transactions = Transactions::create([
-                "user_id" => auth()->user()->id,
-                "amount" => $amount,
+                "user_id"          => auth()->user()->id,
+                "amount"           => $amount,
                 "transaction_type" => "credited",
-                "remark" => "added money",
+                "remark"           => "added money",
             ]);
 
             $wallet = Wallet::where("user_id", auth()->user()->id)->first();
@@ -141,7 +140,7 @@ class RazorpayServiceProvider
             } else {
                 Wallet::create([
                     "user_id" => auth()->user()->id,
-                    "amount" => $amount,
+                    "amount"  => $amount,
 
                 ]);
             }
@@ -155,14 +154,14 @@ class RazorpayServiceProvider
     public function createPayout($amount, $account_number, $ifsc_code)
     {
         $payout = $this->api->payout->create([
-            "amount" => $amount * 100,
-            "currency" => "INR",
-            "method" => "bank_account",
+            "amount"       => $amount * 100,
+            "currency"     => "INR",
+            "method"       => "bank_account",
             "bank_account" => [
                 "account_number" => $account_number,
-                "ifsc_code" => $ifsc_code,
+                "ifsc_code"      => $ifsc_code,
             ],
-            "description" => "Payment to " . $account_number,
+            "description"  => "Payment to " . $account_number,
         ]);
 
         return $payout->id;

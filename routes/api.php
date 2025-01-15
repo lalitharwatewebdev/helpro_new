@@ -193,6 +193,8 @@ Route::prefix('v1')->group(function () {
                 Route::post("start-work", "startWork");
                 Route::post("end-work", "endWork");
                 Route::get("get-labour-booking-history", "getLabourBookingHistory");
+                Route::post("pay-commission", "payCommission");
+                Route::post("fetch-pay-commission", "fetchPayCommission");
 
             });
 
