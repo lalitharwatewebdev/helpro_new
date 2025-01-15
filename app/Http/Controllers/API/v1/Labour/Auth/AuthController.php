@@ -9,6 +9,7 @@ use App\Models\LabourRating;
 use App\Models\OTP;
 use App\Models\PayCommission;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Providers\LabourRazorPayServiceProvider;
 use Illuminate\Http\Request;
 use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
@@ -431,6 +432,11 @@ class AuthController extends Controller
             $data               = PayCommission::where('order_id', $request->order_id)->first();
             $data->order_status = $fetchOrder['status'];
             $data->save();
+
+            $user_wallet         = Wallet::where('user_id', $request->user()->id)->first();
+            $wallet_amount       = (int) $user_wallet->amount + (int) $data->amount;
+            $user_wallet->amount = $wallet_amount;
+            $user_wallet->save();
 
             return response([
                 "message" => "Payment done Successfully",
