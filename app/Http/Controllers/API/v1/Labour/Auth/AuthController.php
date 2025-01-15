@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\API\v1\Labour\Auth;
 
 use App\Helpers\FileUploader;
@@ -83,9 +82,9 @@ class AuthController extends Controller
         if ($request->phone == "8111111111") {
 
             return response([
-                "phone" => $request->phone,
+                "phone"   => $request->phone,
                 "message" => "OTP send to your Mobile Number",
-                "status" => true,
+                "status"  => true,
 
             ], 200);
         }
@@ -94,7 +93,7 @@ class AuthController extends Controller
 
         $data = new OTP();
 
-        $data->phone = $request->phone;
+        $data->phone         = $request->phone;
         $data->generated_otp = $otp;
 
         $data->save();
@@ -103,7 +102,7 @@ class AuthController extends Controller
 
         return response([
             "message" => "OTP send to your Mobile Number",
-            "status" => true,
+            "status"  => true,
         ], 200);
 
     }
@@ -115,7 +114,7 @@ class AuthController extends Controller
 
         $request->validate([
             "phone" => "required",
-            "otp" => "required",
+            "otp"   => "required",
         ]);
         $type = "old";
 
@@ -130,7 +129,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if (!empty($user)) {
+        if (! empty($user)) {
 
             if ($otp->generated_otp == $request->otp) {
                 if ($user->name == null) {
@@ -143,13 +142,13 @@ class AuthController extends Controller
 
                     return response([
                         "message" => "User Authenticated",
-                        "token" => $token,
-                        "type" => $type,
-                        "status" => true,
+                        "token"   => $token,
+                        "type"    => $type,
+                        "status"  => true,
 
                     ], 200);
                 } else {
-                    $type = 'old';
+                    $type  = 'old';
                     $token = $user->createToken("otp_login")->plainTextToken;
                     $user->update([
                         "device_id" => $request->device_id,
@@ -157,33 +156,33 @@ class AuthController extends Controller
 
                     return response([
                         "message" => "User Authenticated",
-                        "token" => $token,
-                        "type" => $type,
-                        "status" => true,
+                        "token"   => $token,
+                        "type"    => $type,
+                        "status"  => true,
 
                     ], 200);
                 }
             } else {
                 return response([
                     "message" => "Invalid OTP",
-                    "status" => false,
+                    "status"  => false,
                 ], 400);
             }
         } else {
             $user = User::create([
                 "device_id" => $request->device_id,
-                "phone" => $request->phone,
-                "type" => "labour",
+                "phone"     => $request->phone,
+                "type"      => "labour",
             ]);
 
             $token = $user->createToken("labour_otp_login")->plainTextToken;
-            $type = "new";
+            $type  = "new";
 
             return response([
                 "message" => 'Account Created Successfully',
-                "status" => true,
-                "token" => $token,
-                "type" => $type,
+                "status"  => true,
+                "token"   => $token,
+                "type"    => $type,
             ]);
         }
     }
@@ -192,7 +191,7 @@ class AuthController extends Controller
     {
 
         $t = $request->validate([
-            'token' => 'required|string',
+            'token'     => 'required|string',
             'device_id' => 'required|string',
         ]);
 
@@ -204,14 +203,14 @@ class AuthController extends Controller
                 'message' => 'The token is invalid: ' . $e->getMessage(),
             ], 401);
         }
-        $uid = $verifiedIdToken->claims()->get('sub');
+        $uid           = $verifiedIdToken->claims()->get('sub');
         $firebase_user = $auth->getUser($uid);
-        $email = $firebase_user->email;
-        $user = User::Where('email', $email)->first();
+        $email         = $firebase_user->email;
+        $user          = User::Where('email', $email)->first();
 
         $type = 'old';
 
-        if (!empty($user)) {
+        if (! empty($user)) {
             if ($user->name == null) {
                 $type = "new";
             }
@@ -219,18 +218,18 @@ class AuthController extends Controller
                 'device_id' => $request->device_id,
             ]);
         } else {
-
+            $type = 'new';
             $user = User::create([
-                'email' => $email,
+                'email'     => $email,
                 'device_id' => $request->device_id,
-                "type" => "labour",
+                "type"      => "labour",
             ]);
 
         }
         return response([
-            'type' => $type,
+            'type'      => $type,
             'user_data' => $user,
-            'token' => $user->createToken('user')->plainTextToken,
+            'token'     => $user->createToken('user')->plainTextToken,
         ]);
     }
 
@@ -241,11 +240,11 @@ class AuthController extends Controller
         ]);
         \Log::info($request->all());
 
-        $data = User::find(auth()->user()->id);
-        $data->name = $request->name;
+        $data        = User::find(auth()->user()->id);
+        $data->name  = $request->name;
         $data->email = $request->email;
         $data->state = $request->state;
-        $data->city = $request->city;
+        $data->city  = $request->city;
         if ($request->profile_image) {
             $data->profile_pic = FileUploader::uploadFile($request->profile_image, "images/profile_pic");
         }
@@ -255,25 +254,25 @@ class AuthController extends Controller
         if ($request->aadhaar_card_back) {
             $data->aadhaar_card_back = FileUploader::uploadFile($request->aadhaar_card_back, "images/aadhaar_card");
         }
-        $data->aadhaar_number = $request->aadhaar_number;
+        $data->aadhaar_number  = $request->aadhaar_number;
         $data->pan_card_number = $request->pan_number;
-        $data->bank_name = $request->bank_name;
-        $data->branch_address = $request->bank_address;
+        $data->bank_name       = $request->bank_name;
+        $data->branch_address  = $request->bank_address;
         $data->pan_card_number = $request->pan_number;
         if ($request->pan_front) {
             $data->pan_front = FileUploader::uploadFile($request->pan_front, "images/pan_card");
         }
-        $data->gender = strtolower($request->gender);
-        $data->lat_long = $request->lat_long;
-        $data->address = $request->address;
-        $data->start_time = $request->start_time;
-        $data->end_time = $request->end_time;
-        $data->IFSC_code = $request->ifsc_code;
-        $data->otp = mt_rand(111111, 999999);
-        $data->availability = $request->days_available;
-        $data->qualification = $request->qualification;
+        $data->gender         = strtolower($request->gender);
+        $data->lat_long       = $request->lat_long;
+        $data->address        = $request->address;
+        $data->start_time     = $request->start_time;
+        $data->end_time       = $request->end_time;
+        $data->IFSC_code      = $request->ifsc_code;
+        $data->otp            = mt_rand(111111, 999999);
+        $data->availability   = $request->days_available;
+        $data->qualification  = $request->qualification;
         $data->account_number = $request->account_number;
-        $data->pin_code = $request->pincode;
+        $data->pin_code       = $request->pincode;
 
         $data->save();
 
@@ -285,7 +284,7 @@ class AuthController extends Controller
 
         return response([
             "message" => "Labour Data Saved Successfully",
-            "status" => true,
+            "status"  => true,
         ], 200);
 
     }
@@ -299,20 +298,20 @@ class AuthController extends Controller
 
         return response([
             "message" => "Category Updated Successfully",
-            "status" => true,
+            "status"  => true,
         ], 200);
     }
 
     public function logOut(Request $request)
     {
-        $user = User::where('id', $request->user()->id)->first();
+        $user            = User::where('id', $request->user()->id)->first();
         $user->device_id = null;
         $user->save();
         auth('sanctum')->user()->id->tokens()->delete();
 
         return response([
             "message" => "Labour Logout Successfully",
-            "status" => true,
+            "status"  => true,
         ], 200);
     }
 
@@ -320,7 +319,7 @@ class AuthController extends Controller
     {
         $user = User::find(auth()->user()->id);
 
-        $sum_rating = LabourRating::where('labour_id', auth()->user()->id)->sum('rating');
+        $sum_rating    = LabourRating::where('labour_id', auth()->user()->id)->sum('rating');
         $booking_count = LabourRating::where('labour_id', auth()->user()->id)->count();
 
         if ($booking_count > 0) {
@@ -331,11 +330,11 @@ class AuthController extends Controller
         }
 
         $user['rating'] = $avg_rating ?? 0;
-        $user_category = $user->category()->orderBy('id', 'desc')->get();
+        $user_category  = $user->category()->orderBy('id', 'desc')->get();
         return response([
-            "data" => $user,
+            "data"     => $user,
             "category" => $user_category,
-            "status" => true,
+            "status"   => true,
         ], 200);
     }
 
@@ -344,14 +343,14 @@ class AuthController extends Controller
         $request->validate([
             "booking_id" => "required",
         ]);
-        $data = LabourAcceptedBooking::where('labour_id', auth()->user()->id)->where('booking_id', $request->booking_id)->first();
+        $data                 = LabourAcceptedBooking::where('labour_id', auth()->user()->id)->where('booking_id', $request->booking_id)->first();
         $data->current_status = 1;
-        $data->start_time = date('Y-m-d H:s', strtotime(now()));
+        $data->start_time     = date('Y-m-d H:s', strtotime(now()));
         $data->save();
 
         return response([
             "message" => "Started Work Successfully",
-            "status" => true,
+            "status"  => true,
         ], 200);
     }
 
@@ -360,16 +359,16 @@ class AuthController extends Controller
         $request->validate([
             "booking_id" => "required",
         ]);
-        $data = LabourAcceptedBooking::where('labour_id', auth()->user()->id)->where('booking_id', $request->booking_id)->first();
+        $data                 = LabourAcceptedBooking::where('labour_id', auth()->user()->id)->where('booking_id', $request->booking_id)->first();
         $data->current_status = 2;
-        $data->end_time = date('Y-m-d H:s', strtotime(now()));
-        $data->is_work_done = 1;
+        $data->end_time       = date('Y-m-d H:s', strtotime(now()));
+        $data->is_work_done   = 1;
 
         $data->save();
 
         return response([
             "message" => "Ended Work Successfully",
-            "status" => true,
+            "status"  => true,
         ], 200);
     }
 
@@ -379,7 +378,7 @@ class AuthController extends Controller
         $labour_booking = LabourAcceptedBooking::with(['booking' => ['user', 'labour_bookings']])->where('labour_id', auth()->user()->id)->where('is_work_done', '1')->orderBy('id', 'desc')->get();
 
         return response([
-            "data" => $labour_booking,
+            "data"   => $labour_booking,
             "status" => true,
         ], 200);
     }
