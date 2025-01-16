@@ -187,7 +187,9 @@
                                         <div class="col-lg-4 col-md-6 mb-2">
                                             <span> <b>Labour Status: </b> {{ $data->labour_status }} </span>
                                         </div>
-
+                                        <div class="col-lg-3 col-md-6">
+                                            <span> <b>Working Days:</b> {{ $data->availability ?? '' }} </span>
+                                        </div>
                                     </div>
                                 </x-card>
 
