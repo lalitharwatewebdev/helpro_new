@@ -1,17 +1,13 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Helpers\FileUploader;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\User;
-use App\Models\State;
-use App\Models\LabourImage;
 use App\Models\City;
-use App\Models\Labour;
+use App\Models\State;
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Jobs\SendNotificationJob;
 
 class LabourController extends Controller
 {
@@ -23,10 +19,8 @@ class LabourController extends Controller
     public function index(Request $request)
     {
 
-        $url = request()->url();
+        $url  = request()->url();
         $type = collect(explode('/', $url))->last();
-
-
 
         return view('content.tables.labour', compact("type"));
     }
@@ -44,18 +38,15 @@ class LabourController extends Controller
 
         $data = compact("states", "category_data");
 
-
         return view("content.tables.add-labour", $data);
     }
 
     public function details(Request $request)
     {
-        $data = User::with("states", "cities")->where("id", $request->id)->first();
+        $data = User::with("states", "cities", "category")->where("id", $request->id)->first();
         // return $data;
         return view("content.tables.details-labours", compact("data"));
     }
-
-
 
     public function getCity(Request $request)
     {
@@ -65,7 +56,6 @@ class LabourController extends Controller
 
         return response($data);
     }
-
 
     public function store(Request $request)
     {
@@ -84,7 +74,6 @@ class LabourController extends Controller
         // ]);
         $data = new User();
 
-
         if ($request->profile_pic) {
             $data->profile_pic = FileUploader::uploadFile($request->profile_pic, "images/profile_pic");
         }
@@ -97,28 +86,23 @@ class LabourController extends Controller
             $data->aadhaar_card_back = FileUploader::uploadFile($request->aadhaar_card_back, "images/aadhaar_card");
         }
 
-
-        $data->phone = $request->phone;
-        $data->email = $request->email;
+        $data->phone           = $request->phone;
+        $data->email           = $request->email;
         $data->pan_card_number = $request->pan_number;
-        $data->bank_name = $request->bank_name;
-        $data->IFSC_code = $request->IFSC_code;
-        $data->address = $request->address;
-        $data->name = $request->name;
-        $data->state = $request->state;
-        $data->start_time = $request->start_time;
-        $data->end_time = $request->end_time;
-        $data->city = $request->city;
-        $data->aadhaar_number = $request->aadhaar_number;
-        $data->branch_address = $request->bank_address;
-        $data->gender = $request->gender;
-        $data->labour_status = "pending";
+        $data->bank_name       = $request->bank_name;
+        $data->IFSC_code       = $request->IFSC_code;
+        $data->address         = $request->address;
+        $data->name            = $request->name;
+        $data->state           = $request->state;
+        $data->start_time      = $request->start_time;
+        $data->end_time        = $request->end_time;
+        $data->city            = $request->city;
+        $data->aadhaar_number  = $request->aadhaar_number;
+        $data->branch_address  = $request->bank_address;
+        $data->gender          = $request->gender;
+        $data->labour_status   = "pending";
 
-
-       
         $data->type = "labour";
-
-
 
         $data->save();
 
@@ -138,13 +122,9 @@ class LabourController extends Controller
 
             // }
 
-
-
         }
         return redirect("admin/labours/pending");
     }
-
-
 
     /**
      * Display the specified resource.
@@ -177,21 +157,18 @@ class LabourController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request)
-    {   
-        $user = User::where("id",$request->id)->first();
+    {
+        $user = User::where("id", $request->id)->first();
         User::find($request->id)->update([
-            "labour_status" => $request->type
+            "labour_status" => $request->type,
         ]);
-
-       
 
         // $firebaseService = new SendNotificationJob();
         // $firebaseService->sendNotification($user->device_id->toArray, "Accepted", "You're accepted");
 
-
         return response([
 
-            "message" => "Labour Updated Successfully"
+            "message" => "Labour Updated Successfully",
         ]);
 
     }
@@ -207,9 +184,9 @@ class LabourController extends Controller
         User::find($id)->delete();
 
         return response([
-            'header' => 'Deleted!',
+            'header'  => 'Deleted!',
             'message' => 'Labour deleted successfully',
-            'table' => 'slider-table',
+            'table'   => 'slider-table',
         ]);
     }
 
@@ -224,7 +201,7 @@ class LabourController extends Controller
 
         return response([
             'message' => 'Labour status updated successfully',
-            'table' => 'labour-table',
+            'table'   => 'labour-table',
         ]);
     }
 }

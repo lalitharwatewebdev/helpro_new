@@ -14,7 +14,7 @@ class LabourTable extends DataTableComponent
 {
 
     protected $model = User::class;
-    public $counter = 1;
+    public $counter  = 1;
     public $type;
     public function mount(Request $request, $type)
     {
@@ -108,10 +108,10 @@ class LabourTable extends DataTableComponent
 
             Column::make('Actions')
                 ->label(function ($row, Column $column) {
-                    $delete_route = route('admin.labours.destroy', $row->id);
-                    $edit_route = route('admin.labours.edit', $row->id);
+                    $delete_route  = route('admin.labours.destroy', $row->id);
+                    $edit_route    = route('admin.labours.edit', $row->id);
                     $edit_callback = 'setValue';
-                    $modal = '#edit-user-modal';
+                    $modal         = '#edit-user-modal';
                     return view('content.table-component.action', compact('edit_route', 'delete_route', 'edit_callback', 'modal'));
                 }),
             Column::make('status')
@@ -154,8 +154,8 @@ class LabourTable extends DataTableComponent
         return [
             SelectFilter::make('Status')
                 ->options([
-                    '' => 'All',
-                    'active' => 'Active',
+                    ''        => 'All',
+                    'active'  => 'Active',
                     'blocked' => 'Blocked',
                 ])
                 ->filter(function (Builder $builder, string $value) {
@@ -193,7 +193,7 @@ class LabourTable extends DataTableComponent
     public function exportSelected()
     {
         $modelData = new User;
-        $type = $this->type;
+        $type      = $this->type;
         // dd($type);
         return Excel::download(new CustomExport($this->getSelected(), $modelData), 'labours.xlsx');
     }

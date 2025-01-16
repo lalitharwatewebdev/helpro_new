@@ -39,6 +39,8 @@
                 <x-input name="percentage_for_less_than" type="number" label="Percentage for Less Than 12 Hours" />
                 <x-input name="percentage_for_more_than" type="number" label="Percentage for More than 12 Hours" />
                 <x-input-file name="image" />
+                <x-input name="note" id="note" type="textarea" label="Note" />
+
             </div>
         </x-form>
     </x-side-modal>
@@ -50,8 +52,9 @@
                     label="Percentage for Less Than 12 Hours" />
                 <x-input name="percentage_for_more_than" id="edit_percentage_for_more_than" type="number"
                     label="Percentage for More than 12 Hours" />
-                {{-- <x-input name="price" id="edit_price" /> --}}
                 <x-input-file name="image" />
+                <x-input name="note" id="edit_note" type="textarea" label="Note" />
+
                 <x-input name="id" type="hidden" />
             </div>
 
@@ -104,8 +107,10 @@
             $(`${modal} #edit_title`).val(data.title);
             $(`${modal} #edit_percentage_for_less_than`).val(data.percentage_for_less_than);
             $(`${modal} #edit_percentage_for_more_than`).val(data.percentage_for_more_than);
+            $(`${modal} #edit_note`).val(data.note);
 
-            $(`${modal} #edit_title`).val(data.title);
+
+            // $(`${modal} #edit_title`).val(data.title);
 
             // $(`${modal} #edit_price`).val(data.price);
 

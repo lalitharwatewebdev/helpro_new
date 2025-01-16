@@ -84,6 +84,13 @@
                                         </div>
 
                                         <div class="col-lg-3 col-md-6">
+                                            <span> <b>Pincode:</b> {{ $data->pin_code ?? '' }} </span>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6">
+                                            <span> <b>Category:</b> {{ $data->category[0]->title ?? '' }} </span>
+                                        </div>
+
+                                        <div class="col-lg-3 col-md-6">
                                             <span> <b>Profile Image:</b>
                                                 @if (!is_null($data->profile_pic))
                                                     <img src="{{ asset("$data->profile_pic") }}"
@@ -149,9 +156,13 @@
                                         <div class="col-lg-4 col-md-6 mb-2">
                                             <span> <b>IFSC Code:</b> {{ $data->IFSC_code }} </span>
                                         </div>
-
+                                        {{-- 
                                         <div class="col-lg-4 col-md-6 mb-2">
                                             <span> <b>Bank Address:</b> {{ $data->branch_address }} </span>
+                                        </div> --}}
+
+                                        <div class="col-lg-4 col-md-6 mb-2">
+                                            <span> <b>Account Number:</b> {{ $data->account_number }} </span>
                                         </div>
 
                                         <x-divider text="Work Details" />

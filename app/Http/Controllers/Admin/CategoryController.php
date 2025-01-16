@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Exports\CategoryExport;
@@ -46,9 +45,10 @@ class CategoryController extends Controller
 
         $data = new Category();
 
-        $data->title = $request->title;
+        $data->title                    = $request->title;
         $data->percentage_for_less_than = $request->percentage_for_less_than;
         $data->percentage_for_more_than = $request->percentage_for_more_than;
+        $data->note                     = $request->note;
 
         if ($request->hasFile("image")) {
             $data->image = FileUploader::uploadFile($request->file("image"), "images/category_images");
@@ -57,10 +57,10 @@ class CategoryController extends Controller
         $data->save();
 
         return response([
-            'header' => 'Added',
+            'header'  => 'Added',
             'message' => 'Added successfully',
-            'table' => 'category-table',
-            "reload" => true,
+            'table'   => 'category-table',
+            "reload"  => true,
         ]);
 
     }
@@ -105,9 +105,10 @@ class CategoryController extends Controller
 
         $data = Category::where("id", $request->id)->first();
 
-        $data->title = $request->title;
+        $data->title                    = $request->title;
         $data->percentage_for_less_than = $request->percentage_for_less_than;
         $data->percentage_for_more_than = $request->percentage_for_more_than;
+        $data->note                     = $request->note;
 
         if ($request->hasFile("image")) {
             $data->image = FileUploader::uploadFile($request->file("image"), "images/category_images");
@@ -116,10 +117,10 @@ class CategoryController extends Controller
         $data->save();
 
         return response([
-            'header' => 'Success!',
+            'header'  => 'Success!',
             'message' => 'Category Updated successfully',
-            'table' => 'category-table',
-            "reload" => true,
+            'table'   => 'category-table',
+            "reload"  => true,
         ]);
     }
 
@@ -134,9 +135,9 @@ class CategoryController extends Controller
         Category::findOrFail($id)->delete();
 
         return response([
-            'header' => 'Deleted!',
+            'header'  => 'Deleted!',
             'message' => 'Category deleted successfully',
-            'table' => 'category-table',
+            'table'   => 'category-table',
         ]);
     }
 
@@ -147,7 +148,7 @@ class CategoryController extends Controller
 
         return response([
             'message' => 'Subscription Status Updated Successfully',
-            'table' => 'student-table',
+            'table'   => 'student-table',
         ]);
     }
 
