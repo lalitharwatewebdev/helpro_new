@@ -17,6 +17,8 @@ class TicketController extends Controller
         $ticket->ticket_number = "#HELPRO" . rand(0000, 9999);
         $ticket->ticket_name   = $request->ticket_name;
         $ticket->ticket_type   = $request->ticket_type;
+        $ticket->description   = $request->description;
+
         if ($request->ticket_type == "booking") {
             $ticket->booking_id = $request->booking_id;
         }
