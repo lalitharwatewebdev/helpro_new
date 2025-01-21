@@ -1,23 +1,20 @@
 <?php
-
 namespace App\Http\Livewire;
 
+use App\Exports\CustomExport;
 use App\Models\User;
+use Excel;
 use Illuminate\Database\Eloquent\Builder;
-use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
+use Illuminate\Http\Request;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use Excel;
-use App\Exports\CustomExport;
-use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
-use Illuminate\Http\Request;
-
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class UserTable extends DataTableComponent
 {
 
     protected $model = User::class;
-    public $counter = 1;
+    public $counter  = 1;
     public $type;
     public function mount(Request $request)
     {
@@ -49,8 +46,8 @@ class UserTable extends DataTableComponent
                     'content.rapasoft.active-inactive',
                     [
                         'route' => 'admin.users.index',
-                    ]
-                ]
+                    ],
+                ],
             ]);
     }
 
@@ -58,12 +55,10 @@ class UserTable extends DataTableComponent
     {
         return [
 
-
             Column::make('SrNo.', 'id')
                 ->format(function ($value, $row, Column $column) {
                     return (($this->page - 1) * $this->getPerPage()) + ($this->counter++);
                 })
-
 
                 ->html(),
 
@@ -87,12 +82,10 @@ class UserTable extends DataTableComponent
                     return $row->states->name ?? "";
                 })->html()->searchable(),
 
-
             Column::make("City", "city")
                 ->format(function ($value, $row) {
                     return $row->cities->name ?? "";
                 })->searchable(),
-
 
             Column::make("View", "id")
                 ->format(function ($value, $row) {
@@ -101,20 +94,14 @@ class UserTable extends DataTableComponent
                 </a>';
                 })->html(),
 
-
-
             // ->collap(),
-
-
-
-
 
             Column::make('Actions')
                 ->label(function ($row, Column $column) {
-                    $view_route = route('admin.users.details', $row->id);
-                    $edit_route = route('admin.labours.edit', $row->id);
+                    $view_route    = route('admin.users.details', $row->id);
+                    $edit_route    = route('admin.labours.edit', $row->id);
                     $edit_callback = 'setValue';
-                    $modal = '#edit-user-modal';
+                    $modal         = '#edit-user-modal';
                     return view('content.table-component.action', compact('edit_route', 'edit_callback', 'modal', "view_route"));
                 }),
             Column::make('status')
@@ -122,7 +109,6 @@ class UserTable extends DataTableComponent
                     $route = route('admin.labours.status');
                     return view('content.table-component.switch', compact('data', 'route'));
                 }),
-
 
             Column::make('profile_pic')
                 ->format(function ($row) {
@@ -158,8 +144,8 @@ class UserTable extends DataTableComponent
         return [
             SelectFilter::make('Status')
                 ->options([
-                    '' => 'All',
-                    'active' => 'Active',
+                    ''        => 'All',
+                    'active'  => 'Active',
                     'blocked' => 'Blocked',
                 ])
                 ->filter(function (Builder $builder, string $value) {

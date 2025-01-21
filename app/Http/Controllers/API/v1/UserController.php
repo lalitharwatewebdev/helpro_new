@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\API\v1;
 
 use App\Helpers\FileUploader;
@@ -32,10 +31,10 @@ class UserController extends Controller
     {
 
         $user_referral = '';
-        $data = User::where("id", auth()->user()->id)->first();
+        $data          = User::where("id", auth()->user()->id)->first();
 
-        $buinsess_settings = BusinessSetting::pluck("value", "key");
-        $referral_amount = $buinsess_settings['referral_amount'];
+        $buinsess_settings   = BusinessSetting::pluck("value", "key");
+        $referral_amount     = $buinsess_settings['referral_amount'];
         $referral_via_amount = $buinsess_settings['referral_via_amount'];
 
         if ($request->referral) {
@@ -45,18 +44,18 @@ class UserController extends Controller
         if (empty($data)) {
             return response([
                 "message" => "user not found",
-                "status" => false,
+                "status"  => false,
             ], 400);
         }
-        $data->name = $request->username;
-        $data->email = $request->email;
-        $data->gender = $request->gender;
-        $data->state = $request->state;
-        $data->city = $request->city;
-        $data->address = $request->address;
+        $data->name     = $request->username;
+        $data->email    = $request->email;
+        $data->gender   = $request->gender;
+        $data->state    = $request->state;
+        $data->city     = $request->city;
+        $data->address  = $request->address;
         $data->lat_long = $request->lat_long;
-        $data->gst_no = $request->gst_no;
-        $data->phone = $request->phone;
+        $data->gst_no   = $request->gst_no;
+        $data->phone    = $request->phone;
 
         $data->referral_code = $this->referralGenerator($request->username);
 
@@ -69,29 +68,29 @@ class UserController extends Controller
             if ($is_refer) {
                 return response([
                     "message" => "Referral Code Already Redeemed",
-                    "status" => true,
+                    "status"  => true,
                 ], 200);
             } else {
                 ReferralMaster::create([
                     "referral_user_id" => $user_referral->id,
-                    "user_id" => auth()->user()->id,
+                    "user_id"          => auth()->user()->id,
                 ]);
             }
 
             if ($user_referral->referral_code == auth()->user()->referral_code) {
                 return response([
                     "message" => "You cannot use this referral code",
-                    "status" => false,
+                    "status"  => false,
                 ], 400);
             }
 
             if ($user_referral) {
                 // adding to authenticated user
                 Transactions::create([
-                    "amount" => $referral_amount,
+                    "amount"           => $referral_amount,
                     "transaction_type" => "credited",
-                    "user_id" => auth()->user()->id,
-                    "remark" => "Added to wallet via referral",
+                    "user_id"          => auth()->user()->id,
+                    "remark"           => "Added to wallet via referral",
                 ]);
 
                 $wallet = Wallet::firstOrCreate([
@@ -103,10 +102,10 @@ class UserController extends Controller
 
                 // adding to referral user
                 Transactions::create([
-                    "amount" => $referral_via_amount,
+                    "amount"           => $referral_via_amount,
                     "transaction_type" => "credited",
-                    "remark" => "Added to wallet via referral",
-                    "user_id" => $user_referral->id,
+                    "remark"           => "Added to wallet via referral",
+                    "user_id"          => $user_referral->id,
                 ]);
 
                 $wallet = Wallet::firstOrCreate([
@@ -126,7 +125,7 @@ class UserController extends Controller
 
         return response([
             "message" => "User Data Added Successfully",
-            "status" => true,
+            "status"  => true,
         ], 200);
     }
 
@@ -135,19 +134,29 @@ class UserController extends Controller
 
         $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
 
-        if (!$user_wallet) {
+        if (! $user_wallet) {
             Wallet::create([
                 "user_id" => auth()->user()->id,
             ]);
         }
 
-        $user_id = auth()->user()->id;
-        $data = User::with("states", "cities")->where("id", $user_id)->first();
+        $user_id      = auth()->user()->id;
+        $data         = User::with("states", "cities")->where("id", $user_id)->first();
+        $rating_sum   = LabourBooking::where('user_id', $user_id)->sum('labour_rating');
+        $rating_count = LabourBooking::where('user_id', $user_id)->count();
+        if ($rating_count > 0) {
+
+            $avg_rating = $rating_sum / $rating_count;
+        } else {
+            $avg_rating = 0;
+        }
+
+        $data['rating'] = $avg_rating ?? 0;
 
         return response([
-            "data" => $data,
+            "data"        => $data,
             "user_wallet" => $user_wallet,
-            "status" => true,
+            "status"      => true,
         ], 200);
     }
 
@@ -155,7 +164,7 @@ class UserController extends Controller
     {
         $state = State::where("country_id", "101")->get();
         return response([
-            "data" => $state,
+            "data"   => $state,
             "status" => true,
         ], 200);
 
@@ -165,7 +174,7 @@ class UserController extends Controller
     {
         $city = City::where("country_id", "101")->where("state_id", $request->query("state_id"))->get();
         return response([
-            "data" => $city,
+            "data"   => $city,
             "status" => true,
         ], 200);
 
@@ -178,14 +187,14 @@ class UserController extends Controller
         if ($booking->transaction_type == "pre_paid") {
             $is_wallet_exist = Wallet::where('user_id', $booking->user_id)->first();
 
-            if (!empty($is_wallet_exist)) {
-                $total = $is_wallet_exist->amount + $booking->total_amount;
+            if (! empty($is_wallet_exist)) {
+                $total                   = $is_wallet_exist->amount + $booking->total_amount;
                 $is_wallet_exist->amount = $total;
                 $is_wallet_exist->save();
             } else {
-                $wallet = new Wallet();
+                $wallet          = new Wallet();
                 $wallet->user_id = $booking->user_id;
-                $wallet->amount = $booking->total_amount;
+                $wallet->amount  = $booking->total_amount;
                 $wallet->save();
             }
         }
@@ -213,7 +222,7 @@ class UserController extends Controller
 
         return response([
             "success" => true,
-            "data" => $labour_data,
+            "data"    => $labour_data,
         ], 200);
     }
 
@@ -229,13 +238,13 @@ class UserController extends Controller
         $labour_accepted_booking = LabourBooking::where('id', $request->booking_id)->first();
 
         $labour_accepted_booking->labour_feedback = $request->feedback;
-        $labour_accepted_booking->labour_rating = $request->rating;
+        $labour_accepted_booking->labour_rating   = $request->rating;
 
         $labour_accepted_booking->save();
 
-        if (!empty($request->images)) {
+        if (! empty($request->images)) {
             foreach ($request->images as $key => $value) {
-                $datas = new LabourFeedbackImage();
+                $datas                    = new LabourFeedbackImage();
                 $datas->labour_booking_id = $labour_accepted_booking->id;
                 if ($value) {
                     $datas->image = FileUploader::uploadFile($value, 'images/labour_feedback_images');
@@ -253,7 +262,7 @@ class UserController extends Controller
 
     public function logOut(Request $request)
     {
-        $user = User::where('id', $request->user()->id)->first();
+        $user            = User::where('id', $request->user()->id)->first();
         $user->device_id = null;
         $user->save();
 
@@ -261,7 +270,7 @@ class UserController extends Controller
 
         return response([
             "message" => $user->type . " Logout Successfully",
-            "status" => true,
+            "status"  => true,
         ], 200);
     }
 
@@ -274,7 +283,7 @@ class UserController extends Controller
     public function fetchExtraTimeWorkOrder(Request $request)
     {
         $request->validate([
-            "booking_id" => "required",
+            "booking_id"   => "required",
             "total_amount" => "required",
         ]);
 
@@ -282,14 +291,14 @@ class UserController extends Controller
 
         $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
 
-        $data = new ExtraTimeWork();
-        $data->booking_id = $request->booking_id;
+        $data                    = new ExtraTimeWork();
+        $data->booking_id        = $request->booking_id;
         $data->labour_booking_id = $booking_data->labour_booking_id;
-        $data->total_amount = $request->total_amount;
+        $data->total_amount      = $request->total_amount;
         $data->commission_amount = $request->commission_amount;
-        $data->gst = $request->gst;
-        $data->labour_id = implode(',', $request->labour_id);
-        $data->labour_amount = $request->labour_amount;
+        $data->gst               = $request->gst;
+        $data->labour_id         = implode(',', $request->labour_id);
+        $data->labour_amount     = $request->labour_amount;
 
         if ($booking_data->transaction_type == 'pre_paid') {
             if ($request->use_wallet == "yes") {
@@ -297,9 +306,9 @@ class UserController extends Controller
                     $order = $this->razorpay->createOrder($request->total_amount, "INR", $request->booking_id);
 
                     $is_razorpay = true;
-                    $wallet_use = false;
+                    $wallet_use  = false;
 
-                    $data->order_status = "pending";
+                    $data->order_status      = "pending";
                     $data->razorpay_order_id = $order->id ?? $order['id'] ?? null;
 
                 }
@@ -313,36 +322,36 @@ class UserController extends Controller
                     // \Log::info(json_encode($order));
 
                     $is_razorpay = true;
-                    $wallet_use = "partial_use";
+                    $wallet_use  = "partial_use";
 
-                    $data->order_status = "pending";
+                    $data->order_status      = "pending";
                     $data->razorpay_order_id = $order->id ?? $order['id'] ?? null;
 
                 } else {
                     $is_razorpay = false;
-                    $wallet_use = true;
+                    $wallet_use  = true;
 
                     $user_wallet->decrement("amount", $request->total_amount);
 
-                    $data->order_status = "paid";
+                    $data->order_status      = "paid";
                     $data->razorpay_order_id = null;
                 }
             } else {
-                $order = $this->razorpay->createOrder($request->total_amount, "INR", $request->booking_id);
+                $order       = $this->razorpay->createOrder($request->total_amount, "INR", $request->booking_id);
                 $is_razorpay = true;
-                $wallet_use = false;
+                $wallet_use  = false;
 
-                $data->order_status = "paid";
+                $data->order_status      = "paid";
                 $data->razorpay_order_id = null;
 
             }
 
             $data->save();
 
-            if (!empty($request->labour_id)) {
+            if (! empty($request->labour_id)) {
                 foreach ($request->labour_id as $key => $val) {
-                    $new_data = new ExtraTimeWorkLabour();
-                    $new_data->labour_id = $val;
+                    $new_data                     = new ExtraTimeWorkLabour();
+                    $new_data->labour_id          = $val;
                     $new_data->extra_time_work_id = $data->id;
                     $new_data->save();
                 }
@@ -353,37 +362,37 @@ class UserController extends Controller
             // \Log::info($data);
 
             return response()->json([
-                "message" => "Add On created successfully",
-                "order_id" => $order->id ?? $order['id'] ?? null,
+                "message"     => "Add On created successfully",
+                "order_id"    => $order->id ?? $order['id'] ?? null,
                 "is_razorpay" => $is_razorpay,
-                "is_wallet" => $wallet_use,
-                "status" => true,
+                "is_wallet"   => $wallet_use,
+                "status"      => true,
             ], 200);
         } else {
 
-            $data = new ExtraTimeWork();
-            $data->booking_id = $request->booking_id;
+            $data                    = new ExtraTimeWork();
+            $data->booking_id        = $request->booking_id;
             $data->labour_booking_id = $booking_data->labour_booking_id;
-            $data->total_amount = $request->total_amount;
+            $data->total_amount      = $request->total_amount;
             $data->commission_amount = $request->commission_amount;
-            $data->gst = $request->gst;
-            $data->labour_id = implode(',', $request->labour_id);
-            $data->labour_amount = $request->labour_amount;
-            $data->order_status = "pending";
+            $data->gst               = $request->gst;
+            $data->labour_id         = implode(',', $request->labour_id);
+            $data->labour_amount     = $request->labour_amount;
+            $data->order_status      = "pending";
             $data->razorpay_order_id = null;
             $data->save();
 
-            if (!empty($request->labour_id)) {
+            if (! empty($request->labour_id)) {
                 foreach ($request->labour_id as $key => $val) {
-                    $new_data = new ExtraTimeWorkLabour();
-                    $new_data->labour_id = $val;
+                    $new_data                     = new ExtraTimeWorkLabour();
+                    $new_data->labour_id          = $val;
                     $new_data->extra_time_work_id = $data->id;
                     $new_data->save();
                 }
             }
 
             return response()->json([
-                "status" => true,
+                "status"  => true,
                 "message" => "Add On created successfully",
             ], 200);
         }
@@ -421,7 +430,7 @@ class UserController extends Controller
 
         return response([
             "success" => true,
-            "data" => $data,
+            "data"    => $data,
         ], 200);
     }
 }
