@@ -287,7 +287,7 @@ class CheckoutController extends Controller
         if (! empty($labours_data)) {
             $labours = User::whereIn('id', $labours_data)->whereHas('category', function ($query) use ($category_id) {
                 $query->where('category_id', $category_id);
-            })->pluck("device_id")->toArray();
+            })->whereNotNull('device_id')->pluck("device_id")->toArray();
         } else {
             $labours = [];
         }
@@ -316,15 +316,15 @@ class CheckoutController extends Controller
         // \Log::info("additional_data");
 
         // \Log::info($additional_data);
-        \Log::info("waleeeeettttt");
+        // \Log::info("waleeeeettttt");
 
-        \Log::info($wallet_use);
-        \Log::info($request->transaction_type);
+        // \Log::info($wallet_use);
+        // \Log::info($request->transaction_type);
 
-        \Log::info($is_razorpay);
+        // \Log::info($is_razorpay);
 
         if ($request->transaction_type == "post_paid" || $wallet_use === true) {
-            \Log::info("inside send notttttt");
+            // \Log::info("inside send notttttt");
 
             $firebaseService = new SendNotificationJob();
             $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);

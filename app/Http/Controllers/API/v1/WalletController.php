@@ -49,7 +49,7 @@ class WalletController extends Controller
         if ($fetch_wallet_order) {
             $user_wallet = Wallet::where('user_id', $request->user()->id)->first();
             if (! empty($user_wallet)) {
-                $user_wallet_amount  = (int) $user_wallet->amount + (int) $order_data->amount;
+                $user_wallet_amount  = (int) ($user_wallet->amount ?? 0) + (int) ($order_data->amount ?? 0);
                 $user_wallet->amount = $user_wallet_amount;
                 $user_wallet->save();
             } else {

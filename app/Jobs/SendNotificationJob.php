@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Jobs;
 
 use Firebase;
-use Kreait\Firebase\Exception\Messaging\NotFound;
+use Kreait\Firebase\Exception\MessagingException;
+use Kreait\Firebase\Exception\Messaging\InvalidMessage;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
@@ -22,12 +22,12 @@ class SendNotificationJob
     }
     public function sendNotification(array $token = [], string $title, string $body, array $data = [], string $image = null)
     {
-        $firebase = $this->firebase->withServiceAccount(base_path('/firebase.json'));
+        $firebase  = $this->firebase->withServiceAccount(base_path('/firebase.json'));
         $messaging = $firebase->createMessaging();
 
         $notificationPayload = [
             'title' => $title,
-            'body' => $body,
+            'body'  => $body,
         ];
         if ($image) {
             $notificationPayload['image'] = $image;
@@ -36,6 +36,7 @@ class SendNotificationJob
         \Log::info("token");
 
         \Log::info($token);
+
         foreach ($token as $key => $t) {
             \Log::info("token111");
             \Log::info($key);
@@ -45,17 +46,23 @@ class SendNotificationJob
                 ->withHighestPossiblePriority('high');
 
             if ($data) {
+                $messaging->validate($message);
                 $message = $message->withData($data);
             }
 
             try {
+                // $messaging->validate($message);
                 $messaging->send($message);
                 // \Log::info($messaging->send($message));
-            } catch (NotFound $e) {
+            } catch (MessagingException $e) {
                 \Log::info($e);
+                print_r($e->errors());
                 // Skip the token if it's not registered or found
                 continue;
 
+            } catch (InvalidMessage $e) {
+                echo $e->getMessage();
+                print_r($e->errors());
             }
         }
     }
