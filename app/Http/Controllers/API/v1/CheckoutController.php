@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\API\v1;
 
 use App\Helpers\FileUploader;
@@ -54,9 +53,9 @@ class CheckoutController extends Controller
     public function formatDateWithSuffix($date)
     {
         $dateTime = new DateTime($date);
-        $day = $dateTime->format('j'); // Day of the month without leading zeros
-        $month = $dateTime->format('M'); // Short month name (Jan, Feb, Mar, etc.)
-        $year = $dateTime->format('Y'); // Full year
+        $day      = $dateTime->format('j'); // Day of the month without leading zeros
+        $month    = $dateTime->format('M'); // Short month name (Jan, Feb, Mar, etc.)
+        $year     = $dateTime->format('Y'); // Full year
 
         // Determine the appropriate ordinal suffix
         if ($day % 10 == 1 && $day != 11) {
@@ -82,41 +81,41 @@ class CheckoutController extends Controller
         // \Log::info("Store");
 
         // \Log::info($request->all());
-        $is_razorpay = true;
+        $is_razorpay       = true;
         $business_settings = BusinessSetting::pluck("value", "key")->toArray();
-        $services_charges = $business_settings['service_charges'];
+        $services_charges  = $business_settings['service_charges'];
         $request->validate([
             "start_date" => "required",
-            "end_date" => "required",
+            "end_date"   => "required",
             "start_time" => "required",
-            "end_time" => "required",
+            "end_time"   => "required",
         ]);
 
-        $area = Areas::find($request->area_id);
+        $area          = Areas::find($request->area_id);
         $category_data = Category::find($request->category_id);
 
-        $labour_arr = [];
-        $diff = (strtotime($request->end_date) - strtotime($request->start_date));
+        $labour_arr  = [];
+        $diff        = (strtotime($request->end_date) - strtotime($request->start_date));
         $date_result = abs(round($diff) / 86400) + 1;
 
         // $amount = (intval($area->price) * intval($request->quantity)) * $date_result + $services_charges;
         $amount = $request->amount;
 
-        $data = new Checkout();
-        $data->start_date = $request->start_date;
-        $data->end_date = $request->end_date;
-        $data->start_time = $request->start_time;
-        $data->end_time = $request->end_time;
-        $data->address_id = $request->address_id;
-        $data->user_id = auth()->user()->id;
-        $data->category_id = $request->category_id;
-        $data->area_id = $request->area_id;
-        $data->labour_quantity = $request->quantity;
-        $data->alternate_number = $request->alternate_number;
-        $data->note = $request->note;
-        $data->transaction_type = $request->transaction_type;
+        $data                    = new Checkout();
+        $data->start_date        = $request->start_date;
+        $data->end_date          = $request->end_date;
+        $data->start_time        = $request->start_time;
+        $data->end_time          = $request->end_time;
+        $data->address_id        = $request->address_id;
+        $data->user_id           = auth()->user()->id;
+        $data->category_id       = $request->category_id;
+        $data->area_id           = $request->area_id;
+        $data->labour_quantity   = $request->quantity;
+        $data->alternate_number  = $request->alternate_number;
+        $data->note              = $request->note;
+        $data->transaction_type  = $request->transaction_type;
         $data->labour_booking_id = $request->labour_booking_id;
-        $data->lat_long = $request->lat_long;
+        $data->lat_long          = $request->lat_long;
 
         $data->save();
 
@@ -130,7 +129,7 @@ class CheckoutController extends Controller
                     \Log::info(json_encode($order));
 
                     $is_razorpay = true;
-                    $wallet_use = false;
+                    $wallet_use  = false;
 
                 }
 
@@ -143,66 +142,67 @@ class CheckoutController extends Controller
                     // \Log::info(json_encode($order));
 
                     $is_razorpay = true;
-                    $wallet_use = "partial_use";
+                    $wallet_use  = "partial_use";
                 } else {
                     $is_razorpay = false;
-                    $wallet_use = true;
+                    $wallet_use  = true;
 
                     $user_wallet->decrement("amount", $amount);
                 }
 
                 Transactions::create([
-                    "user_id" => auth()->user()->id,
-                    "amount" => $amount,
-                    "remark" => "Labours Purchased",
+                    "user_id"          => auth()->user()->id,
+                    "amount"           => $amount,
+                    "remark"           => "Labours Purchased",
                     "transaction_type" => "debited",
                 ]);
             } else {
                 $order = $this->razorpay->createOrder($amount, "INR", $data->id);
+                // \Log::info("orderrssssssssssssssssssssssssssq");
                 \Log::info(json_encode($order));
                 $is_razorpay = true;
-                $wallet_use = false;
+                $wallet_use  = false;
 
             }
         } else {
             $is_razorpay = false;
-            $wallet_use = false;
+            $wallet_use  = false;
         }
         if ($request->transaction_type == "post_paid" || $is_razorpay == false) {
-            $booking = new Booking();
-            $booking->user_id = auth()->user()->id;
-            $booking->total_amount = $amount;
+            $booking                  = new Booking();
+            $booking->user_id         = auth()->user()->id;
+            $booking->total_amount    = $amount;
             $booking->service_charges = $services_charges;
             if ($request->use_wallet == 'yes') {
                 $booking->payment_status = 'captured';
             } else {
                 $booking->payment_status = 'failed';
             }
-            $booking->checkout_id = $data->id;
-            $booking->quantity_required = $request->quantity;
-            $booking->otp = mt_rand(111111, 999999);
-            $booking->transaction_type = $request->transaction_type;
-            $booking->labour_amount = $request->labour_amount;
-            $booking->commission_amount = $request->commission_amount;
+            $booking->checkout_id          = $data->id;
+            $booking->quantity_required    = $request->quantity;
+            $booking->otp                  = mt_rand(111111, 999999);
+            $booking->transaction_type     = $request->transaction_type;
+            $booking->labour_amount        = $request->labour_amount;
+            $booking->commission_amount    = $request->commission_amount;
             $booking->total_labour_charges = $request->total_labour_charges;
-            $booking->labour_booking_id = $request->labour_booking_id;
+            $booking->labour_booking_id    = $request->labour_booking_id;
 
             if ($request->transaction_type == 'pre_paid') {
                 $booking->razorpay_status = "created";
             } else {
                 $booking->razorpay_status = "pending";
-                $booking->razorpay_type = "offline";
+                $booking->razorpay_type   = "offline";
 
             }
 
             $booking->save();
         }
         $category_id = $data->category_id;
-        $user = User::find(auth()->user()->id);
-        // $user->update(["lat_long" => $request->lat_long]);
-        $earthRadius = 6371; // Earth radius in kilometers
-        $business_settings = BusinessSetting::pluck("value", "key")->toArray();
-        $radius = $business_settings['radius'];
+        $user        = User::find(auth()->user()->id);
+                                            // $user->update(["lat_long" => $request->lat_long]);
+        $earthRadius                = 6371; // Earth radius in kilometers
+        $business_settings          = BusinessSetting::pluck("value", "key")->toArray();
+        $radius                     = $business_settings['radius'];
         list($latitude, $longitude) = explode(',', $data->lat_long);
 
         $latFrom = deg2rad($latitude);
@@ -242,7 +242,7 @@ class CheckoutController extends Controller
 
         $labours = '';
 
-        if (!empty($area_data)) {
+        if (! empty($area_data)) {
 
             // \Log::info("inside area");
             // \Log::info($areas);
@@ -284,7 +284,7 @@ class CheckoutController extends Controller
 
         \Log::info("labours_data");
         \Log::info($labours_data);
-        if (!empty($labours_data)) {
+        if (! empty($labours_data)) {
             $labours = User::whereIn('id', $labours_data)->whereHas('category', function ($query) use ($category_id) {
                 $query->where('category_id', $category_id);
             })->pluck("device_id")->toArray();
@@ -296,19 +296,19 @@ class CheckoutController extends Controller
         // \Log::info($labours);
         $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
 
-        if (!$user_address) {
+        if (! $user_address) {
             return response([
                 "message" => "Address is required",
-                "status" => true,
+                "status"  => true,
             ], 400);
         }
 
         $labour_booking_data = LabourBooking::where('id', $data->labour_booking_id)->first();
         // \Log::info("labour's device_id ===>", $labour_get_data);
         $user_address = Address::where("user_id", auth()->user()->id)->first();
-        $title = "New Job Available";
-        $message = "You have a new job available.";
-        $device_ids = $labours;
+        $title        = "New Job Available";
+        $message      = "You have a new job available.";
+        $device_ids   = $labours;
         if ($request->transaction_type == "post_paid" || $is_razorpay == false) {
             $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking->id, "start_time" => $this->formatTimeWithAMPM($data->start_time), "end_time" => $this->formatTimeWithAMPM($data->end_time), "price" => $booking->total_amount, "start_date" => $this->formatDateWithSuffix($data->start_date), "end_date" => $this->formatDateWithSuffix($data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity, 'total_price' => $booking->total_amount / $labour_booking_data->labour_quantity];
         }
@@ -335,16 +335,17 @@ class CheckoutController extends Controller
         //     $firebaseService = new SendNotificationJob();
         //     $firebaseService->sendNotification($device_ids, $title, $message, $additional_data);
         // }
-
-        // \Log::info($order);
+       
+     
+        $order_datas = ($order??null);
 
         return response()->json([
-            "message" => "Booking created successfully",
-            "order_id" => $order->id ?? $order['id'] ?? null,
+            "message"     => "Booking created successfully",
+            "order_id"    => $order_datas['razorpay_order_id'] ?? $order->id ?? $order['id'] ?? null,
             "checkout_id" => $data->id,
             "is_razorpay" => $is_razorpay,
-            "is_wallet" => $wallet_use,
-            "status" => true,
+            "is_wallet"   => $wallet_use,
+            "status"      => true,
         ], 200);
     }
 
@@ -354,60 +355,60 @@ class CheckoutController extends Controller
             "order_id" => "required",
         ]);
 
-        $fetchOrder = $this->razorpay->fetchOrder($request->order_id);
+        $fetchOrder        = $this->razorpay->fetchOrder($request->order_id);
         $business_settings = BusinessSetting::pluck("value", "key")->toArray();
-        $services_charges = $business_settings['service_charges'];
+        $services_charges  = $business_settings['service_charges'];
         if ($fetchOrder['status'] == true) {
             if ($request->is_wallet == "partial_use") {
 
-                $user_wallet = Wallet::where("user_id", auth()->user()->id)->first();
+                $user_wallet         = Wallet::where("user_id", auth()->user()->id)->first();
                 $user_wallet->amount = 0;
                 $user_wallet->save();
             }
 
             $amount = $request->amount;
 
-            $data = new Checkout();
-            $data->start_date = $request->start_date;
-            $data->end_date = $request->end_date;
-            $data->start_time = $request->start_time;
-            $data->end_time = $request->end_time;
-            $data->address_id = $request->address_id;
-            $data->user_id = auth()->user()->id;
-            $data->category_id = $request->category_id;
-            $data->area_id = $request->area_id;
-            $data->labour_quantity = $request->quantity;
-            $data->alternate_number = $request->alternate_number;
-            $data->note = $request->note;
-            $data->transaction_type = $request->transaction_type;
+            $data                    = new Checkout();
+            $data->start_date        = $request->start_date;
+            $data->end_date          = $request->end_date;
+            $data->start_time        = $request->start_time;
+            $data->end_time          = $request->end_time;
+            $data->address_id        = $request->address_id;
+            $data->user_id           = auth()->user()->id;
+            $data->category_id       = $request->category_id;
+            $data->area_id           = $request->area_id;
+            $data->labour_quantity   = $request->quantity;
+            $data->alternate_number  = $request->alternate_number;
+            $data->note              = $request->note;
+            $data->transaction_type  = $request->transaction_type;
             $data->labour_booking_id = $request->labour_booking_id;
-            $data->lat_long = $request->lat_long;
+            $data->lat_long          = $request->lat_long;
 
             $data->save();
 
-            $booking = new Booking();
-            $booking->user_id = auth()->user()->id;
-            $booking->total_amount = $amount;
+            $booking                  = new Booking();
+            $booking->user_id         = auth()->user()->id;
+            $booking->total_amount    = $amount;
             $booking->service_charges = $services_charges;
             if ($request->use_wallet == 'yes') {
                 $booking->payment_status = 'captured';
             } else {
                 $booking->payment_status = 'failed';
             }
-            $booking->checkout_id = $data->id;
-            $booking->quantity_required = $request->quantity;
-            $booking->otp = mt_rand(111111, 999999);
-            $booking->transaction_type = $request->transaction_type;
-            $booking->labour_amount = $request->labour_amount;
-            $booking->commission_amount = $request->commission_amount;
+            $booking->checkout_id          = $data->id;
+            $booking->quantity_required    = $request->quantity;
+            $booking->otp                  = mt_rand(111111, 999999);
+            $booking->transaction_type     = $request->transaction_type;
+            $booking->labour_amount        = $request->labour_amount;
+            $booking->commission_amount    = $request->commission_amount;
             $booking->total_labour_charges = $request->total_labour_charges;
-            $booking->labour_booking_id = $request->labour_booking_id;
+            $booking->labour_booking_id    = $request->labour_booking_id;
 
             if ($request->transaction_type == 'pre_paid') {
                 $booking->razorpay_status = "created";
             } else {
                 $booking->razorpay_status = "pending";
-                $booking->razorpay_type = "offline";
+                $booking->razorpay_type   = "offline";
 
             }
 
@@ -418,25 +419,25 @@ class CheckoutController extends Controller
             if ($booking_data->transaction_type == "pre_paid") {
                 Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
                     "payment_status" => "captured",
-                    "otp" => mt_rand(111111, 999999),
+                    "otp"            => mt_rand(111111, 999999),
                 ]);
             } else {
                 Booking::where("user_id", auth()->user()->id)->where("checkout_id", $fetchOrder["checkout_id"])->update([
                     "payment_status" => "captured",
-                    "is_work_done" => "1",
-                    "otp" => mt_rand(111111, 999999),
+                    "is_work_done"   => "1",
+                    "otp"            => mt_rand(111111, 999999),
                 ]);
             }
 
-            $checkout_data = Checkout::where('id', $fetchOrder["checkout_id"])->first();
+            $checkout_data       = Checkout::where('id', $fetchOrder["checkout_id"])->first();
             $labour_booking_data = LabourBooking::where('id', $checkout_data->labour_booking_id)->first();
 
             $category_id = $checkout_data->category_id;
-            $user = User::find(auth()->user()->id);
-            // $user->update(["lat_long" => $request->lat_long]);
-            $earthRadius = 6371; // Earth radius in kilometers
-            $business_settings = BusinessSetting::pluck("value", "key")->toArray();
-            $radius = $business_settings['radius'];
+            $user        = User::find(auth()->user()->id);
+                                                // $user->update(["lat_long" => $request->lat_long]);
+            $earthRadius                = 6371; // Earth radius in kilometers
+            $business_settings          = BusinessSetting::pluck("value", "key")->toArray();
+            $radius                     = $business_settings['radius'];
             list($latitude, $longitude) = explode(',', $checkout_data->lat_long);
 
             $latFrom = deg2rad($latitude);
@@ -461,7 +462,7 @@ class CheckoutController extends Controller
 
             $labours = '';
 
-            if (!empty($areas)) {
+            if (! empty($areas)) {
 
                 // \Log::info("inside area");
                 // \Log::info($areas);
@@ -472,7 +473,7 @@ class CheckoutController extends Controller
                     ->get()
                     ->filter(function ($labour) use ($latitude, $longitude, $radius, $request, $checkout_data) {
                         [$labourLatitude, $labourLongitude] = explode(',', $checkout_data->lat_long);
-                        $distance = $this->haversineGreatCircleDistance(
+                        $distance                           = $this->haversineGreatCircleDistance(
                             $latitude,
                             $longitude,
                             $labourLatitude,
@@ -488,20 +489,20 @@ class CheckoutController extends Controller
 
             $user_address = Address::where("user_id", auth()->user()->id)->where("is_primary", "yes")->first();
 
-            if (!$user_address) {
+            if (! $user_address) {
                 return response([
                     "message" => "Address is required",
-                    "status" => true,
+                    "status"  => true,
                 ], 400);
             }
 
-            $diff = (strtotime($checkout_data->end_date) - strtotime($checkout_data->start_date));
+            $diff        = (strtotime($checkout_data->end_date) - strtotime($checkout_data->start_date));
             $date_result = abs(round($diff) / 86400) + 1;
             // \Log::info("labours deatils");
             // \Log::info($labours);
-            $title = "New Job Available11";
-            $message = "You have a new job available.";
-            $device_ids = $labours;
+            $title           = "New Job Available11";
+            $message         = "You have a new job available.";
+            $device_ids      = $labours;
             $additional_data = ["category_name" => "Helper", "address" => $user_address->address, "booking_id" => $booking_data->id, "start_time" => $this->formatTimeWithAMPM($checkout_data->start_time), "end_time" => $this->formatTimeWithAMPM($checkout_data->end_time), "price" => $booking_data->total_amount, "start_date" => $this->formatDateWithSuffix($checkout_data->start_date), "end_date" => $this->formatDateWithSuffix($checkout_data->end_date), "days_count" => $date_result, "user_ name" => $user->name, "category_id" => $request->category_id, "price" => $labour_booking_data->labour_amount / $labour_booking_data->labour_quantity];
 
             $firebaseService = new SendNotificationJob();
@@ -545,7 +546,7 @@ class CheckoutController extends Controller
         });
 
         return response([
-            "data" => $data,
+            "data"   => $data,
             "status" => true,
         ], 200);
     }
@@ -570,20 +571,20 @@ class CheckoutController extends Controller
     {
         $request->validate([
             "booking_id" => "required",
-            "rating" => "required",
-            "review" => "required",
+            "rating"     => "required",
+            "review"     => "required",
         ]);
 
-        $data = new UserReview();
-        $data->review = $request->review;
-        $data->rating = $request->rating;
-        $data->user_id = auth()->user()->id;
+        $data             = new UserReview();
+        $data->review     = $request->review;
+        $data->rating     = $request->rating;
+        $data->user_id    = auth()->user()->id;
         $data->booking_id = $request->booking_id;
         $data->save();
 
-        if (!empty($request->images)) {
+        if (! empty($request->images)) {
             foreach ($request->images as $key => $value) {
-                $datas = new ReviewImage();
+                $datas            = new ReviewImage();
                 $datas->review_id = $data->id;
                 if ($value) {
                     $datas->image = FileUploader::uploadFile($value, 'images/review_images');
@@ -595,19 +596,19 @@ class CheckoutController extends Controller
         $labour_booking = Booking::where('id', $request->booking_id)->first();
 
         $labourAccepted = LabourAcceptedBooking::where('booking_id', $labour_booking->labour_booking_id)->get();
-        if (!empty($labourAccepted)) {
+        if (! empty($labourAccepted)) {
             foreach ($labourAccepted as $key => $value) {
-                $labour_rating = new LabourRating();
-                $labour_rating->labour_id = $value['labour_id'];
+                $labour_rating             = new LabourRating();
+                $labour_rating->labour_id  = $value['labour_id'];
                 $labour_rating->booking_id = $request->booking_id;
-                $labour_rating->rating = $request->rating;
+                $labour_rating->rating     = $request->rating;
                 $labour_rating->save();
             }
         }
 
         return response([
             "message" => "Review Added Successfully",
-            "status" => true,
+            "status"  => true,
         ], 200);
 
     }
@@ -615,15 +616,15 @@ class CheckoutController extends Controller
     public function postPaidPayment(Request $request)
     {
         $request->validate([
-            "booking_id" => "required",
+            "booking_id"    => "required",
             "razorpay_type" => "required",
-            "amount" => "required",
+            "amount"        => "required",
 
         ]);
 
         \Log::info($request->all());
 
-        $amount = $request->amount;
+        $amount  = $request->amount;
         $booking = Booking::where('id', $request->booking_id)->first();
 
         if ($request->razorpay_type == "online") {
@@ -633,44 +634,44 @@ class CheckoutController extends Controller
 
                 if ($user_wallet->amount == 0) {
 
-                    $order = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
+                    $order       = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
                     $is_razorpay = true;
                 }
 
                 if ($user_wallet->amount < $amount) {
                     $partial_amount = $amount - $user_wallet->amount;
                     $user_wallet->decrement("amount", $user_wallet->amount);
-                    $order = $this->razorpay->createOrder($partial_amount, "INR", $booking->checkout_id);
+                    $order       = $this->razorpay->createOrder($partial_amount, "INR", $booking->checkout_id);
                     $is_razorpay = true;
                 } else {
                     $is_razorpay = false;
                     $user_wallet->decrement("amount", $amount);
-                    $booking->is_work_done = 1;
+                    $booking->is_work_done  = 1;
                     $booking->razorpay_type = $request->razorpay_type;
 
                     $booking->save();
                 }
 
                 Transactions::create([
-                    "user_id" => auth()->user()->id,
-                    "amount" => $amount,
-                    "remark" => "Labours Purchased",
+                    "user_id"          => auth()->user()->id,
+                    "amount"           => $amount,
+                    "remark"           => "Labours Purchased",
                     "transaction_type" => "debited",
                 ]);
             } else {
-                $order = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
+                $order       = $this->razorpay->createOrder($amount, "INR", $booking->checkout_id);
                 $is_razorpay = 1;
             }
 
-            $one_labour_amount = $booking->labour_amount / $booking->quantity_required;
+            $one_labour_amount   = $booking->labour_amount / $booking->quantity_required;
             $labour_booking_data = LabourBooking::where('id', $booking->labour_booking_id)->first();
 
-            $fdate = $labour_booking_data->start_date;
-            $tdate = $labour_booking_data->end_date;
+            $fdate     = $labour_booking_data->start_date;
+            $tdate     = $labour_booking_data->end_date;
             $datetime1 = new DateTime($fdate);
             $datetime2 = new DateTime($tdate);
-            $interval = $datetime1->diff($datetime2);
-            $days = $interval->format('%a') + 1;
+            $interval  = $datetime1->diff($datetime2);
+            $days      = $interval->format('%a') + 1;
 
             $labour_payable_amount = $one_labour_amount * $days;
 
@@ -683,50 +684,50 @@ class CheckoutController extends Controller
                     $q->where('users.id', $value['labour_id']);
                 })->where('booking_id', $request->booking_id)->get();
                 $add_amount = 0;
-                if (!empty($add_on_charges)) {
+                if (! empty($add_on_charges)) {
                     foreach ($add_on_charges as $key1 => $value1) {
-                        $count_labour = ExtraTimeWorkLabour::where('extra_time_work_id', $value1['id'])->count();
+                        $count_labour          = ExtraTimeWorkLabour::where('extra_time_work_id', $value1['id'])->count();
                         $one_labour_add_amount = $value1['labour_amount'] / $count_labour;
-                        $add_amount = $add_amount + $one_labour_add_amount;
+                        $add_amount            = $add_amount + $one_labour_add_amount;
                     }
                 }
 
-                if (!empty($wallet)) {
-                    $amount = $wallet->amount + $labour_payable_amount + $add_amount;
+                if (! empty($wallet)) {
+                    $amount         = $wallet->amount + $labour_payable_amount + $add_amount;
                     $wallet->amount = $amount;
                     $wallet->save();
                 } else {
-                    $wallets = new Wallet();
+                    $wallets          = new Wallet();
                     $wallets->user_id = $value['labour_id'];
-                    $wallets->amount = $labour_payable_amount + $add_amount;
+                    $wallets->amount  = $labour_payable_amount + $add_amount;
                     $wallets->save();
                 }
 
             }
 
             return response()->json([
-                "message" => "Booking created successfully",
-                "order_id" => $order['id'] ?? null,
+                "message"     => "Booking created successfully",
+                "order_id"    => $order['id'] ?? null,
                 "checkout_id" => $booking->checkout_id,
                 "is_razorpay" => $is_razorpay,
-                "status" => true,
+                "status"      => true,
             ], 200);
 
         } else if ($request->razorpay_type == "offline") {
 
-            $booking = Booking::where('id', $request->booking_id)->first();
+            $booking                = Booking::where('id', $request->booking_id)->first();
             $booking->razorpay_type = "offline";
-            $booking->is_work_done = 1;
+            $booking->is_work_done  = 1;
             $booking->save();
 
             $labour_booking_data = LabourBooking::where('id', $booking->labour_booking_id)->first();
 
-            $fdate = $labour_booking_data->start_date;
-            $tdate = $labour_booking_data->end_date;
+            $fdate     = $labour_booking_data->start_date;
+            $tdate     = $labour_booking_data->end_date;
             $datetime1 = new DateTime($fdate);
             $datetime2 = new DateTime($tdate);
-            $interval = $datetime1->diff($datetime2);
-            $days = $interval->format('%a') + 1;
+            $interval  = $datetime1->diff($datetime2);
+            $days      = $interval->format('%a') + 1;
 
             $one = $booking->labour_amount * $days;
 
@@ -755,16 +756,16 @@ class CheckoutController extends Controller
                     $q->where('users.id', $value['labour_id']);
                 })->where('booking_id', $request->booking_id)->get();
                 $add_on_commission_amount = 0;
-                if (!empty($add_on_charges)) {
+                if (! empty($add_on_charges)) {
                     foreach ($add_on_charges as $key1 => $value1) {
-                        $count_labour = ExtraTimeWorkLabour::where('extra_time_work_id', $value1['id'])->count();
-                        $one_labour_add_amount = $value1['labour_amount'] / $count_labour;
-                        $one_labour_commision = $value1['commission_amount'] / $count_labour;
+                        $count_labour             = ExtraTimeWorkLabour::where('extra_time_work_id', $value1['id'])->count();
+                        $one_labour_add_amount    = $value1['labour_amount'] / $count_labour;
+                        $one_labour_commision     = $value1['commission_amount'] / $count_labour;
                         $add_on_commission_amount = $add_on_commission_amount + $one_labour_commision;
                     }
                 }
-                if (!empty($wallet)) {
-                    $amounts = (int) ($wallet->amount) - ((int) $labour_payable_commision_amount + (int) $add_on_commission_amount);
+                if (! empty($wallet)) {
+                    $amounts        = (int) ($wallet->amount) - ((int) $labour_payable_commision_amount + (int) $add_on_commission_amount);
                     $wallet->amount = $amounts;
                     $wallet->save();
 
@@ -772,9 +773,9 @@ class CheckoutController extends Controller
 
                     // \Log::info($wallet);
                 } else {
-                    $wallets = new Wallet();
+                    $wallets          = new Wallet();
                     $wallets->user_id = $value['labour_id'];
-                    $wallets->amount = '-' . ((int) $labour_payable_commision_amount + (int) $add_on_commission_amount);
+                    $wallets->amount  = '-' . ((int) $labour_payable_commision_amount + (int) $add_on_commission_amount);
                     $wallets->save();
 
                     // \Log::info("wallettttttbbbbbbbbbb");
@@ -786,11 +787,11 @@ class CheckoutController extends Controller
 
             $is_razorpay = false;
             return response()->json([
-                "message" => "Booking created successfully",
-                "order_id" => null,
+                "message"     => "Booking created successfully",
+                "order_id"    => null,
                 "checkout_id" => $booking->checkout_id,
                 "is_razorpay" => $is_razorpay,
-                "status" => true,
+                "status"      => true,
             ], 200);
         }
     }

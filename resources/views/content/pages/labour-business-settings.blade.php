@@ -64,6 +64,9 @@
                     <label class="custom-control-label" for="switch-labour-ios-production">Labour IOS Production</label>
                 </div>
             </div>
+            <div class="col-md-4 mt-3">
+                <x-input value="{{ $data['contact_no'] ?? '' }}" name="contact_no" label="Contact No" />
+            </div>
             {{-- <div class="col-md-6 mt-3">
            
                 <x-input name="razor_pay_key" value="{{ $data['razor_pay_key'] ?? '' }}" :required="false" label="Razor Pay Key  " />

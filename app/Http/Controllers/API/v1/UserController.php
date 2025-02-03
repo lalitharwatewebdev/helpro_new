@@ -151,8 +151,8 @@ class UserController extends Controller
             $avg_rating = 0;
         }
 
-        $data['rating'] = $avg_rating ?? 0;
-
+        $data['rating'] = number_format($avg_rating, 1);
+        // number_format($avg_rating, 1);
         return response([
             "data"        => $data,
             "user_wallet" => $user_wallet,
